@@ -7,7 +7,7 @@ import { formatJSON } from './engine/reporter';
 import { uploadReport } from './upload';
 import { LintResult, Diagnostic } from './engine/types';
 
-const VERSION = "0.1.5";
+const VERSION = "0.1.6";
 
 /* ─── ANSI Colors ─── */
 const c = {
@@ -135,14 +135,28 @@ function formatTerminalColored(result: LintResult): string {
 
   // Categories
   for (const cat of result.categories) {
-    const bar = makeBar(cat.score);
     const label = (cat.category.charAt(0).toUpperCase() + cat.category.slice(1)).padEnd(14);
     
     let barColor = c.red;
-    if (cat.score >= 80) barColor = c.green;
-    else if (cat.score >= 50) barColor = c.yellow;
+    if (cat.score >= 95) barColor = c.magenta;
+    else if (cat.score >= 85) barColor = c.green;
+    else if (cat.score >= 68) barColor = c.yellow;
 
-    lines.push(`  ${label} ${barColor}${bar}${c.reset} ${cat.score}`);
+    // Grade per category
+    let catGrade = "F";
+    if (cat.score >= 98) catGrade = "S";
+    else if (cat.score >= 95) catGrade = "A+";
+    else if (cat.score >= 90) catGrade = "A";
+    else if (cat.score >= 85) catGrade = "A-";
+    else if (cat.score >= 80) catGrade = "B+";
+    else if (cat.score >= 75) catGrade = "B";
+    else if (cat.score >= 68) catGrade = "B-";
+    else if (cat.score >= 58) catGrade = "C+";
+    else if (cat.score >= 45) catGrade = "C";
+    else if (cat.score >= 30) catGrade = "D";
+
+    const bar = makeBar(cat.score);
+    lines.push(`  ${label} ${barColor}${bar}${c.reset} ${cat.score} ${c.dim}${catGrade}${c.reset}`);
   }
   lines.push("");
 

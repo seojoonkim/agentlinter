@@ -1,6 +1,6 @@
 {
   "name": "agentlinter",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "ESLint for AI Agents — Score, diagnose, and auto-fix your CLAUDE.md and agent workspace files",
   "bin": {
     "agentlinter": "dist/bin.js"
