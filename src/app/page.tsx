@@ -183,7 +183,7 @@ export default function Home() {
         className="fixed top-0 w-full z-50 backdrop-blur-xl bg-[var(--bg)]/70 border-b border-[var(--border)]"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        <div className="max-w-[920px] mx-auto px-6 sm:px-8 h-14 flex items-center justify-between">
+        <div className="max-w-[920px] mx-auto px-7 sm:px-8 h-14 flex items-center justify-between">
           <span className="font-semibold text-[15px] tracking-tight">
             AgentLinter
           </span>
@@ -207,7 +207,7 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="pt-[140px] sm:pt-[160px] pb-20 sm:pb-28 px-6 sm:px-8">
+      <section className="pt-[200px] sm:pt-[180px] pb-20 sm:pb-28 px-7 sm:px-8">
         <div className="max-w-[920px] mx-auto">
           <motion.div
             className="max-w-[600px]"
@@ -263,7 +263,7 @@ export default function Home() {
       </section>
 
       {/* ── Features ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-8">
+      <section className="py-20 sm:py-28 px-7 sm:px-8">
         <div className="max-w-[920px] mx-auto">
           <div className="mb-14 sm:mb-16">
             <h2 className="text-[24px] sm:text-[32px] font-bold tracking-tight mb-3">
@@ -323,7 +323,7 @@ export default function Home() {
       </section>
 
       {/* ── Share ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-8 border-t border-[var(--border)]">
+      <section className="py-20 sm:py-28 px-7 sm:px-8 border-t border-[var(--border)]">
         <div className="max-w-[920px] mx-auto">
           <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
             <div>
@@ -360,7 +360,7 @@ export default function Home() {
       </section>
 
       {/* ── Self-Evolving ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-8 border-t border-[var(--border)]">
+      <section className="py-20 sm:py-28 px-7 sm:px-8 border-t border-[var(--border)]">
         <div className="max-w-[920px] mx-auto">
           <div className="mb-14">
             <h2 className="text-[24px] sm:text-[32px] font-bold tracking-tight mb-3">
@@ -446,7 +446,7 @@ export default function Home() {
 
       {/* ── Get Started ── */}
       <section
-        className="py-20 sm:py-28 px-6 sm:px-8 border-t border-[var(--border)]"
+        className="py-20 sm:py-28 px-7 sm:px-8 border-t border-[var(--border)]"
         id="get-started"
       >
         <div className="max-w-[560px] mx-auto">
@@ -489,7 +489,7 @@ export default function Home() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="py-10 px-6 sm:px-8 border-t border-[var(--border)]">
+      <footer className="py-10 px-7 sm:px-8 border-t border-[var(--border)]">
         <div className="max-w-[920px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-[13px]">
             <span className="font-semibold">AgentLinter</span>
