@@ -41,16 +41,8 @@ function Logo({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="32" height="32" rx="8" fill="url(#logo-grad)" />
-      {/* Prism body */}
-      <path d="M16 6L24 18H8L16 6Z" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-      {/* Light rays splitting from prism — 5 dimensions */}
-      <line x1="24" y1="18" x2="27" y2="14" stroke="#a78bfa" strokeWidth="1" strokeLinecap="round" opacity="0.9" />
-      <line x1="24" y1="18" x2="27.5" y2="16.5" stroke="#5eead4" strokeWidth="1" strokeLinecap="round" opacity="0.9" />
-      <line x1="24" y1="18" x2="28" y2="19" stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.7" />
-      <line x1="24" y1="18" x2="27.5" y2="21.5" stroke="#E27B4E" strokeWidth="1" strokeLinecap="round" opacity="0.9" />
-      <line x1="24" y1="18" x2="27" y2="24" stroke="#60a5fa" strokeWidth="1" strokeLinecap="round" opacity="0.9" />
-      {/* Input light */}
-      <line x1="5" y1="18" x2="8" y2="18" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      {/* Simple prism triangle */}
+      <path d="M16 7L25 22H7L16 7Z" fill="rgba(255,255,255,0.15)" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
       <defs>
         <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
           <stop offset="0%" stopColor="#7c3aed" />
@@ -58,65 +50,6 @@ function Logo({ size = 24 }: { size?: number }) {
         </linearGradient>
       </defs>
     </svg>
-  );
-}
-
-/* ════════════════════════════════════════
-   Hero Prism Illustration
-   ════════════════════════════════════════ */
-function HeroPrism() {
-  return (
-    <motion.div 
-      className="relative w-full max-w-[320px] sm:max-w-[400px] mx-auto"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.3 }}
-    >
-      <svg viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-        {/* Glow behind prism */}
-        <circle cx="180" cy="120" r="80" fill="url(#prism-glow)" opacity="0.3" />
-        
-        {/* Input light beam */}
-        <line x1="20" y1="120" x2="130" y2="120" stroke="white" strokeWidth="2" opacity="0.4" />
-        <line x1="60" y1="120" x2="130" y2="120" stroke="white" strokeWidth="3" opacity="0.2" />
-        
-        {/* Input label */}
-        <text x="30" y="108" fill="#a8a8b0" fontSize="11" fontFamily="monospace">CLAUDE.md</text>
-        
-        {/* Prism */}
-        <path d="M180 50L240 180H120L180 50Z" fill="rgba(167,139,250,0.08)" stroke="url(#prism-stroke)" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M180 50L240 180H120L180 50Z" fill="url(#prism-fill)" />
-        
-        {/* Output rays — 5 dimensions with colors */}
-        <line x1="240" y1="140" x2="370" y2="60" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
-        <line x1="240" y1="150" x2="370" y2="100" stroke="#5eead4" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
-        <line x1="240" y1="160" x2="370" y2="140" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-        <line x1="240" y1="170" x2="370" y2="180" stroke="#E27B4E" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
-        <line x1="240" y1="178" x2="370" y2="216" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
-        
-        {/* Output labels */}
-        <text x="310" y="56" fill="#a78bfa" fontSize="10" fontFamily="monospace">Structure</text>
-        <text x="310" y="96" fill="#5eead4" fontSize="10" fontFamily="monospace">Clarity</text>
-        <text x="310" y="136" fill="#a8a8b0" fontSize="10" fontFamily="monospace">Completeness</text>
-        <text x="310" y="176" fill="#E27B4E" fontSize="10" fontFamily="monospace">Security</text>
-        <text x="310" y="214" fill="#60a5fa" fontSize="10" fontFamily="monospace">Consistency</text>
-        
-        <defs>
-          <radialGradient id="prism-glow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="prism-stroke" x1="120" y1="180" x2="240" y2="50">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#5eead4" stopOpacity="0.4" />
-          </linearGradient>
-          <linearGradient id="prism-fill" x1="120" y1="180" x2="240" y2="50">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.06" />
-            <stop offset="100%" stopColor="#5eead4" stopOpacity="0.03" />
-          </linearGradient>
-        </defs>
-      </svg>
-    </motion.div>
   );
 }
 
@@ -427,11 +360,6 @@ export default function Home() {
               Free &amp; open source · No config needed · Runs in seconds
             </p>
           </motion.div>
-
-          {/* Prism Illustration */}
-          <div className="mt-12 sm:mt-16 mb-10 sm:mb-14">
-            <HeroPrism />
-          </div>
 
           {/* Terminal */}
           <motion.div initial={{ opacity: 0, y: 36 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}>

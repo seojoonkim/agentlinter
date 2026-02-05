@@ -18,11 +18,8 @@ export default function Icon() {
           justifyContent: 'center',
         }}
       >
-        <svg width="20" height="22" viewBox="0 0 20 22" fill="none">
-          <path d="M10 2L18 18H2L10 2Z" fill="rgba(255,255,255,0.15)" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-          <line x1="18" y1="14" x2="19" y2="10" stroke="#a78bfa" strokeWidth="1" />
-          <line x1="18" y1="15.5" x2="19" y2="14" stroke="#5eead4" strokeWidth="1" />
-          <line x1="18" y1="17" x2="19" y2="18" stroke="#E27B4E" strokeWidth="1" />
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L18 17H2L10 2Z" fill="rgba(255,255,255,0.2)" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
         </svg>
       </div>
     ),
