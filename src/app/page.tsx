@@ -22,6 +22,10 @@ import {
   Check,
   Sparkles,
   Braces,
+  ExternalLink,
+  Minus,
+  CircleCheck,
+  CircleMinus,
 } from "lucide-react";
 
 /* ────────────────────────────────────────
@@ -525,6 +529,188 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Comparison: vs Anthropic's Official Tool ── */}
+      <section className="py-20 sm:py-28 px-7 sm:px-8 border-t border-[var(--border)]">
+        <div className="max-w-[920px] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="mb-14 sm:mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border)] text-[var(--text-secondary)] text-[12px] mono mb-6">
+                Built on top of the official foundation
+              </div>
+              <h2 className="text-[24px] sm:text-[32px] font-bold tracking-tight mb-4">
+                Anthropic built the foundation.
+                <br />
+                <span className="text-[var(--accent)]">We built the linter.</span>
+              </h2>
+              <p className="text-[var(--text-secondary)] text-[15px] leading-[1.7] max-w-[600px]">
+                Anthropic&apos;s Claude Code provides{" "}
+                <a
+                  href="https://code.claude.com/docs/en/memory"
+                  target="_blank"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+                >
+                  CLAUDE.md memory
+                  <ExternalLink className="w-3 h-3" />
+                </a>{" "}
+                and{" "}
+                <a
+                  href="https://code.claude.com/docs/en/skills"
+                  target="_blank"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+                >
+                  skills
+                  <ExternalLink className="w-3 h-3" />
+                </a>{" "}
+                — the building blocks for agent configuration. AgentLinter takes these
+                building blocks and tells you if you&apos;re using them well.
+              </p>
+            </div>
+
+            {/* Comparison Table */}
+            <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+              {/* Table Header */}
+              <div className="grid grid-cols-3 bg-[var(--bg-card)]">
+                <div className="p-4 sm:p-5 border-r border-[var(--border)]">
+                  <span className="text-[12px] text-[var(--text-dim)] mono">Feature</span>
+                </div>
+                <div className="p-4 sm:p-5 border-r border-[var(--border)] text-center">
+                  <div className="text-[13px] text-[var(--text-secondary)]">Claude Code</div>
+                  <div className="text-[10px] text-[var(--text-dim)] mono mt-0.5">Anthropic Official</div>
+                </div>
+                <div className="p-4 sm:p-5 text-center">
+                  <div className="text-[13px] font-semibold text-[var(--accent)]">AgentLinter</div>
+                  <div className="text-[10px] text-[var(--text-dim)] mono mt-0.5">This project</div>
+                </div>
+              </div>
+
+              {/* Table Rows */}
+              {[
+                {
+                  feature: "Scoring",
+                  official: "Single score via /init",
+                  ours: "5-category breakdown (0-100)",
+                  officialStatus: "partial",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Scope",
+                  official: "Single CLAUDE.md file",
+                  ours: "Entire workspace (all .md files)",
+                  officialStatus: "partial",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Cross-file consistency",
+                  official: "—",
+                  ours: "Detects contradictions across files",
+                  officialStatus: "none",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Secret scanning",
+                  official: "—",
+                  ours: "API keys, tokens, passwords",
+                  officialStatus: "none",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Auto-fix",
+                  official: "Suggestions via prompting",
+                  ours: "One-command --fix",
+                  officialStatus: "partial",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Custom rules",
+                  official: "—",
+                  ours: ".agentlinterrc per team",
+                  officialStatus: "none",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "CI/CD integration",
+                  official: "—",
+                  ours: "GitHub Action on every PR",
+                  officialStatus: "none",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Templates",
+                  official: "/init bootstrap",
+                  ours: "4 templates (personal, coding, team, chatbot)",
+                  officialStatus: "partial",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Shareable reports",
+                  official: "—",
+                  ours: "Web reports + Score Cards for X",
+                  officialStatus: "none",
+                  oursStatus: "full",
+                },
+                {
+                  feature: "Multi-framework",
+                  official: "Claude Code only",
+                  ours: "Claude Code, Clawdbot, Cursor, Windsurf",
+                  officialStatus: "partial",
+                  oursStatus: "full",
+                },
+              ].map((row, i) => (
+                <div
+                  key={row.feature}
+                  className={`grid grid-cols-3 ${i % 2 === 0 ? "bg-[#0a0a10]" : "bg-[var(--bg-card)]/50"}`}
+                >
+                  <div className="p-4 sm:p-5 border-r border-t border-[var(--border)]">
+                    <span className="text-[13px] text-white font-medium">{row.feature}</span>
+                  </div>
+                  <div className="p-4 sm:p-5 border-r border-t border-[var(--border)] flex items-start gap-2">
+                    {row.officialStatus === "full" ? (
+                      <CircleCheck className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                    ) : row.officialStatus === "partial" ? (
+                      <CircleMinus className="w-3.5 h-3.5 text-[var(--amber)] mt-0.5 shrink-0" />
+                    ) : (
+                      <Minus className="w-3.5 h-3.5 text-[var(--text-dim)] mt-0.5 shrink-0" />
+                    )}
+                    <span className="text-[12px] text-[var(--text-secondary)]">{row.official}</span>
+                  </div>
+                  <div className="p-4 sm:p-5 border-t border-[var(--border)] flex items-start gap-2">
+                    {row.oursStatus === "full" ? (
+                      <CircleCheck className="w-3.5 h-3.5 text-[var(--accent)] mt-0.5 shrink-0" />
+                    ) : row.oursStatus === "partial" ? (
+                      <CircleMinus className="w-3.5 h-3.5 text-[var(--amber)] mt-0.5 shrink-0" />
+                    ) : (
+                      <Minus className="w-3.5 h-3.5 text-[var(--text-dim)] mt-0.5 shrink-0" />
+                    )}
+                    <span className="text-[12px] text-[var(--text-secondary)]">{row.ours}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom note */}
+            <div className="mt-8 p-5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)]">
+              <p className="text-[13px] text-[var(--text-secondary)] leading-[1.7]">
+                <span className="text-white font-medium">Not a replacement — an extension.</span>{" "}
+                AgentLinter builds on Anthropic&apos;s CLAUDE.md standard and{" "}
+                <a
+                  href="https://agentskills.io"
+                  target="_blank"
+                  className="text-[var(--accent)] hover:underline"
+                >
+                  Agent Skills
+                </a>{" "}
+                open standard. Think of it as ESLint for your JavaScript — the language
+                gives you the syntax, the linter tells you if your code is good.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
