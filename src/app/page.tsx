@@ -431,14 +431,14 @@ export default function Home() {
             </div>
 
             <h1 className="text-[32px] sm:text-[44px] lg:text-[56px] font-bold leading-[1.1] tracking-tight mb-6">
-              How good is your
+              How sharp is
               <br />
-              <span className="text-[var(--accent)]">CLAUDE.md?</span>
+              <span className="text-[var(--accent)]">your agent?</span>
             </h1>
 
             <p className="text-[15px] sm:text-[17px] text-[var(--text-secondary)] leading-[1.7] mb-10 max-w-[480px]">
-              Your agent is only as good as its config. One command scores your
-              workspace, finds what&apos;s broken, and tells you exactly how to fix it.
+              Your agent is only as good as its config. One command scans your
+              entire workspace — every file, every rule — and tells you exactly what to fix.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
