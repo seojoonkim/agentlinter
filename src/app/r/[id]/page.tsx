@@ -522,21 +522,19 @@ export default function ReportPage() {
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 sm:p-8 mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="relative">
-                    <span className="text-[72px] sm:text-[88px] font-bold text-white leading-none display">
-                      {data.totalScore}
-                    </span>
-                    <div className="absolute -top-1 -right-8">
-                      <span className="text-[28px]">{tier.emoji}</span>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-3 sm:gap-4 mb-3">
+                  <span className="text-[64px] sm:text-[88px] font-bold text-white leading-none display">
+                    {data.totalScore}
+                  </span>
                   <div className="flex flex-col gap-1.5">
-                    <div
-                      className="px-3.5 py-1.5 rounded-xl text-[20px] font-bold mono"
-                      style={{ color: tier.color, backgroundColor: tier.bg }}
-                    >
-                      {tier.grade}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[24px] sm:text-[28px]">{tier.emoji}</span>
+                      <div
+                        className="px-3 py-1 rounded-xl text-[18px] sm:text-[20px] font-bold mono"
+                        style={{ color: tier.color, backgroundColor: tier.bg }}
+                      >
+                        {tier.grade}
+                      </div>
                     </div>
                     <span className="text-[13px] font-medium" style={{ color: tier.color }}>{tier.label}</span>
                   </div>
