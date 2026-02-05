@@ -21,7 +21,46 @@ import {
   TrendingUp,
   Check,
   Sparkles,
+  Braces,
 } from "lucide-react";
+
+/* ────────────────────────────────────────
+   Logo
+   ──────────────────────────────────────── */
+function Logo({ size = 24 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="32" height="32" rx="8" fill="url(#logo-grad)" />
+      <path
+        d="M9 10.5L16 7L23 10.5V17L16 25L9 17V10.5Z"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path
+        d="M12 13L16 11L20 13V17L16 21L12 17V13Z"
+        fill="rgba(255,255,255,0.15)"
+        stroke="white"
+        strokeWidth="1"
+        strokeLinejoin="round"
+      />
+      <circle cx="16" cy="15.5" r="1.5" fill="white" />
+      <defs>
+        <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
+          <stop offset="0%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 /* ────────────────────────────────────────
    Animated Terminal
@@ -84,7 +123,7 @@ function AnimatedTerminal() {
   };
 
   return (
-    <div className="rounded-xl border border-[var(--border)] overflow-hidden bg-[#0a0a12]">
+    <div className="rounded-xl border border-[var(--border)] overflow-hidden bg-[#0a0a10]">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
         <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
         <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -126,7 +165,7 @@ function ScoreCardPreview() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
     >
-      <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1a] border border-[var(--border)]">
+      <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-[#1c1530] to-[#0e0b1a] border border-[var(--border)]">
         <div className="flex items-center gap-2 mb-6 text-[var(--text-secondary)] text-sm">
           <Search className="w-4 h-4" />
           <span>AgentLinter Score</span>
@@ -162,12 +201,7 @@ function ScoreCardPreview() {
         </div>
       </div>
 
-      <div className="flex justify-center mt-4">
-        <button className="flex items-center gap-2 px-5 py-2 rounded-full border border-[var(--border)] text-sm text-[var(--text-secondary)] hover:text-white hover:border-[var(--border-hover)] transition-colors">
-          <Share2 className="w-3.5 h-3.5" />
-          Share on X
-        </button>
-      </div>
+      {/* Share button only appears after running lint */}
     </motion.div>
   );
 }
@@ -184,9 +218,12 @@ export default function Home() {
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="max-w-[920px] mx-auto px-7 sm:px-8 h-14 flex items-center justify-between">
-          <span className="font-semibold text-[15px] tracking-tight">
-            AgentLinter
-          </span>
+          <div className="flex items-center gap-2.5">
+            <Logo size={22} />
+            <span className="font-semibold text-[15px] tracking-tight">
+              AgentLinter
+            </span>
+          </div>
           <div className="flex items-center gap-5">
             <a
               href="https://github.com/seojoonkim/agentlinter"
@@ -207,7 +244,7 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="pt-[200px] sm:pt-[180px] pb-20 sm:pb-28 px-7 sm:px-8">
+      <section className="pt-[100px] sm:pt-[120px] pb-14 sm:pb-20 px-7 sm:px-8">
         <div className="max-w-[920px] mx-auto">
           <motion.div
             className="max-w-[600px]"
@@ -242,7 +279,7 @@ export default function Home() {
               <a
                 href="https://github.com/seojoonkim/agentlinter"
                 target="_blank"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--border-hover)] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--accent)]/30 transition-all"
               >
                 <Star className="w-3.5 h-3.5" />
                 Star on GitHub
@@ -337,7 +374,7 @@ export default function Home() {
               <div className="space-y-3">
                 {[
                   "Auto-generated Score Card image",
-                  "One-click share to X",
+                  "One-click share to X after linting",
                   "Percentile ranking — Top 12%",
                   "Progress tracking — 72 → 89 (+17 pts)",
                   "Badges: Security Master 🛡️, Perfect Score 💯",
@@ -492,7 +529,10 @@ export default function Home() {
       <footer className="py-10 px-7 sm:px-8 border-t border-[var(--border)]">
         <div className="max-w-[920px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-[13px]">
-            <span className="font-semibold">AgentLinter</span>
+            <div className="flex items-center gap-2">
+              <Logo size={16} />
+              <span className="font-semibold">AgentLinter</span>
+            </div>
             <span className="text-[var(--text-dim)]">
               by{" "}
               <a

@@ -2,15 +2,15 @@
 
 @theme {
   --color-bg: #08080c;
-  --color-bg-elevated: #0f0f15;
-  --color-bg-card: #12121a;
+  --color-bg-elevated: #0e0d15;
+  --color-bg-card: #13121c;
   --color-border: rgba(255, 255, 255, 0.06);
   --color-border-hover: rgba(255, 255, 255, 0.12);
   --color-text: #e8e6e3;
   --color-text-secondary: #8a8a8e;
   --color-text-dim: #555560;
-  --color-accent: #4ade80;
-  --color-accent-dim: rgba(74, 222, 128, 0.12);
+  --color-accent: #a78bfa;
+  --color-accent-dim: rgba(167, 139, 250, 0.12);
   --color-red: #f87171;
   --color-amber: #fbbf24;
   --color-blue: #60a5fa;
@@ -19,15 +19,15 @@
 @layer base {
   :root {
     --bg: #08080c;
-    --bg-elevated: #0f0f15;
-    --bg-card: #12121a;
+    --bg-elevated: #0e0d15;
+    --bg-card: #13121c;
     --border: rgba(255, 255, 255, 0.06);
     --border-hover: rgba(255, 255, 255, 0.12);
     --text: #e8e6e3;
     --text-secondary: #8a8a8e;
     --text-dim: #555560;
-    --accent: #4ade80;
-    --accent-dim: rgba(74, 222, 128, 0.12);
+    --accent: #a78bfa;
+    --accent-dim: rgba(167, 139, 250, 0.12);
     --red: #f87171;
     --amber: #fbbf24;
     --blue: #60a5fa;
