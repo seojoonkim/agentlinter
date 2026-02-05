@@ -33,20 +33,15 @@ function Logo({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       <rect width="32" height="32" rx="8" fill="url(#lg)" />
-      <line x1="10" y1="8" x2="22" y2="12" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-      <line x1="22" y1="12" x2="10" y2="20" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-      <line x1="10" y1="20" x2="22" y2="24" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-      <line x1="10" y1="8" x2="10" y2="20" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-      <line x1="22" y1="12" x2="22" y2="24" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-      <line x1="16" y1="15" x2="10" y2="8" stroke="rgba(94,234,212,0.4)" strokeWidth="1" />
-      <line x1="16" y1="15" x2="22" y2="12" stroke="rgba(94,234,212,0.4)" strokeWidth="1" />
-      <line x1="16" y1="15" x2="10" y2="20" stroke="rgba(94,234,212,0.4)" strokeWidth="1" />
-      <line x1="16" y1="15" x2="22" y2="24" stroke="rgba(94,234,212,0.4)" strokeWidth="1" />
-      <circle cx="10" cy="8" r="2.5" fill="white" />
-      <circle cx="22" cy="12" r="2.5" fill="white" />
-      <circle cx="10" cy="20" r="2.5" fill="white" />
-      <circle cx="22" cy="24" r="2.5" fill="white" />
-      <circle cx="16" cy="15" r="3" fill="#5eead4" />
+      <path d="M10 6 C10 10, 22 12, 22 16 C22 20, 10 22, 10 26" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.9" />
+      <path d="M22 6 C22 10, 10 12, 10 16 C10 20, 22 22, 22 26" stroke="#5eead4" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.9" />
+      <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+      <line x1="14" y1="13" x2="18" y2="13" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+      <line x1="14" y1="19" x2="18" y2="19" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+      <line x1="12" y1="23" x2="20" y2="23" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+      <circle cx="16" cy="11" r="1.5" fill="white" opacity="0.8" />
+      <circle cx="16" cy="16" r="2" fill="#5eead4" />
+      <circle cx="16" cy="21" r="1.5" fill="white" opacity="0.8" />
       <defs>
         <linearGradient id="lg" x1="0" y1="0" x2="32" y2="32">
           <stop offset="0%" stopColor="#7c3aed" />

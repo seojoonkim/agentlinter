@@ -19,21 +19,13 @@ export default function Icon() {
         }}
       >
         <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-          {/* Connection lines */}
-          <line x1="10" y1="8" x2="22" y2="12" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-          <line x1="22" y1="12" x2="10" y2="20" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-          <line x1="10" y1="20" x2="22" y2="24" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-          <line x1="16" y1="15" x2="10" y2="8" stroke="rgba(94,234,212,0.5)" strokeWidth="1" />
-          <line x1="16" y1="15" x2="22" y2="12" stroke="rgba(94,234,212,0.5)" strokeWidth="1" />
-          <line x1="16" y1="15" x2="10" y2="20" stroke="rgba(94,234,212,0.5)" strokeWidth="1" />
-          <line x1="16" y1="15" x2="22" y2="24" stroke="rgba(94,234,212,0.5)" strokeWidth="1" />
-          {/* Nodes */}
-          <circle cx="10" cy="8" r="2.5" fill="white" />
-          <circle cx="22" cy="12" r="2.5" fill="white" />
-          <circle cx="10" cy="20" r="2.5" fill="white" />
-          <circle cx="22" cy="24" r="2.5" fill="white" />
-          {/* Center node — teal */}
-          <circle cx="16" cy="15" r="3" fill="#5eead4" />
+          <path d="M10 6 C10 10, 22 12, 22 16 C22 20, 10 22, 10 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9" />
+          <path d="M22 6 C22 10, 10 12, 10 16 C10 20, 22 22, 22 26" stroke="#5eead4" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9" />
+          <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+          <line x1="14" y1="13" x2="18" y2="13" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+          <line x1="14" y1="19" x2="18" y2="19" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+          <line x1="12" y1="23" x2="20" y2="23" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+          <circle cx="16" cy="16" r="2.5" fill="#5eead4" />
         </svg>
       </div>
     ),
