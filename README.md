@@ -5,9 +5,9 @@
 <h1 align="center">🔍 AgentLinter</h1>
 
 <p align="center">
-  <strong>ESLint for AI Agents</strong> — Score, diagnose, and auto-fix your entire agent workspace.
+  <strong>Free & open source ESLint for AI Agents</strong> — Score, diagnose, and auto-fix your entire agent workspace.
   <br />
-  <em>Sharpen your agent's edge.</em>
+  <em>100% free. Always will be.</em>
 </p>
 
 <p align="center">
@@ -53,7 +53,7 @@ Your AI agent is only as good as its config files. A vague `CLAUDE.md` produces 
 npx agentlinter
 ```
 
-That's it. No config. No API key. No signup. Runs in seconds.
+That's it. **Free, open source, forever.** No config. No API key. No signup. No paywall. Runs in seconds.
 
 ```
 🔍 AgentLinter v1.0.0

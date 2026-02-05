@@ -325,6 +325,11 @@ export default function Home() {
       <section className="pt-[120px] sm:pt-[140px] pb-8 sm:pb-12 px-6 sm:px-8">
         <div className="max-w-[1000px] mx-auto">
           <motion.div className="max-w-[700px]" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--teal-dim)] text-[var(--teal)] text-[12px] mono mb-7">
+              <Sparkles className="w-3 h-3" />
+              Free &amp; Open Source
+            </div>
+
             <h1 className="display text-[40px] sm:text-[56px] lg:text-[72px] leading-[1.05] tracking-tight mb-7">
               How sharp is
               <br />
@@ -350,7 +355,7 @@ export default function Home() {
             </div>
 
             <p className="text-[12px] text-[var(--text-dim)] mono">
-              No config needed. Runs in seconds. Works offline.
+              Free &amp; open source · No config needed · Runs in seconds
             </p>
           </motion.div>
 
@@ -835,7 +840,7 @@ export default function Home() {
             </div>
 
             <p className="text-[12px] text-[var(--text-dim)] mono mb-12">
-              Click to copy · Works with any Node.js 18+ environment
+              100% free &amp; open source · Click to copy · Node.js 18+
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -864,7 +869,7 @@ export default function Home() {
                 <span className="font-semibold">AgentLinter</span>
               </div>
               <span className="text-[var(--text-dim)]">·</span>
-              <span className="text-[var(--text-dim)]">ESLint for AI Agents</span>
+              <span className="text-[var(--text-dim)]">Free &amp; Open Source ESLint for AI Agents</span>
             </div>
             <div className="flex items-center gap-6 text-[13px] text-[var(--text-dim)]">
               <a href="https://github.com/seojoonkim/agentlinter" className="hover:text-[var(--text-secondary)] transition-colors flex items-center gap-1.5">
