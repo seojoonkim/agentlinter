@@ -80,23 +80,22 @@ function RotatingAgentName() {
   }, []);
 
   return (
-    <span className="inline-block relative">
+    <span className="relative inline-block align-bottom">
+      {/* Invisible sizer — always reserves width of the widest name */}
+      <span className="invisible whitespace-nowrap" aria-hidden="true">Claude Code</span>
+      {/* Animated name — absolutely positioned, no layout shift */}
       <AnimatePresence mode="wait">
         <motion.span
           key={AGENT_NAMES[index]}
-          className="inline-block"
-          initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+          className="absolute left-0 bottom-0 whitespace-nowrap"
+          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -20, filter: "blur(4px)" }}
+          exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
           transition={{ duration: 0.35, ease: "easeInOut" }}
         >
           {AGENT_NAMES[index]}
         </motion.span>
       </AnimatePresence>
-      {/* Invisible sizer to prevent layout shift — use widest name */}
-      <span className="invisible block h-0 overflow-hidden" aria-hidden="true">
-        Claude Code_
-      </span>
     </span>
   );
 }
