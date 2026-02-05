@@ -900,10 +900,10 @@ export default function ReportPage({ data }: { data: ReportData }) {
             {/* Bonuses */}
             <div>
               <h3 className="text-[15px] font-semibold mb-3">Bonus Points</h3>
-              <div className="space-y-2.5">
-                {SCORING_METHODOLOGY.bonuses.map((b) => (
-                  <div key={b.category} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3 text-[12px]">
-                    <span className="text-[var(--green)] mono font-medium shrink-0 sm:w-[100px]">{b.category}</span>
+              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-[12px]">
+                {SCORING_METHODOLOGY.bonuses.map((b, i) => (
+                  <div key={b.category} className="contents">
+                    <span className="text-[var(--green)] mono font-medium whitespace-nowrap">{b.category}</span>
                     <span className="text-[var(--text-secondary)]">{b.description}</span>
                   </div>
                 ))}
