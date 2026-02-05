@@ -1,35 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #08080c;
-  --color-bg-elevated: #0e0d15;
-  --color-bg-card: #13121c;
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-hover: rgba(255, 255, 255, 0.12);
-  --color-text: #e8e6e3;
+  --color-bg: #06060a;
+  --color-bg-elevated: #0c0b14;
+  --color-bg-card: #11101a;
+  --color-bg-card-hover: #161522;
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-border-hover: rgba(255, 255, 255, 0.10);
+  --color-text: #eae8e4;
   --color-text-secondary: #8a8a8e;
-  --color-text-dim: #555560;
+  --color-text-dim: #4a4a54;
   --color-accent: #a78bfa;
-  --color-accent-dim: rgba(167, 139, 250, 0.12);
+  --color-accent-bright: #c4b5fd;
+  --color-accent-dim: rgba(167, 139, 250, 0.10);
+  --color-accent-glow: rgba(167, 139, 250, 0.06);
   --color-red: #f87171;
   --color-amber: #fbbf24;
+  --color-green: #34d399;
   --color-blue: #60a5fa;
 }
 
 @layer base {
   :root {
-    --bg: #08080c;
-    --bg-elevated: #0e0d15;
-    --bg-card: #13121c;
-    --border: rgba(255, 255, 255, 0.06);
-    --border-hover: rgba(255, 255, 255, 0.12);
-    --text: #e8e6e3;
+    --bg: #06060a;
+    --bg-elevated: #0c0b14;
+    --bg-card: #11101a;
+    --bg-card-hover: #16152;
+    --border: rgba(255, 255, 255, 0.05);
+    --border-hover: rgba(255, 255, 255, 0.10);
+    --text: #eae8e4;
     --text-secondary: #8a8a8e;
-    --text-dim: #555560;
+    --text-dim: #4a4a54;
     --accent: #a78bfa;
-    --accent-dim: rgba(167, 139, 250, 0.12);
+    --accent-bright: #c4b5fd;
+    --accent-dim: rgba(167, 139, 250, 0.10);
+    --accent-glow: rgba(167, 139, 250, 0.06);
     --red: #f87171;
     --amber: #fbbf24;
+    --green: #34d399;
     --blue: #60a5fa;
   }
 
@@ -46,6 +54,10 @@
     line-height: 1.6;
   }
 
+  .display {
+    font-family: 'Instrument Serif', Georgia, serif;
+  }
+
   code, pre, .mono {
     font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   }
@@ -53,6 +65,26 @@
   ::selection {
     background: var(--accent);
     color: black;
+  }
+
+  /* Noise texture overlay */
+  .noise::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Glow effect for accent elements */
+  .glow-accent {
+    box-shadow: 0 0 40px rgba(167, 139, 250, 0.15), 0 0 80px rgba(167, 139, 250, 0.05);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
   }
 
   @supports (padding-top: env(safe-area-inset-top)) {
