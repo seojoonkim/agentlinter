@@ -1114,6 +1114,16 @@ export default function ReportPage() {
           </div>
         </div>
 
+        {/* ═══════ Privacy Note ═══════ */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex items-start gap-3">
+          <Shield className="w-4 h-4 text-[var(--teal)] mt-0.5 shrink-0" />
+          <div className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
+            <span className="font-medium text-[var(--teal)]">Privacy:</span> This report contains only scores, file names, and diagnostic messages.
+            Your actual file contents never leave your machine. AgentLinter runs 100% locally — no cloud, no API calls.{" "}
+            <a href="https://agentlinter.vercel.app/#privacy" className="text-[var(--teal)] hover:underline">Learn more →</a>
+          </div>
+        </div>
+
         {/* ═══════ Footer ═══════ */}
         <div className="pt-6 border-t border-[var(--border)] flex items-center justify-between text-[12px] text-[var(--text-dim)]">
           <div className="flex items-center gap-2">

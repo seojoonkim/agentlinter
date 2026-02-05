@@ -308,6 +308,7 @@ export default function Home() {
             <a href="#why" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors hidden sm:inline">Why</a>
             <a href="#how" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors hidden sm:inline">How</a>
             <a href="#compare" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors hidden sm:inline">Compare</a>
+            <a href="#privacy" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors hidden sm:inline">Privacy</a>
             <a href="https://github.com/seojoonkim/agentlinter" target="_blank" className="text-[13px] text-[var(--text-secondary)] hover:text-white transition-colors flex items-center gap-1.5">
               <Github className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">GitHub</span>
@@ -808,6 +809,98 @@ export default function Home() {
             ))}
           </div>
           <p className="text-[11px] text-[var(--text-dim)] mt-6 mono">All data anonymized · opt-out: --no-telemetry</p>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+         PRIVACY & SECURITY
+         ══════════════════════════════════════ */}
+      <section id="privacy" className="py-24 sm:py-32 px-6 sm:px-8 border-t border-[var(--border)]">
+        <div className="max-w-[1000px] mx-auto">
+          <FadeIn>
+            <p className="text-[12px] mono text-[var(--teal)] mb-4 tracking-wider uppercase">Privacy &amp; Security</p>
+            <h2 className="display text-[28px] sm:text-[40px] lg:text-[48px] leading-[1.1] tracking-tight mb-6 max-w-[700px]">
+              Your files never leave
+              <br />
+              <span className="text-[var(--teal)]">your machine.</span>
+            </h2>
+            <p className="text-[15px] text-[var(--text-secondary)] leading-[1.7] mb-16 max-w-[560px]">
+              AgentLinter runs 100% locally. No cloud. No API calls. No telemetry by default.
+              Your agent configs — which may contain sensitive instructions, personal context,
+              and security rules — stay exactly where they are.
+            </p>
+          </FadeIn>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                icon: Lock,
+                title: "100% Local Execution",
+                desc: "The entire scan runs on your machine. No files, no content, no metadata is sent anywhere. It's a local Node.js process — inspect the source yourself.",
+                badge: "Zero network calls",
+              },
+              {
+                icon: Shield,
+                title: "Secrets Auto-Masked",
+                desc: "When AgentLinter detects a secret (API key, token, password), it appears as [REDACTED] in diagnostics. Even in shareable reports, raw secrets are never included.",
+                badge: "16 secret patterns",
+              },
+              {
+                icon: Eye,
+                title: "Reports ≠ Raw Files",
+                desc: "Shareable reports contain only scores, file names, line numbers, and diagnostic messages. Never the original file content. Your SOUL.md stays private.",
+                badge: "Metadata only",
+              },
+              {
+                icon: FileText,
+                title: "Open Source, Auditable",
+                desc: "Every line of code is on GitHub. No obfuscated binaries, no hidden network calls. Read it, fork it, verify it. Trust through transparency.",
+                badge: "MIT License",
+              },
+              {
+                icon: Terminal,
+                title: "No Telemetry by Default",
+                desc: "Unlike many dev tools, AgentLinter sends zero analytics out of the box. If you opt in to anonymous usage stats, it's aggregated counts only — never content.",
+                badge: "--no-telemetry flag",
+              },
+              {
+                icon: Lock,
+                title: "CI/CD Safe",
+                desc: "In CI pipelines, AgentLinter only outputs scores and diagnostics to stdout. No artifacts, no uploads, no external dependencies beyond Node.js itself.",
+                badge: "Air-gap compatible",
+              },
+            ].map((item, i) => (
+              <FadeIn key={item.title} delay={0.05 * i}>
+                <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-all h-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <item.icon className="w-5 h-5 text-[var(--teal)]" />
+                    <span className="text-[10px] mono text-[var(--teal)] bg-[var(--teal-dim)] px-2 py-0.5 rounded-lg">{item.badge}</span>
+                  </div>
+                  <h3 className="font-semibold text-[15px] mb-2">{item.title}</h3>
+                  <p className="text-[13px] text-[var(--text-secondary)] leading-[1.7]">{item.desc}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          {/* TL;DR box */}
+          <FadeIn delay={0.15}>
+            <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-[var(--teal-dim)] border border-[var(--teal)]/20 max-w-[640px]">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--teal)]/15 flex items-center justify-center shrink-0">
+                  <Shield className="w-5 h-5 text-[var(--teal)]" />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-semibold text-[var(--teal)] mb-2">TL;DR</h3>
+                  <p className="text-[14px] text-[var(--text)] leading-[1.7]">
+                    AgentLinter reads your files locally, scores them locally, and outputs results locally.
+                    Nothing touches a server unless <em>you</em> choose to share a report — and even then,
+                    only scores and diagnostic messages are included, never your actual file contents.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
