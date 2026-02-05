@@ -143,7 +143,7 @@ function AnimatedTerminal() {
     { text: "  WARN No error recovery strategy defined", type: "warn" },
     { text: "  WARN 2 cross-file references broken", type: "warn" },
     { text: "", type: "blank" },
-    { text: "  💡 3 auto-fixable. Run: npx agentlinter --fix", type: "success" },
+    { text: "  💡 3 issues with suggested fixes. See report for details.", type: "success" },
     { text: "  📊 Report → agentlinter.com/r/a3f8k2", type: "success" },
   ];
 
@@ -526,8 +526,8 @@ export default function Home() {
                 step: "03",
                 icon: Zap,
                 title: "Fix",
-                desc: "Every issue comes with a prescription. Most are auto-fixable with --fix. Secrets get flagged for rotation. Contradictions get resolved.",
-                detail: "Run npx agentlinter --fix to apply all safe fixes in one pass. Review and approve each change.",
+                desc: "Every issue comes with a prescription and a suggested fix. Secrets get flagged for rotation. Contradictions get resolved.",
+                detail: "Each diagnostic includes a 💡 Fix suggestion. Apply them to your files and re-run to verify your score improves.",
               },
             ].map((item, i) => (
               <FadeIn key={item.step} delay={0.1 * i}>
@@ -677,7 +677,7 @@ export default function Home() {
                 { feature: "Scope", official: "Single CLAUDE.md", ours: "Full workspace (all files)", os: "partial", us: "full" },
                 { feature: "Cross-file checks", official: "—", ours: "Contradiction detection", os: "none", us: "full" },
                 { feature: "Secret scanning", official: "—", ours: "Keys, tokens, passwords", os: "none", us: "full" },
-                { feature: "Auto-fix", official: "Prompting suggestions", ours: "One-command --fix", os: "partial", us: "full" },
+                { feature: "Fix guidance", official: "Prompting suggestions", ours: "Actionable fix per issue", os: "partial", us: "full" },
                 { feature: "Custom rules", official: "—", ours: ".agentlinterrc per team", os: "none", us: "full" },
                 { feature: "CI/CD", official: "—", ours: "GitHub Action per PR", os: "none", us: "full" },
                 { feature: "Templates", official: "/init bootstrap", ours: "4 starter templates", os: "partial", us: "full" },

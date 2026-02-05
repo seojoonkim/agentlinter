@@ -71,11 +71,11 @@ export function formatTerminal(result: LintResult): string {
     lines.push("");
   }
 
-  // Auto-fixable count
+  // Fixable count
   const fixable = result.diagnostics.filter((d) => d.fix).length;
   if (fixable > 0) {
     lines.push(
-      `💡 ${fixable} issue(s) have suggested fixes. Run \`agentlinter fix --auto\` to apply.`
+      `💡 ${fixable} issue(s) have suggested fixes above. Apply them manually to improve your score.`
     );
     lines.push("");
   }

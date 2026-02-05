@@ -1029,12 +1029,11 @@ export default function ReportPage({ data }: { data: ReportData }) {
               <div className="mt-4 rounded-lg bg-[var(--teal-dim)] border border-[var(--teal)]/20 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Zap className="w-3.5 h-3.5 text-[var(--teal)]" />
-                  <span className="text-[12px] font-semibold text-[var(--teal)] uppercase tracking-wider">Auto-Fix Available</span>
+                  <span className="text-[12px] font-semibold text-[var(--teal)] uppercase tracking-wider">Fixes Available</span>
                 </div>
                 <p className="text-[13px] text-[var(--text-secondary)]">
-                  {data.diagnostics.filter((d) => (d as any).fix).length} issues have suggested fixes. Run:
+                  {data.diagnostics.filter((d) => (d as any).fix).length} issues have suggested fixes. Apply the 💡 suggestions above to improve your score.
                 </p>
-                <CodeBlock code="npx agentlinter --fix" />
               </div>
             )}
           </div>
