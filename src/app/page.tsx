@@ -334,13 +334,13 @@ export default function Home() {
             </div>
 
             <h1 className="display text-[40px] sm:text-[56px] lg:text-[72px] leading-[1.05] tracking-tight mb-5">
-              How sharp is
+              Is your agent
               <br />
-              <span className="text-[var(--accent)] glow-text">your agent?</span>
+              <span className="text-[var(--accent)] glow-text">sharp & secure?</span>
             </h1>
 
             <p className="text-[16px] sm:text-[18px] text-[var(--text-secondary)] leading-[1.7] mb-8 max-w-[540px]">
-              Score your agent&apos;s clarity, structure, security, and consistency in one command.
+              Lint your agent&apos;s clarity, structure, security, and consistency in one command.
               Catch leaked secrets, vague instructions, and broken references before they cost you.
             </p>
 
