@@ -11,21 +11,39 @@ export default function Icon() {
         style={{
           width: 32,
           height: 32,
-          borderRadius: 6,
-          background: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
+          borderRadius: 8,
+          background: '#0a0a0f',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-          <path d="M10 6 C10 10, 22 12, 22 16 C22 20, 10 22, 10 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9" />
-          <path d="M22 6 C22 10, 10 12, 10 16 C10 20, 22 22, 22 26" stroke="#5eead4" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9" />
-          <line x1="12" y1="9" x2="20" y2="9" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-          <line x1="14" y1="13" x2="18" y2="13" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-          <line x1="14" y1="19" x2="18" y2="19" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-          <line x1="12" y1="23" x2="20" y2="23" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+          {/* Left strand (S-curve) with gradient effect */}
+          <path 
+            d="M10 4 C10 9, 22 11, 22 16 C22 21, 10 23, 10 28" 
+            stroke="#a78bfa" 
+            strokeWidth="2.5" 
+            strokeLinecap="round" 
+            fill="none" 
+          />
+          {/* Right strand (mirrored S-curve) */}
+          <path 
+            d="M22 4 C22 9, 10 11, 10 16 C10 21, 22 23, 22 28" 
+            stroke="#5eead4" 
+            strokeWidth="2.5" 
+            strokeLinecap="round" 
+            fill="none" 
+          />
+          {/* Horizontal rungs */}
+          <line x1="12" y1="8" x2="20" y2="8" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+          <line x1="14" y1="12.5" x2="18" y2="12.5" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+          <line x1="14" y1="19.5" x2="18" y2="19.5" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+          <line x1="12" y1="24" x2="20" y2="24" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+          {/* Nodes at intersections */}
+          <circle cx="16" cy="10.5" r="2" fill="#a78bfa" />
           <circle cx="16" cy="16" r="2.5" fill="#5eead4" />
+          <circle cx="16" cy="21.5" r="2" fill="#a78bfa" />
         </svg>
       </div>
     ),
