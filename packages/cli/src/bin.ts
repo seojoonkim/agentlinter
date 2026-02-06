@@ -109,15 +109,14 @@ async function main() {
           
           const shareText = `🧬 AgentLinter Score: ${result.totalScore}/100
 
-┌─────────────────┐
-│ ${grade} tier · Top ${percentile}% │
-└─────────────────┘
+⭐ ${grade} tier · Top ${percentile}%
 
 ${allCats}
 
 Is YOUR AI agent sharp & secure?
+Free lint in one command:
 
-▸ npx agentlinter
+npx agentlinter
 
 ${url}
 

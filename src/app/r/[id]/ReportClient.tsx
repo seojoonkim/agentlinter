@@ -468,15 +468,14 @@ export default function ReportPage({ data }: { data: ReportData }) {
   
   const shareText = `🧬 AgentLinter Score: ${data.totalScore}/100
 
-┌─────────────────┐
-│ ${tier.grade} tier · Top ${percentile}% │
-└─────────────────┘
+⭐ ${tier.grade} tier · Top ${percentile}%
 
 ${allCategories}
 
 Is YOUR AI agent sharp & secure?
+Free lint in one command:
 
-▸ npx agentlinter
+npx agentlinter
 
 ${reportUrl}
 
