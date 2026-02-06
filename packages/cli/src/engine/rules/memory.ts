@@ -14,6 +14,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "warning",
     description: "Agent should have an explicit memory/continuity strategy",
+    applicableContexts: ["openclaw-runtime"], // Only for persistent agents, not project-scoped Claude Code
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -57,6 +58,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "warning",
     description: "Agent should know how to hand off context between sessions",
+    applicableContexts: ["openclaw-runtime"], // Session handoff is an OpenClaw concept
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -94,6 +96,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "info",
     description: "File-based memory (daily notes, logs) provides persistence",
+    applicableContexts: ["openclaw-runtime"], // File-based memory is an OpenClaw pattern
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -128,6 +131,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "info",
     description: "Agent should write things down, not rely on 'mental notes'",
+    applicableContexts: ["openclaw-runtime"], // Note-taking is an OpenClaw pattern
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -162,6 +166,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "info",
     description: "Agent should be aware of context window limitations",
+    applicableContexts: ["openclaw-runtime"], // Context window management is for long-running agents
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -192,6 +197,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "info",
     description: "Agent should track current task state for continuity",
+    applicableContexts: ["openclaw-runtime"], // State tracking across sessions is an OpenClaw pattern
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
@@ -230,6 +236,7 @@ export const memoryRules: Rule[] = [
     category: "memory",
     severity: "info",
     description: "Agent should learn from past interactions",
+    applicableContexts: ["openclaw-runtime"], // Continual learning is for persistent agents
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
 
