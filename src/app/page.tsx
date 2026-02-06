@@ -483,7 +483,7 @@ export default function Home() {
               { label: "Anthropic CLAUDE.md", href: "https://code.claude.com/docs/en/memory" },
               { label: "Agent Skills Standard", href: "https://agentskills.io" },
               { label: "Claude Code", href: "https://github.com/anthropics/claude-code" },
-              { label: "Clawdbot", href: "https://docs.clawd.bot" },
+              { label: "OpenClaw", href: "https://docs.openclaw.ai" },
               { label: "Cursor", href: "https://cursor.sh" },
               { label: "Windsurf", href: "https://codeium.com/windsurf" },
             ].map((item) => (
@@ -602,7 +602,7 @@ export default function Home() {
                 icon: Search,
                 title: "Scan",
                 desc: "Discovers every .md file in your workspace — CLAUDE.md, SOUL.md, USER.md, TOOLS.md, rules/, skills/. Parses structure, references, and content.",
-                detail: "Supports Claude Code, Clawdbot, Cursor, Windsurf, and any Agent Skills–compatible workspace.",
+                detail: "Supports Claude Code, OpenClaw, Moltbot, Cursor, Windsurf, and any Agent Skills–compatible workspace.",
               },
               {
                 step: "02",
@@ -674,9 +674,9 @@ export default function Home() {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-[11px] mono text-[var(--teal)] bg-[var(--teal)]/10 px-2.5 py-1 rounded-lg">AGENT MODE</span>
                 </div>
-                <h3 className="text-[18px] font-semibold mb-3">OpenClaw / Clawdbot Agents</h3>
+                <h3 className="text-[18px] font-semibold mb-3">OpenClaw / Moltbot Agents</h3>
                 <p className="text-[14px] text-[var(--text-secondary)] leading-[1.7] mb-4">
-                  Detected when <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">AGENTS.md</code>, <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">openclaw.json</code>, or <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">clawdbot.json</code> exists.
+                  Detected when <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">AGENTS.md</code>, <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">openclaw.json</code>, or <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">moltbot.json</code> exists.
                 </p>
                 <ul className="text-[13px] text-[var(--text-dim)] space-y-2">
                   <li>✓ Full rule set applied</li>
@@ -840,7 +840,7 @@ export default function Home() {
                 { feature: "CI/CD", official: "✕", ours: "GitHub Action per PR", os: "none", us: "full" },
                 { feature: "Templates", official: "/init bootstrap", ours: "4 starter templates", os: "partial", us: "full" },
                 { feature: "Reports", official: "✕", ours: "Web report + Share on X", os: "none", us: "full" },
-                { feature: "Frameworks", official: "Claude Code only", ours: "CC, Clawdbot, Cursor, Windsurf", os: "partial", us: "full" },
+                { feature: "Frameworks", official: "Claude Code only", ours: "CC, OpenClaw, Moltbot, Cursor, Windsurf", os: "partial", us: "full" },
               ].map((row, i) => (
                 <div key={row.feature} className={`grid grid-cols-[140px_1fr_1fr] min-w-[600px] ${i % 2 === 0 ? "bg-[var(--bg)]" : "bg-white/[0.01]"}`}>
                   <div className="px-4 py-2.5 sm:px-5 sm:py-3 border-r border-t border-[var(--border)]">

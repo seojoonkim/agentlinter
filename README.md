@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/github/stars/seojoonkim/agentlinter?style=flat-square&color=f59e0b" alt="GitHub Stars" />
   <img src="https://img.shields.io/badge/node-18%2B-brightgreen?style=flat-square" alt="Node 18+" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" />
-  <img src="https://img.shields.io/badge/frameworks-Claude_Code_%7C_Clawdbot_%7C_Cursor_%7C_Windsurf-purple?style=flat-square" alt="Frameworks" />
+  <img src="https://img.shields.io/badge/frameworks-Claude_Code_%7C_OpenClaw_%7C_Moltbot_%7C_Cursor_%7C_Windsurf-purple?style=flat-square" alt="Frameworks" />
 </p>
 
 ---
@@ -105,12 +105,12 @@ npx agentlinter share
 
 ## Automatic Mode Detection
 
-AgentLinter automatically detects whether you're running in **Project Mode** (Claude Code) or **Agent Mode** (OpenClaw/Clawdbot) and adjusts recommendations accordingly.
+AgentLinter automatically detects whether you're running in **Project Mode** (Claude Code) or **Agent Mode** (OpenClaw/Moltbot/Clawdbot) and adjusts recommendations accordingly.
 
 | Mode | Detected When | Rules Applied |
 |------|--------------|---------------|
 | **Project Mode** | Only `CLAUDE.md` present | Project-scoped rules (no memory/user context requirements) |
-| **Agent Mode** | `AGENTS.md`, `openclaw.json`, or `clawdbot.json` present | Full rules (memory strategy, user context, handoff protocol) |
+| **Agent Mode** | `AGENTS.md`, `openclaw.json`, `moltbot.json`, or `clawdbot.json` present | Full rules (memory strategy, user context, handoff protocol) |
 
 This means:
 - **Claude Code projects** won't get recommendations for `USER.md`, memory strategies, or session handoff — those are OpenClaw patterns
@@ -126,7 +126,7 @@ No configuration needed — it just works.
 
 Discovers every `.md` file in your agent workspace — `CLAUDE.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `SECURITY.md`, `.claude/rules/`, skill files, and more.
 
-Supports **Claude Code**, **Clawdbot**, **Cursor**, **Windsurf**, and any workspace following the [Agent Skills](https://agentskills.io) open standard.
+Supports **Claude Code**, **OpenClaw**, **Moltbot**, **Cursor**, **Windsurf**, and any workspace following the [Agent Skills](https://agentskills.io) open standard.
 
 ### 2. 📊 Score
 
@@ -316,7 +316,7 @@ Anthropic provides [CLAUDE.md memory](https://code.claude.com/docs/en/memory) an
 | **CI/CD** | — | ✅ GitHub Action |
 | **Templates** | `/init` | ✅ 4 starter templates |
 | **Reports** | — | ✅ Web + Share on X |
-| **Frameworks** | Claude Code only | ✅ CC, Clawdbot, Cursor, Windsurf |
+| **Frameworks** | Claude Code only | ✅ CC, OpenClaw, Moltbot, Cursor, Windsurf |
 
 > **Not a replacement — an extension.** AgentLinter builds on Anthropic's CLAUDE.md standard and the [Agent Skills](https://agentskills.io) open standard. Think of it as ESLint for JavaScript — the language gives you the syntax, the linter tells you if your code is good.
 
@@ -371,7 +371,9 @@ Score changes are posted as PR comments automatically.
 | Framework | Config Files | Status |
 |-----------|-------------|--------|
 | **Claude Code** | `CLAUDE.md`, `.claude/rules/`, `.claude/skills/` | ✅ Full support |
-| **Clawdbot** | `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md` | ✅ Full support |
+| **OpenClaw** | `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `openclaw.json` | ✅ Full support |
+| **Moltbot** | `AGENTS.md`, `SOUL.md`, `moltbot.json` | ✅ Full support |
+| **Clawdbot** | `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `clawdbot.json` | ✅ Full support |
 | **Cursor** | `.cursorrules`, `.cursor/rules/` | ✅ Full support |
 | **Windsurf** | `.windsurfrules`, `.windsurf/rules/` | ✅ Full support |
 | **Any Agent Skills** | `SKILL.md` with frontmatter | ✅ Full support |
