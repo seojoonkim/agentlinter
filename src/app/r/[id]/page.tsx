@@ -71,18 +71,58 @@ async function fetchReport(id: string): Promise<ReportData | null> {
       .order("created_at", { ascending: false })
       .limit(10);
 
+    // Robust parsing with fallbacks
+    let categories = [];
+    try {
+      const rawCategories = data.categories;
+      if (Array.isArray(rawCategories)) {
+        categories = rawCategories.map((c: any) => ({
+          name: c?.name || "Unknown",
+          score: typeof c?.score === "number" ? c.score : 0,
+        }));
+      } else if (typeof rawCategories === "string") {
+        categories = JSON.parse(rawCategories).map((c: any) => ({
+          name: c?.name || "Unknown",
+          score: typeof c?.score === "number" ? c.score : 0,
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to parse categories:", e);
+    }
+
+    let diagnostics = [];
+    try {
+      const rawDiagnostics = data.diagnostics;
+      if (Array.isArray(rawDiagnostics)) {
+        diagnostics = rawDiagnostics;
+      } else if (typeof rawDiagnostics === "string") {
+        diagnostics = JSON.parse(rawDiagnostics);
+      }
+    } catch (e) {
+      console.error("Failed to parse diagnostics:", e);
+    }
+
+    let fileNames = [];
+    try {
+      const rawFileNames = data.file_names;
+      if (Array.isArray(rawFileNames)) {
+        fileNames = rawFileNames;
+      } else if (typeof rawFileNames === "string") {
+        fileNames = JSON.parse(rawFileNames);
+      }
+    } catch (e) {
+      console.error("Failed to parse file names:", e);
+    }
+
     return {
       id: data.id,
       workspace: "workspace",
-      totalScore: data.score,
-      filesScanned: data.files_scanned || data.file_names?.length || 0,
+      totalScore: typeof data.score === "number" ? data.score : 0,
+      filesScanned: data.files_scanned || fileNames.length || 0,
       timestamp: data.created_at || new Date().toISOString(),
-      categories: (data.categories || []).map((c: any) => ({
-        name: c.name,
-        score: c.score,
-      })),
-      diagnostics: data.diagnostics || [],
-      files: data.file_names || [],
+      categories,
+      diagnostics,
+      files: fileNames,
       history: history || [],
     };
   } catch (e) {

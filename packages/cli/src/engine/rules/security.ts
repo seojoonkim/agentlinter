@@ -92,6 +92,7 @@ export const securityRules: Rule[] = [
     category: "security",
     severity: "warning",
     description: "Agent should have clear permission boundaries",
+    applicableContexts: ["openclaw-runtime"], // More relevant for OpenClaw runtime
     check(files) {
       const allContent = files.map((f) => f.content).join("\n");
       const hasPermissions =

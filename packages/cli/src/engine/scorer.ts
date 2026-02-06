@@ -18,10 +18,18 @@ export function lint(workspacePath: string, files: FileInfo[]): LintResult {
   const coreFiles = files.filter((f) => !f.name.startsWith("skills/"));
   const skillFiles = files.filter((f) => f.name.startsWith("skills/"));
 
+  // Detect workspace context
+  const context = files[0]?.context || "universal";
+
   // Run all rules — skill files only go through skillSafety + runtime rules
   const allDiagnostics: Diagnostic[] = [];
   for (const rule of allRules) {
     try {
+      // Skip rules that don't apply to this context
+      if (rule.applicableContexts && !rule.applicableContexts.includes(context) && !rule.applicableContexts.includes("universal")) {
+        continue;
+      }
+
       const targetFiles =
         rule.category === "skillSafety" || rule.category === "runtime"
           ? files       // these categories check everything
@@ -65,6 +73,7 @@ export function lint(workspacePath: string, files: FileInfo[]): LintResult {
 
   return {
     workspace: workspacePath,
+    context,
     files,
     categories: categoryScores,
     totalScore,

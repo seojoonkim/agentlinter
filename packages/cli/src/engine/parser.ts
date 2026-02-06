@@ -1,6 +1,6 @@
 /* ─── Markdown Parser ─── */
 
-import { FileInfo, Section } from "./types";
+import { FileInfo, Section, LintContext } from "./types";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -25,16 +25,48 @@ const AGENT_FILES = [
 const AGENT_DIRS = [".claude", "claude", ".cursor", ".windsurf"];
 
 /**
+ * Detect lint context based on files present
+ */
+function detectContext(fileNames: string[]): LintContext {
+  // CLAUDE.md → claude-code context
+  if (fileNames.includes("CLAUDE.md")) {
+    return "claude-code";
+  }
+
+  // AGENTS.md or openclaw.json → openclaw-runtime context
+  if (fileNames.includes("AGENTS.md") ||
+      fileNames.includes("openclaw.json") ||
+      fileNames.includes("clawdbot.json")) {
+    return "openclaw-runtime";
+  }
+
+  // Default to universal
+  return "universal";
+}
+
+/**
  * Scan a workspace for agent configuration files
  */
 export function scanWorkspace(workspacePath: string): FileInfo[] {
   const files: FileInfo[] = [];
+  const fileNames: string[] = [];
 
-  // Check root-level files
+  // First pass: collect file names for context detection
   for (const fileName of AGENT_FILES) {
     const filePath = path.join(workspacePath, fileName);
     if (fs.existsSync(filePath)) {
-      files.push(parseFile(filePath, fileName));
+      fileNames.push(fileName);
+    }
+  }
+
+  // Detect context based on collected files
+  const context = detectContext(fileNames);
+
+  // Second pass: parse files with context
+  for (const fileName of AGENT_FILES) {
+    const filePath = path.join(workspacePath, fileName);
+    if (fs.existsSync(filePath)) {
+      files.push(parseFile(filePath, fileName, context));
     }
   }
 
@@ -47,7 +79,7 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
         if (fileName.endsWith(".md") || fileName.endsWith(".txt")) {
           const filePath = path.join(dirPath, fileName);
           const relativeName = `${dir}/${fileName}`;
-          files.push(parseFile(filePath, relativeName));
+          files.push(parseFile(filePath, relativeName, context));
         }
       }
     }
@@ -60,7 +92,7 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
     for (const fileName of compoundFiles) {
       if (fileName.endsWith(".md")) {
         const filePath = path.join(compoundDir, fileName);
-        files.push(parseFile(filePath, `compound/${fileName}`));
+        files.push(parseFile(filePath, `compound/${fileName}`, context));
       }
     }
   }
@@ -74,7 +106,7 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
   for (const configPath of clawdbotConfigPaths) {
     if (fs.existsSync(configPath)) {
       const name = path.basename(configPath);
-      files.push(parseFile(configPath, name));
+      files.push(parseFile(configPath, name, context));
       break; // Only read the first one found
     }
   }
@@ -87,7 +119,7 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
   ];
   for (const skillsDir of skillsDirs) {
     if (fs.existsSync(skillsDir) && fs.statSync(skillsDir).isDirectory()) {
-      scanSkillsDir(skillsDir, files, skillsDir);
+      scanSkillsDir(skillsDir, files, skillsDir, context);
     }
   }
 
@@ -97,7 +129,7 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
 /**
  * Recursively scan skills directory (max depth 3)
  */
-function scanSkillsDir(dir: string, files: FileInfo[], baseDir: string, depth = 0) {
+function scanSkillsDir(dir: string, files: FileInfo[], baseDir: string, context: LintContext, depth = 0) {
   if (depth > 3) return;
   try {
     const entries = fs.readdirSync(dir);
@@ -106,12 +138,12 @@ function scanSkillsDir(dir: string, files: FileInfo[], baseDir: string, depth = 
       const fullPath = path.join(dir, entry);
       const stat = fs.statSync(fullPath);
       if (stat.isDirectory()) {
-        scanSkillsDir(fullPath, files, baseDir, depth + 1);
+        scanSkillsDir(fullPath, files, baseDir, context, depth + 1);
       } else if (entry === "SKILL.md" || entry.endsWith(".md")) {
         const relativeName = "skills/" + path.relative(baseDir, fullPath);
         // Avoid duplicates
         if (!files.some((f) => f.path === fullPath)) {
-          files.push(parseFile(fullPath, relativeName));
+          files.push(parseFile(fullPath, relativeName, context));
         }
       }
     }
@@ -123,12 +155,12 @@ function scanSkillsDir(dir: string, files: FileInfo[], baseDir: string, depth = 
 /**
  * Parse a single markdown file
  */
-export function parseFile(filePath: string, name: string): FileInfo {
+export function parseFile(filePath: string, name: string, context: LintContext): FileInfo {
   const content = fs.readFileSync(filePath, "utf-8");
   const lines = content.split("\n");
   const sections = parseSections(lines);
 
-  return { name, path: filePath, content, lines, sections };
+  return { name, path: filePath, content, lines, sections, context };
 }
 
 /**

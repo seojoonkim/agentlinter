@@ -12,6 +12,14 @@ export type Category =
   | "runtime"
   | "skillSafety";
 
+/**
+ * Lint context — determines which rules apply
+ * - claude-code: Project-scoped (CLAUDE.md, .claude/)
+ * - openclaw-runtime: Workspace-scoped (AGENTS.md, USER.md, ~/.openclaw/)
+ * - universal: Applies to both contexts
+ */
+export type LintContext = "claude-code" | "openclaw-runtime" | "universal";
+
 export interface Diagnostic {
   severity: Severity;
   category: Category;
@@ -28,6 +36,7 @@ export interface FileInfo {
   content: string;
   lines: string[];
   sections: Section[];
+  context: LintContext;
 }
 
 export interface Section {
@@ -47,6 +56,7 @@ export interface CategoryScore {
 
 export interface LintResult {
   workspace: string;
+  context: LintContext;
   files: FileInfo[];
   categories: CategoryScore[];
   totalScore: number;
@@ -59,6 +69,7 @@ export interface Rule {
   category: Category;
   severity: Severity;
   description: string;
+  applicableContexts?: LintContext[]; // If undefined, applies to all contexts
   check: (files: FileInfo[]) => Diagnostic[];
 }
 

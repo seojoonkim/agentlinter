@@ -112,6 +112,7 @@ export const completenessRules: Rule[] = [
     category: "completeness",
     severity: "info",
     description: "Providing user context helps personalization",
+    applicableContexts: ["openclaw-runtime"], // Only for OpenClaw, not Claude Code
     check(files) {
       const hasUserFile = files.some(
         (f) =>
