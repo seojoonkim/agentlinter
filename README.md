@@ -1,24 +1,25 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v1.0.0-7c3aed?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjN2MzYWVkIi8+PHBhdGggZD0iTTkgMTAuNUwxNiA3TDIzIDEwLjVWMTdMMTYgMjVMOSAxN1YxMC41WiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE1LjUiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz48L3N2Zz4=&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v0.2.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
-<h1 align="center">🔍 AgentLinter</h1>
+<h1 align="center">🧬 AgentLinter</h1>
 
 <p align="center">
-  <strong>Free & open source ESLint for AI Agents</strong> — Score, diagnose, and auto-fix your entire agent workspace.
+  <strong>ESLint for AI Agents</strong> — Score, diagnose, and auto-fix your entire agent workspace.
   <br />
-  <em>100% free. Always will be.</em>
+  <em>Free & open source. Always will be.</em>
 </p>
 
 <p align="center">
   <a href="https://agentlinter.vercel.app">Website</a> ·
   <a href="#quick-start">Quick Start</a> ·
-  <a href="#five-scoring-dimensions">Scoring</a> ·
+  <a href="#eight-scoring-dimensions">Scoring</a> ·
   <a href="#vs-anthropics-official-tools">Comparison</a> ·
   <a href="#how-it-works">How it Works</a>
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/github/stars/seojoonkim/agentlinter?style=flat-square&color=f59e0b" alt="GitHub Stars" />
   <img src="https://img.shields.io/badge/node-18%2B-brightgreen?style=flat-square" alt="Node 18+" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" />
   <img src="https://img.shields.io/badge/frameworks-Claude_Code_%7C_Clawdbot_%7C_Cursor_%7C_Windsurf-purple?style=flat-square" alt="Frameworks" />
@@ -42,8 +43,10 @@ Your AI agent is only as good as its config files. A vague `CLAUDE.md` produces 
 | 🔇 **Vague instructions fail silently** | "Be helpful" gives zero guidance | Detects ambiguity, suggests specifics |
 | 🔑 **Secrets in plain text** | API keys committed to repos | Scans for 20+ secret patterns |
 | 🔀 **Multi-file drift** | SOUL.md contradicts CLAUDE.md | Cross-file consistency checks |
-| 📉 **No quality baseline** | Can't measure improvement | 0–100 score across 5 dimensions |
+| 📉 **No quality baseline** | Can't measure improvement | 0–100 score across 8 dimensions |
 | 🏗️ **Missing essentials** | No error recovery, no boundaries | Completeness checklist with auto-fix |
+| ⚙️ **Insecure runtime config** | Gateway exposed to network | Runtime config security checks |
+| 🛠️ **Dangerous skills** | `curl | bash` in skill files | Skill safety scanning |
 
 ---
 
@@ -56,26 +59,29 @@ npx agentlinter
 That's it. **Free, open source, forever.** No config. No API key. No signup. No paywall. Runs in seconds.
 
 ```
-🔍 AgentLinter v1.0.0
+🔍 AgentLinter v0.2.0
 📁 Scanning workspace: .claude/ + root
    Found 5 files: CLAUDE.md, SOUL.md, USER.md, TOOLS.md, SECURITY.md
 
-  Workspace Score ........ 72/100  (B)
+  Workspace Score ........ 76/100  (B+)
   ├─ Structure     ████████░░  80
   ├─ Clarity       ███████░░░  70
   ├─ Completeness  ██████░░░░  60
   ├─ Security      █████████░  90
-  └─ Consistency   ██████░░░░  60
+  ├─ Consistency   ██████░░░░  60
+  ├─ Memory        ████████░░  80
+  ├─ Runtime Cfg   █████████░  88
+  └─ Skill Safety  █████████░  92
 
-  2 errors · 3 warnings
+  2 critical(s) · 3 warning(s)
 
-  ERR  TOOLS.md:14 — Secret: API key pattern "sk-proj-..."
-  ERR  SOUL.md ↔ CLAUDE.md — Conflicting persona definition
-  WARN CLAUDE.md:28 — Vague: "be helpful" → be specific
-  WARN No error recovery strategy defined
-  WARN 2 cross-file references broken
+  🔴 CRITICAL  TOOLS.md:14 — Secret: API key pattern "sk-proj-..."
+  🔴 CRITICAL  SOUL.md ↔ CLAUDE.md — Conflicting persona definition
+  ⚠️  WARN  CLAUDE.md:28 — Vague: "be helpful" → be specific
+  ⚠️  WARN  No error recovery strategy defined
+  ⚠️  WARN  2 cross-file references broken
 
-  💡 3 auto-fixable. Run: npx agentlinter --fix
+  💡 3 issues with suggested fixes. See report for details.
   📊 Report → agentlinter.com/r/a3f8k2
 ```
 
@@ -107,7 +113,7 @@ Supports **Claude Code**, **Clawdbot**, **Cursor**, **Windsurf**, and any worksp
 
 ### 2. 📊 Score
 
-Evaluates across **five dimensions**, each scored 0–100. Every rule is documented and derived from Anthropic's official best practices plus patterns from high-performing agent workspaces.
+Evaluates across **eight dimensions**, each scored 0–100. Every rule is documented and derived from Anthropic's official best practices plus patterns from high-performing agent workspaces.
 
 ### 3. ⚡ Fix
 
@@ -119,35 +125,34 @@ Every issue comes with a prescription. Most are auto-fixable with `--fix`:
 
 ---
 
-## Five Scoring Dimensions
+## Eight Scoring Dimensions
 
 Each dimension checks specific, documented rules:
 
-### Structure — 20%
+### Structure — 12%
 
 > File organization, naming conventions, section hierarchy.
 
 | Rule | Severity | Example |
 |------|----------|---------|
-| Required files present | Error | `Missing TOOLS.md — referenced in CLAUDE.md:12` |
+| Required files present | Critical | `Missing TOOLS.md — referenced in CLAUDE.md:12` |
 | Section separation | Warning | `CLAUDE.md has 200+ lines with no headers` |
 | Naming conventions | Info | `Use CLAUDE.md, not claude.md` |
 | Frontmatter format | Info | `SKILL.md missing description field` |
 
-### Clarity — 25%
+### Clarity — 20%
 
 > Instruction quality — can an AI agent unambiguously follow these?
 
 | Rule | Severity | Example |
 |------|----------|---------|
-| Naked conditionals | Error | `"If appropriate" — what's the criteria?` |
+| Naked conditionals | Critical | `"If appropriate" — what's the criteria?` |
 | Compound instructions | Warning | `Line has 4 instructions — split them` |
 | Ambiguous pronouns | Warning | `"Update it" — update what?` |
 | Missing priorities | Warning | `No P0/P1/P2 signals — which tasks first?` |
 | Vague language | Warning | `"be helpful" → specify: response length, tone, format` |
-| Escape hatch missing | Info | `Absolute rule with no exception path` |
 
-### Completeness — 20%
+### Completeness — 12%
 
 > Does the workspace cover all essential aspects?
 
@@ -157,31 +162,63 @@ Each dimension checks specific, documented rules:
 | Tool documentation | Warning | `6 tools referenced but undocumented` |
 | Boundaries & constraints | Warning | `No safety boundaries defined` |
 | Error recovery strategy | Warning | `No escalation or fallback path` |
-| Memory/handoff strategy | Info | `No session continuity plan` |
 
-### Security — 20%
+### Security — 15%
 
 > Protecting your agent and your data.
 
 | Rule | Severity | Example |
 |------|----------|---------|
-| Secret detection | Error | `API key pattern "sk-proj-..." in TOOLS.md:14` |
-| Token patterns | Error | `GitHub token "ghp_..." exposed` |
+| Secret detection | Critical | `API key pattern "sk-proj-..." in TOOLS.md:14` |
+| Token patterns | Critical | `GitHub token "ghp_..." exposed` |
 | Injection defense | Warning | `No prompt injection defense instructions` |
 | Permission boundaries | Warning | `No external action restrictions` |
-| Sensitive data rules | Info | `Consider adding data handling policy` |
 
-### Consistency — 15%
+### Consistency — 8%
 
 > Cross-file coherence across the entire workspace.
 
 | Rule | Severity | Example |
 |------|----------|---------|
-| Persona alignment | Error | `SOUL.md persona ≠ CLAUDE.md persona` |
-| Permission conflicts | Error | `CLAUDE.md allows X, SECURITY.md forbids X` |
+| Persona alignment | Critical | `SOUL.md persona ≠ CLAUDE.md persona` |
+| Permission conflicts | Critical | `CLAUDE.md allows X, SECURITY.md forbids X` |
 | Broken references | Warning | `CLAUDE.md:12 references TOOLS.md — file not found` |
 | Language mixing | Info | `Mixed ko/en in same section` |
-| Tone alignment | Info | `Formal in CLAUDE.md, casual in SOUL.md` |
+
+### Memory — 10%
+
+> Session handoff and knowledge persistence.
+
+| Rule | Severity | Example |
+|------|----------|---------|
+| Session handoff protocol | Warning | `No handoff protocol — agent loses context between sessions` |
+| File-based persistence | Warning | `No daily notes or progress files` |
+| Task state tracking | Info | `Consider adding progress.md` |
+| Learning loop | Info | `No knowledge distillation strategy` |
+
+### Runtime Config — 13%
+
+> OpenClaw/Gateway configuration security.
+
+| Rule | Severity | Example |
+|------|----------|---------|
+| Gateway bind | Critical | `Gateway bind "0.0.0.0" — exposes agent to network` |
+| Auth mode enabled | Critical | `No auth configured — agent exposed` |
+| Token strength | Warning | `Token < 32 chars — use stronger token` |
+| DM/group policy | Warning | `No DM policy — consider restricting` |
+| Plaintext secrets | Critical | `API key in config file` |
+
+### Skill Safety — 10%
+
+> Dangerous patterns in skill files.
+
+| Rule | Severity | Example |
+|------|----------|---------|
+| Dangerous shell commands | Critical | `Skill contains: rm -rf /` |
+| Curl pipe bash | Critical | `Skill contains: curl ... \| bash` |
+| Sensitive path access | Warning | `Skill accesses ~/.ssh` |
+| Data exfiltration | Warning | `Skill sends data to external URL` |
+| Prompt injection vectors | Warning | `Skill vulnerable to injection` |
 
 ---
 
@@ -226,7 +263,7 @@ Enforce your team's standards with `.agentlinterrc`:
 
 Every run generates a **web report** with:
 
-- **Tier grade**: S → A+ → A → A- → B+ → B → C → D
+- **Tier grade**: S → A+ → A → B+ → B → C
 - **Category breakdown**: Visual bars for each dimension
 - **Prescriptions**: Exact issues with auto-fix markers
 - **Percentile ranking**: Where you stand among all agents
@@ -251,10 +288,12 @@ Anthropic provides [CLAUDE.md memory](https://code.claude.com/docs/en/memory) an
 
 | Feature | Claude Code (Anthropic) | AgentLinter |
 |---------|:-----------------------:|:-----------:|
-| **Scoring** | Basic via `/init` | ✅ 5-category (0-100) |
+| **Scoring** | Basic via `/init` | ✅ 8-category (0-100) |
 | **Scope** | Single CLAUDE.md | ✅ Full workspace |
 | **Cross-file checks** | — | ✅ Contradiction detection |
 | **Secret scanning** | — | ✅ 20+ patterns |
+| **Runtime config audit** | — | ✅ Gateway/auth checks |
+| **Skill safety scan** | — | ✅ Dangerous pattern detection |
 | **Auto-fix** | Prompting suggestions | ✅ One-command `--fix` |
 | **Custom rules** | — | ✅ `.agentlinterrc` |
 | **CI/CD** | — | ✅ GitHub Action |
@@ -322,18 +361,30 @@ Score changes are posted as PR comments automatically.
 
 ---
 
+## Privacy
+
+**100% local execution.** Your files never leave your machine. No cloud, no API calls, no telemetry by default.
+
+- All scanning happens locally
+- Reports are generated client-side
+- Secrets are auto-masked in reports
+- Opt-out telemetry with `--no-telemetry`
+
+---
+
 ## Roadmap
 
-- [x] Core scoring engine (5 dimensions)
+- [x] Core scoring engine (8 dimensions)
 - [x] Auto-fix with `--fix`
 - [x] Secret scanning (20+ patterns)
 - [x] Cross-file consistency checks
 - [x] Web reports with sharing
+- [x] Runtime config audit
+- [x] Skill safety scanning
 - [ ] GitHub Action marketplace release
 - [ ] VS Code extension (real-time linting)
 - [ ] Team dashboard
 - [ ] Leaderboard & badges
-- [ ] `agentlinter init` interactive wizard
 
 ---
 
@@ -346,6 +397,13 @@ We welcome contributions! Areas where help is needed:
 - **Templates** — Create starter templates for new use cases
 - **Docs** — Improve documentation and examples
 
+```bash
+git clone https://github.com/seojoonkim/agentlinter
+cd agentlinter
+npm install
+npm run dev
+```
+
 ---
 
 ## License
@@ -355,7 +413,8 @@ MIT
 ---
 
 <p align="center">
-  Built by <a href="https://twitter.com/simonkim_nft">@simonkim_nft</a>
-  <br />
+  <a href="https://github.com/seojoonkim/agentlinter">⭐ Star on GitHub</a> · 
+  <a href="https://twitter.com/simonkim_nft">@simonkim_nft</a>
+  <br /><br />
   Built on <a href="https://code.claude.com/docs/en/memory">Anthropic's CLAUDE.md standard</a> · <a href="https://agentskills.io">Agent Skills open standard</a>
 </p>
