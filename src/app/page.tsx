@@ -636,6 +636,61 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════
+         AUTOMATIC MODE DETECTION
+         ══════════════════════════════════════ */}
+      <section className="py-18 sm:py-24 px-5 sm:px-8 border-t border-[var(--border)]">
+        <div className="max-w-[1000px] mx-auto">
+          <FadeIn>
+            <p className="text-[14px] mono text-[var(--teal)] mb-4 tracking-wider uppercase">Smart Detection</p>
+            <h2 className="display text-[32px] sm:text-[48px] lg:text-[56px] leading-[1.1] tracking-tight mb-5">
+              Project vs Agent. <span className="text-[var(--teal)]">Auto-detected.</span>
+            </h2>
+            <p className="text-[15px] text-[var(--text-secondary)] leading-[1.7] mb-12 max-w-[560px]">
+              AgentLinter automatically detects your workspace type and adjusts recommendations. 
+              No configuration needed.
+            </p>
+          </FadeIn>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            <FadeIn delay={0.1}>
+              <div className="p-6 sm:p-7 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-[11px] mono text-[var(--accent)] bg-[var(--accent)]/10 px-2.5 py-1 rounded-lg">PROJECT MODE</span>
+                </div>
+                <h3 className="text-[18px] font-semibold mb-3">Claude Code Projects</h3>
+                <p className="text-[14px] text-[var(--text-secondary)] leading-[1.7] mb-4">
+                  Detected when only <code className="text-[var(--accent)] bg-[var(--accent)]/10 px-1.5 py-0.5 rounded text-[13px]">CLAUDE.md</code> is present.
+                </p>
+                <ul className="text-[13px] text-[var(--text-dim)] space-y-2">
+                  <li>✓ Project-scoped rules</li>
+                  <li>✓ No memory strategy requirements</li>
+                  <li>✓ No USER.md recommendations</li>
+                  <li>✓ No session handoff checks</li>
+                </ul>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <div className="p-6 sm:p-7 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-[11px] mono text-[var(--teal)] bg-[var(--teal)]/10 px-2.5 py-1 rounded-lg">AGENT MODE</span>
+                </div>
+                <h3 className="text-[18px] font-semibold mb-3">OpenClaw / Clawdbot Agents</h3>
+                <p className="text-[14px] text-[var(--text-secondary)] leading-[1.7] mb-4">
+                  Detected when <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">AGENTS.md</code>, <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">openclaw.json</code>, or <code className="text-[var(--teal)] bg-[var(--teal)]/10 px-1.5 py-0.5 rounded text-[13px]">clawdbot.json</code> exists.
+                </p>
+                <ul className="text-[13px] text-[var(--text-dim)] space-y-2">
+                  <li>✓ Full rule set applied</li>
+                  <li>✓ Memory strategy checks</li>
+                  <li>✓ User context recommendations</li>
+                  <li>✓ Session handoff validation</li>
+                </ul>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
          FIVE DIMENSIONS (technical depth)
          ══════════════════════════════════════ */}
       <section className="py-18 sm:py-24 px-5 sm:px-8 border-t border-[var(--border)]">

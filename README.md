@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v0.2.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v0.3.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
 <h1 align="center">🧬 AgentLinter</h1>
@@ -100,6 +100,23 @@ npx agentlinter init --template coding
 # Share your score
 npx agentlinter share
 ```
+
+---
+
+## Automatic Mode Detection
+
+AgentLinter automatically detects whether you're running in **Project Mode** (Claude Code) or **Agent Mode** (OpenClaw/Clawdbot) and adjusts recommendations accordingly.
+
+| Mode | Detected When | Rules Applied |
+|------|--------------|---------------|
+| **Project Mode** | Only `CLAUDE.md` present | Project-scoped rules (no memory/user context requirements) |
+| **Agent Mode** | `AGENTS.md`, `openclaw.json`, or `clawdbot.json` present | Full rules (memory strategy, user context, handoff protocol) |
+
+This means:
+- **Claude Code projects** won't get recommendations for `USER.md`, memory strategies, or session handoff — those are OpenClaw patterns
+- **OpenClaw agents** get the full rule set for persistent, multi-session agents
+
+No configuration needed — it just works.
 
 ---
 
