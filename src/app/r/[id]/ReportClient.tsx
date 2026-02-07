@@ -577,6 +577,44 @@ https://agentlinter.com`;
               </div>
             </div>
 
+            {/* Grade Scale Explainer */}
+            <div className="mt-6 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-4 h-4 text-[var(--accent)]" />
+                <span className="text-[13px] font-medium text-[var(--text-primary)]">Grade Scale</span>
+              </div>
+              <div className="grid grid-cols-7 sm:grid-cols-14 gap-1 text-center">
+                {[
+                  { grade: "S", min: "98+", color: "#c084fc" },
+                  { grade: "A+", min: "96", color: "#a78bfa" },
+                  { grade: "A", min: "93", color: "#818cf8" },
+                  { grade: "A-", min: "90", color: "#60a5fa" },
+                  { grade: "B+", min: "86", color: "#34d399" },
+                  { grade: "B", min: "80", color: "#4ade80" },
+                  { grade: "B-", min: "73", color: "#a3e635" },
+                  { grade: "C+", min: "65", color: "#fbbf24" },
+                  { grade: "C", min: "58", color: "#f59e0b" },
+                  { grade: "C-", min: "50", color: "#fb923c" },
+                  { grade: "D+", min: "43", color: "#f87171" },
+                  { grade: "D", min: "35", color: "#ef4444" },
+                  { grade: "D-", min: "25", color: "#dc2626" },
+                  { grade: "F", min: "<25", color: "#991b1b" },
+                ].map((g) => (
+                  <div
+                    key={g.grade}
+                    className={`py-1.5 px-1 rounded-md text-[10px] mono ${tier.grade === g.grade ? 'ring-2 ring-white/30' : ''}`}
+                    style={{ backgroundColor: `${g.color}18`, color: g.color }}
+                  >
+                    <div className="font-bold">{g.grade}</div>
+                    <div className="opacity-70 text-[9px]">{g.min}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-[11px] text-[var(--text-dim)] leading-relaxed">
+                💡 <strong>90+</strong> = Production-ready · <strong>80-89</strong> = Good with minor fixes · <strong>70-79</strong> = Needs attention · <strong>&lt;70</strong> = Significant improvements needed
+              </p>
+            </div>
+
             {/* Category bars */}
             <div className="mt-8 space-y-3">
               {data.categories.map((cat) => {
