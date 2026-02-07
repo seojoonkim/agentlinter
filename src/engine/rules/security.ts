@@ -197,4 +197,75 @@ export const securityRules: Rule[] = [
       return diagnostics;
     },
   },
+
+  {
+    id: "security/has-shield",
+    category: "security",
+    severity: "info",
+    description: "SHIELD.md defines the agent's security policy and threat model",
+    check(files) {
+      const hasShield = files.some((f) => f.name === "SHIELD.md");
+      if (!hasShield) {
+        return [
+          {
+            severity: "info",
+            category: "security",
+            rule: this.id,
+            file: "(workspace)",
+            message:
+              "No SHIELD.md found. A security policy file helps define threat boundaries and enforcement states.",
+            fix: "Create SHIELD.md with sections: Purpose, Scope, Threat categories, Enforcement states, Decision requirement.",
+          },
+        ];
+      }
+      return [];
+    },
+  },
+
+  {
+    id: "security/shield-complete",
+    category: "security",
+    severity: "warning",
+    description: "SHIELD.md should have all required sections for a complete security policy",
+    check(files) {
+      const shieldFile = files.find((f) => f.name === "SHIELD.md");
+      if (!shieldFile) return []; // handled by has-shield rule
+
+      const diagnostics: Diagnostic[] = [];
+      const content = shieldFile.content.toLowerCase();
+      const headings = shieldFile.sections.map((s) => s.heading.toLowerCase());
+
+      // Required sections (flexible matching)
+      const requiredSections = [
+        { name: "Purpose", patterns: ["purpose", "목적", "overview"] },
+        { name: "Scope", patterns: ["scope", "범위", "coverage"] },
+        { name: "Threat categories", patterns: ["threat", "위협", "attack", "공격", "risk"] },
+        { name: "Enforcement states", patterns: ["enforcement", "시행", "state", "level", "mode"] },
+        { name: "Decision requirement", patterns: ["decision", "결정", "authorization", "권한", "approval", "승인"] },
+      ];
+
+      const missingSections: string[] = [];
+      for (const section of requiredSections) {
+        const found = section.patterns.some(
+          (p) => headings.some((h) => h.includes(p)) || content.includes(p)
+        );
+        if (!found) {
+          missingSections.push(section.name);
+        }
+      }
+
+      if (missingSections.length > 0) {
+        diagnostics.push({
+          severity: "warning",
+          category: "security",
+          rule: this.id,
+          file: "SHIELD.md",
+          message: `Missing required sections: ${missingSections.join(", ")}`,
+          fix: `Add the missing sections to complete your security policy: ${missingSections.join(", ")}.`,
+        });
+      }
+
+      return diagnostics;
+    },
+  },
 ];

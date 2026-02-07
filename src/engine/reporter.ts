@@ -1,6 +1,62 @@
 /* ─── Output Reporter ─── */
 
-import { LintResult, CATEGORY_LABELS, Diagnostic } from "./types";
+import { LintResult, CATEGORY_LABELS, Diagnostic, FileInfo } from "./types";
+
+/**
+ * Get SHIELD.md security policy summary
+ */
+function getShieldSummary(files: FileInfo[]): string[] {
+  const lines: string[] = [];
+  const shieldFile = files.find((f) => f.name === "SHIELD.md");
+
+  lines.push("🛡️ Security Policy");
+
+  if (!shieldFile) {
+    lines.push("  Status: Not configured");
+    lines.push("  💡 Create SHIELD.md to define your agent's security boundaries");
+    return lines;
+  }
+
+  lines.push("  Status: ✅ SHIELD.md present");
+
+  // Check for required sections
+  const shieldContent = shieldFile.content.toLowerCase();
+  const shieldHeadings = shieldFile.sections.map((s) => s.heading.toLowerCase());
+
+  const requiredSections = [
+    { name: "Purpose", patterns: ["purpose", "목적", "overview"], icon: "🎯" },
+    { name: "Scope", patterns: ["scope", "범위", "coverage"], icon: "📐" },
+    { name: "Threats", patterns: ["threat", "위협", "attack", "공격", "risk"], icon: "⚠️" },
+    { name: "Enforcement", patterns: ["enforcement", "시행", "state", "level", "mode"], icon: "🔒" },
+    { name: "Decisions", patterns: ["decision", "결정", "authorization", "권한", "approval", "승인"], icon: "✋" },
+  ];
+
+  const present: string[] = [];
+  const missing: string[] = [];
+
+  for (const section of requiredSections) {
+    const found = section.patterns.some(
+      (p) => shieldHeadings.some((h) => h.includes(p)) || shieldContent.includes(p)
+    );
+    if (found) {
+      present.push(`${section.icon} ${section.name}`);
+    } else {
+      missing.push(section.name);
+    }
+  }
+
+  if (present.length > 0) {
+    lines.push(`  Sections: ${present.join(" | ")}`);
+  }
+
+  if (missing.length > 0) {
+    lines.push(`  Missing: ${missing.join(", ")}`);
+  } else if (present.length === requiredSections.length) {
+    lines.push("  Coverage: ✅ Complete");
+  }
+
+  return lines;
+}
 
 /**
  * Format lint result as terminal output
@@ -33,6 +89,11 @@ export function formatTerminal(result: LintResult): string {
     const label = CATEGORY_LABELS[cat.category].padEnd(16);
     lines.push(`  ${label} ${bar} ${cat.score}`);
   }
+  lines.push("");
+
+  // Security Policy section
+  const shieldLines = getShieldSummary(result.files);
+  lines.push(...shieldLines);
   lines.push("");
 
   // Diagnostics
@@ -84,6 +145,45 @@ export function formatTerminal(result: LintResult): string {
 }
 
 /**
+ * Get SHIELD.md status for JSON output
+ */
+function getShieldStatus(files: FileInfo[]): {
+  present: boolean;
+  sections: { name: string; found: boolean }[];
+  complete: boolean;
+} {
+  const shieldFile = files.find((f) => f.name === "SHIELD.md");
+
+  if (!shieldFile) {
+    return { present: false, sections: [], complete: false };
+  }
+
+  const shieldContent = shieldFile.content.toLowerCase();
+  const shieldHeadings = shieldFile.sections.map((s) => s.heading.toLowerCase());
+
+  const requiredSections = [
+    { name: "Purpose", patterns: ["purpose", "목적", "overview"] },
+    { name: "Scope", patterns: ["scope", "범위", "coverage"] },
+    { name: "Threats", patterns: ["threat", "위협", "attack", "공격", "risk"] },
+    { name: "Enforcement", patterns: ["enforcement", "시행", "state", "level", "mode"] },
+    { name: "Decisions", patterns: ["decision", "결정", "authorization", "권한", "approval", "승인"] },
+  ];
+
+  const sections = requiredSections.map((section) => ({
+    name: section.name,
+    found: section.patterns.some(
+      (p) => shieldHeadings.some((h) => h.includes(p)) || shieldContent.includes(p)
+    ),
+  }));
+
+  return {
+    present: true,
+    sections,
+    complete: sections.every((s) => s.found),
+  };
+}
+
+/**
  * Format lint result as JSON
  */
 export function formatJSON(result: LintResult): string {
@@ -96,6 +196,7 @@ export function formatJSON(result: LintResult): string {
         weight: c.weight,
         issues: c.diagnostics.length,
       })),
+      securityPolicy: getShieldStatus(result.files),
       diagnostics: result.diagnostics.map((d) => ({
         severity: d.severity,
         category: d.category,

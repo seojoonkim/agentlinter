@@ -139,6 +139,26 @@ function computeBonus(category: Category, files: FileInfo[]): number {
       // Bonus for injection defense
       const allContent = files.map((f) => f.content).join("\n");
       if (/inject|jailbreak/i.test(allContent)) bonus += 5;
+      // Bonus for SHIELD.md (security policy)
+      const shieldFile = files.find((f) => f.name === "SHIELD.md");
+      if (shieldFile) {
+        bonus += 5; // Base bonus for having SHIELD.md
+        // Additional bonus for complete sections
+        const shieldContent = shieldFile.content.toLowerCase();
+        const shieldHeadings = shieldFile.sections.map((s) => s.heading.toLowerCase());
+        const requiredPatterns = [
+          ["purpose", "목적", "overview"],
+          ["scope", "범위", "coverage"],
+          ["threat", "위협", "attack", "공격", "risk"],
+          ["enforcement", "시행", "state", "level", "mode"],
+          ["decision", "결정", "authorization", "권한", "approval", "승인"],
+        ];
+        const sectionsFound = requiredPatterns.filter((patterns) =>
+          patterns.some((p) => shieldHeadings.some((h) => h.includes(p)) || shieldContent.includes(p))
+        ).length;
+        // +2 per section found (max +10 for all 5 sections)
+        bonus += sectionsFound * 2;
+      }
       break;
 
     case "consistency":
