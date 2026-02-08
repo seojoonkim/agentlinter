@@ -65,7 +65,7 @@ export function formatTerminal(result: LintResult): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push("🔍 AgentLinter v0.1.0");
+  lines.push(`🔍 AgentLinter v${process.env.NEXT_PUBLIC_CLI_VERSION || "0.0.0"}`);
   lines.push(`📁 Scanning workspace: ${result.workspace}`);
   lines.push(`📄 Files found: ${result.files.map((f) => f.name).join(", ")}`);
   lines.push("");

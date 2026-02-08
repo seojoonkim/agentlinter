@@ -1251,7 +1251,7 @@ https://agentlinter.com`;
           <div className="flex items-center gap-2">
             <Logo size={14} />
             <span>AgentLinter</span>
-            <span className="text-[10px] mono">v0.1.0</span>
+            <span className="text-[10px] mono">v{process.env.NEXT_PUBLIC_CLI_VERSION}</span>
           </div>
           <span className="mono">{new Date(data.timestamp).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
         </div>
