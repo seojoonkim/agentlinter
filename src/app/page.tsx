@@ -400,7 +400,7 @@ export default function Home() {
             <span className="text-[19px]" style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 600, letterSpacing: "-0.01em" }}>
               Agent<span className="text-[var(--accent)]">Linter</span>
             </span>
-            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v0.2.0</span>
+            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v0.5.0</span>
           </div>
           <div className="hidden sm:flex items-center gap-6 flex-1 justify-center">
             <a href="#why" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors">Why</a>
@@ -632,6 +632,111 @@ export default function Home() {
               </FadeIn>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+         SKILL SECURITY SCANNER
+         ══════════════════════════════════════ */}
+      <section className="py-18 sm:py-24 px-5 sm:px-8 border-t border-[var(--border)] bg-gradient-to-b from-[var(--red)]/[0.02] to-transparent">
+        <div className="max-w-[1000px] mx-auto">
+          <FadeIn>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--red)]/30 text-[var(--red)] text-[12px] sm:text-[13px] mono mb-4">
+              <Shield className="w-3 h-3" />
+              <span>NEW in v0.5.0</span>
+            </div>
+            <p className="text-[14px] mono text-[var(--red)] mb-4 tracking-wider uppercase">Security Scanner</p>
+            <h2 className="display text-[32px] sm:text-[48px] lg:text-[56px] leading-[1.1] tracking-tight mb-5">
+              Scan skills before they
+              <br />
+              <span className="text-[var(--red)]">compromise your agent.</span>
+            </h2>
+            <p className="text-[15px] sm:text-[16px] text-[var(--text-secondary)] leading-[1.7] mb-8 max-w-[600px]">
+              The MoltX incident exposed <span className="text-[var(--red)] font-semibold">440,000 agents</span> to private key theft through a malicious skill.
+              AgentLinter now scans skills for hidden attack vectors before you install them.
+            </p>
+          </FadeIn>
+
+          {/* 3-Layer Attack Structure */}
+          <FadeIn delay={0.1}>
+            <div className="mb-12 p-6 sm:p-8 rounded-2xl bg-[var(--bg-card)] border border-[var(--red)]/20">
+              <h3 className="text-[16px] font-semibold mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-[var(--red)]" />
+                3-Layer Attack Structure
+              </h3>
+              <div className="grid sm:grid-cols-3 gap-4">
+                {[
+                  { layer: "L1", title: "Manifest", desc: "Metadata tricks — fake names, hidden permissions, misleading descriptions", color: "var(--amber)" },
+                  { layer: "L2", title: "Skill File", desc: "Malicious code — remote eval, secret exfiltration, wallet drains", color: "var(--red)" },
+                  { layer: "L3", title: "Prompt", desc: "Injection payloads — LLM manipulation, context poisoning", color: "var(--red)" },
+                ].map((item) => (
+                  <div key={item.layer} className="p-4 rounded-xl bg-white/[0.02] border border-[var(--border)]">
+                    <span className="text-[11px] mono px-2 py-0.5 rounded" style={{ color: item.color, backgroundColor: `${item.color}15` }}>{item.layer}</span>
+                    <h4 className="text-[14px] font-semibold mt-2 mb-1">{item.title}</h4>
+                    <p className="text-[13px] text-[var(--text-dim)] leading-[1.5]">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Detection Items */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {[
+              { icon: Terminal, title: "Remote Code Injection", desc: "curl|bash, eval(), dynamic requires", severity: "CRITICAL" },
+              { icon: Lock, title: "Key Theft", desc: "Private key, seed phrase, wallet access", severity: "CRITICAL" },
+              { icon: Shield, title: "In-band Injection", desc: "Prompt manipulation, context override", severity: "DANGEROUS" },
+              { icon: Zap, title: "Forced Wallet Connect", desc: "Unauthorized transaction signing", severity: "CRITICAL" },
+            ].map((item, i) => (
+              <FadeIn key={item.title} delay={0.05 * i}>
+                <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--red)]/30 transition-all h-full">
+                  <div className="flex items-center justify-between mb-3">
+                    <item.icon className="w-4 h-4 text-[var(--text-dim)]" />
+                    <span className="text-[9px] mono text-[var(--red)] bg-[var(--red)]/10 px-1.5 py-0.5 rounded">{item.severity}</span>
+                  </div>
+                  <h3 className="font-semibold text-[14px] mb-1">{item.title}</h3>
+                  <p className="text-[12px] text-[var(--text-dim)] leading-[1.5]">{item.desc}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          {/* Verdict Levels */}
+          <FadeIn delay={0.15}>
+            <div className="p-6 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] mb-10">
+              <h3 className="text-[15px] font-semibold mb-4">Verdict Levels</h3>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { label: "SAFE", color: "#4ade80", desc: "No threats detected" },
+                  { label: "SUSPICIOUS", color: "#fbbf24", desc: "Review recommended" },
+                  { label: "DANGEROUS", color: "#f97316", desc: "Known risk patterns" },
+                  { label: "MALICIOUS", color: "#ef4444", desc: "Active threat detected" },
+                ].map((v) => (
+                  <div key={v.label} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.02] border border-[var(--border)]">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: v.color }} />
+                    <span className="text-[13px] font-semibold" style={{ color: v.color }}>{v.label}</span>
+                    <span className="text-[12px] text-[var(--text-dim)]">— {v.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* CLI Commands */}
+          <FadeIn delay={0.2}>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)]">
+                <div className="text-[11px] mono text-[var(--teal)] mb-2">DEFAULT SCAN</div>
+                <CopyCommand command="npx agentlinter" className="text-[15px] mb-3" />
+                <p className="text-[13px] text-[var(--text-dim)]">Score + Skill scan + Share (all-in-one)</p>
+              </div>
+              <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)]">
+                <div className="text-[11px] mono text-[var(--red)] mb-2">PRE-INSTALL CHECK</div>
+                <CopyCommand command="npx agentlinter scan <url>" className="text-[15px] mb-3" />
+                <p className="text-[13px] text-[var(--text-dim)]">Verify external skill before installing</p>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -1170,6 +1275,22 @@ export default function Home() {
                 Join Community
               </a>
             </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── Acknowledgments ── */}
+      <section className="py-10 px-5 sm:px-8 border-t border-[var(--border)]">
+        <div className="max-w-[600px] mx-auto text-center">
+          <FadeIn>
+            <p className="text-[12px] mono text-[var(--text-dim)] mb-3 tracking-wider uppercase">Acknowledgments</p>
+            <p className="text-[14px] text-[var(--text-secondary)] leading-[1.7]">
+              Skill Security Scanner was inspired by{" "}
+              <a href="https://dev.to/sebayaki/moltx-44-1plm" target="_blank" className="text-[var(--accent)] hover:underline">
+                @sebayaki&apos;s MoltX security analysis
+              </a>
+              {" "}— thank you for uncovering the vulnerability that protects 440K+ agents today.
+            </p>
           </FadeIn>
         </div>
       </section>
