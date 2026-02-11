@@ -2,6 +2,32 @@
 
 All notable changes to AgentLinter will be documented in this file.
 
+## [0.6.0] - 2026-02-11
+
+### Added - English Config Files Rule
+
+New rule `clarity/english-config-files` detects non-English content in core configuration files.
+
+**Why this matters:**
+- **Token efficiency**: Non-English text uses 2.5x more tokens than English
+- **Interpretation accuracy**: LLMs are trained on 95% English data, leading to better performance with English instructions
+- **Translation Tax**: Non-English inputs go through internal translation, losing fidelity
+
+**Target files:**
+- CLAUDE.md, AGENTS.md, SOUL.md, README.md, .cursorrules
+
+**Severity:**
+- 30%+ non-English content → `warning`
+- Below 30% → `info`
+
+**Research basis:**
+- EleutherAI "The Pile" (2021): 95% of LLM training data is English
+- Hugging Face benchmarks: Korean uses 2.4-3.8x more tokens
+- MMLU benchmark: 10-20% accuracy gap between English and non-English prompts
+- mT5 (NAACL 2021): English as optimal "pivot language" for 5-15% performance gains
+
+---
+
 ## [0.2.0] - 2026-02-11
 
 ### Added - Claude Code Best Practice Rules

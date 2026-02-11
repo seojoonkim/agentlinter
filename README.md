@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v0.3.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v0.6.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
 <h1 align="center">🧬 AgentLinter</h1>
@@ -47,6 +47,7 @@ Your AI agent is only as good as its config files. A vague `CLAUDE.md` produces 
 | 🏗️ **Missing essentials** | No error recovery, no boundaries | Completeness checklist with auto-fix |
 | ⚙️ **Insecure runtime config** | Gateway exposed to network | Runtime config security checks |
 | 🛠️ **Dangerous skills** | `curl | bash` in skill files | Skill safety scanning |
+| 🌐 **Non-English config files** | 2.5x token waste, interpretation errors | Detects non-English content, suggests translation |
 
 ---
 

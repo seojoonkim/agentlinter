@@ -400,7 +400,7 @@ export default function Home() {
             <span className="text-[19px]" style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 600, letterSpacing: "-0.01em" }}>
               Agent<span className="text-[var(--accent)]">Linter</span>
             </span>
-            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v0.4.0</span>
+            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v0.6.0</span>
           </div>
           <div className="hidden sm:flex items-center gap-6 flex-1 justify-center">
             <a href="#why" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors">Why</a>
@@ -643,7 +643,7 @@ export default function Home() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--red)]/30 text-[var(--red)] text-[12px] sm:text-[13px] mono mb-4">
               <Shield className="w-3 h-3" />
-              <span>NEW in v0.4.0</span>
+              <span>NEW in v0.6.0</span>
             </div>
             <p className="text-[14px] mono text-[var(--red)] mb-4 tracking-wider uppercase">Security Scanner</p>
             <h2 className="display text-[32px] sm:text-[48px] lg:text-[56px] leading-[1.1] tracking-tight mb-5">
