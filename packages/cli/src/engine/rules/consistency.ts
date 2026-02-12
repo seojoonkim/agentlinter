@@ -6,27 +6,44 @@ export const consistencyRules: Rule[] = [
   {
     id: "consistency/referenced-files-exist",
     category: "consistency",
-    severity: "critical",
+    severity: "error",
     description: "Files referenced in agent configs should exist",
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const fileNames = new Set(files.map((f) => f.name));
+      // Also track lowercase versions and base names (without path)
+      const fileNamesLower = new Set(files.map((f) => f.name.toLowerCase()));
+      const baseNames = new Set(files.map((f) => f.name.split("/").pop() || f.name));
+      const baseNamesLower = new Set(files.map((f) => (f.name.split("/").pop() || f.name).toLowerCase()));
 
       // Generic pattern references to skip (e.g., "Check SKILL.md for each" refers to a pattern, not a specific file)
-      const PATTERN_REFS = new Set(["SKILL.md", "README.md", "CHANGELOG.md", "LICENSE.md"]);
+      // Also includes common agent workspace file names that may exist but not be uploaded
+      const PATTERN_REFS = new Set([
+        // Generic patterns
+        "SKILL.md", "README.md", "CHANGELOG.md", "LICENSE.md",
+        // Common agent workspace files (often exist but may not be included in analysis)
+        "SECURITY.md", "FORMATTING.md", "HEARTBEAT.md", "SHIELD.md",
+        "USER.md", "SOUL.md", "IDENTITY.md", "TOOLS.md", "MEMORY.md",
+        "BOOTSTRAP.md", "WORKSPACE.md", "CONFIG.md", "RULES.md",
+      ]);
 
       for (const file of files) {
         // Find references to other .md files
         const refs = file.content.matchAll(
-          /(?:see|read|check|refer to|load|include)\s+[`"']?([A-Z][A-Za-z_-]+\.md)[`"']?/gi
+          /(?:see|read|check|refer to|load|include)\s+[`"']?([A-Z][A-Za-z_-]+\.md)(?:#[a-z0-9-]+)?[`"']?/gi
         );
 
         for (const match of refs) {
           const refName = match[1];
           if (PATTERN_REFS.has(refName)) continue; // skip generic patterns
-          if (!fileNames.has(refName) && !fileNames.has(refName.toLowerCase())) {
+          // Check all variants: exact, lowercase, basename, basename lowercase
+          const exists = fileNames.has(refName) 
+            || fileNamesLower.has(refName.toLowerCase())
+            || baseNames.has(refName)
+            || baseNamesLower.has(refName.toLowerCase());
+          if (!exists) {
             diagnostics.push({
-              severity: "critical",
+              severity: "error",
               category: "consistency",
               rule: this.id,
               file: file.name,
@@ -36,14 +53,19 @@ export const consistencyRules: Rule[] = [
           }
         }
 
-        // Also check backtick references like `SOUL.md`
+        // Also check backtick references like `SOUL.md` or `SOUL.md#section`
         const backtickRefs = file.content.matchAll(
-          /`([A-Z][A-Za-z_-]+\.md)`/g
+          /`([A-Z][A-Za-z_-]+\.md)(?:#[a-z0-9-]+)?`/g
         );
         for (const match of backtickRefs) {
           const refName = match[1];
           if (PATTERN_REFS.has(refName)) continue; // skip generic patterns
-          if (!fileNames.has(refName) && !fileNames.has(refName.toLowerCase())) {
+          // Check all variants
+          const exists = fileNames.has(refName) 
+            || fileNamesLower.has(refName.toLowerCase())
+            || baseNames.has(refName)
+            || baseNamesLower.has(refName.toLowerCase());
+          if (!exists) {
             const alreadyFound = diagnostics.some(
               (d) =>
                 d.file === file.name &&
@@ -51,7 +73,7 @@ export const consistencyRules: Rule[] = [
             );
             if (!alreadyFound) {
               diagnostics.push({
-                severity: "critical",
+                severity: "error",
                 category: "consistency",
                 rule: this.id,
                 file: file.name,
@@ -219,7 +241,7 @@ export const consistencyRules: Rule[] = [
   {
     id: "consistency/permission-conflict",
     category: "consistency",
-    severity: "critical",
+    severity: "error",
     description: "Permission levels should not conflict across files",
     check(files) {
       const diagnostics: Diagnostic[] = [];
@@ -267,7 +289,7 @@ export const consistencyRules: Rule[] = [
           const shared = [...wordsA].filter(w => wordsB.has(w));
           if (shared.length >= 2) {
             diagnostics.push({
-              severity: "critical",
+              severity: "error",
               category: "consistency",
               rule: this.id,
               file: sb.file,
@@ -551,7 +573,7 @@ export const consistencyRules: Rule[] = [
   {
     id: "consistency/outdated-cross-references",
     category: "consistency",
-    severity: "critical",
+    severity: "error",
     description: "Section references should point to sections that actually exist",
     check(files) {
       const diagnostics: Diagnostic[] = [];
@@ -577,7 +599,7 @@ export const consistencyRules: Rule[] = [
           }
           if (!found) {
             diagnostics.push({
-              severity: "critical",
+              severity: "error",
               category: "consistency",
               rule: this.id,
               file: file.name,

@@ -498,6 +498,9 @@ export const clarityRules: Rule[] = [
         "DAN", "SYS", "INST", "EOF", "TTY", "PTY", "PID", "UID", "GID",
         "HVL", "CAPS", "CAST", "MAX", "MIN", "SRC", "DST", "TMP",
         "ZEON", "REPO", "DIR", "DEV", "OPS", "SLA", "KPI", "ROI",
+        // RFC 2119 keywords (requirement levels) — NOT acronyms
+        "MUST", "SHALL", "SHOULD", "MAY", "REQUIRED", "RECOMMENDED",
+        "OPTIONAL", "NOT", "NEVER", "ALWAYS", "ALL", "ANY", "ONLY",
       ]);
       const coreFiles = files.filter(
         (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")

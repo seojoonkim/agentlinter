@@ -31,6 +31,20 @@ const DATA_EXFIL_PATTERNS = [
   { pattern: /ngrok|localhost\.run|serveo/, name: "Tunnel service (potential exfil)" },
 ];
 
+/** Security/defense skills document attacks as examples — demote severity for these */
+const SECURITY_SKILL_PATTERNS = [
+  /prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i,
+  /shield/i, /protect/i, /hive[- ]?fence/i, /guard/i, /firewall/i,
+  /threat/i, /attack/i, /vulnerability/i, /red[- ]?team/i, /pentest/i,
+];
+
+/** Check if a file is a security-related skill (documents attack patterns for defensive purposes) */
+function isSecuritySkill(file: { name: string; content: string }): boolean {
+  return SECURITY_SKILL_PATTERNS.some(
+    (p) => p.test(file.name) || p.test(file.content.substring(0, 500))
+  );
+}
+
 export const skillSafetyRules: Rule[] = [
   {
     id: "skill-safety/has-metadata",
@@ -130,22 +144,20 @@ export const skillSafetyRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const skillFiles = files.filter((f) => f.name.includes("skills/"));
-      const securitySkillPatterns = [/prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i];
-
       for (const file of skillFiles) {
-        const isSecuritySkill = securitySkillPatterns.some((p) => p.test(file.name) || p.test(file.content.substring(0, 500)));
+        const isSecurity = isSecuritySkill(file);
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i];
           for (const { pattern, name } of SENSITIVE_PATH_PATTERNS) {
             if (pattern.test(line)) {
               diagnostics.push({
-                severity: isSecuritySkill ? "info" : "warning",
+                severity: isSecurity ? "info" : "warning",
                 category: "skillSafety",
                 rule: this.id,
                 file: file.name,
                 line: i + 1,
                 message: `Access to sensitive path: ${name}`,
-                fix: isSecuritySkill
+                fix: isSecurity
                   ? "This is a security skill documenting sensitive paths. Verify context."
                   : "Ensure this access is necessary and the skill has legitimate reasons for it.",
               });
@@ -165,17 +177,16 @@ export const skillSafetyRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const skillFiles = files.filter((f) => f.name.includes("skills/"));
-      const securitySkillPatterns = [/prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i];
 
       for (const file of skillFiles) {
-        const isSecuritySkill = securitySkillPatterns.some((p) => p.test(file.name) || p.test(file.content.substring(0, 500)));
+        const isSecurity = isSecuritySkill(file);
         let inCodeBlock = false;
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i];
           if (line.trim().startsWith("```")) inCodeBlock = !inCodeBlock;
           for (const { pattern, name } of DATA_EXFIL_PATTERNS) {
             if (pattern.test(line)) {
-              const isDoc = isSecuritySkill || inCodeBlock || /^[\s]*[>❌✅|$#]/.test(line);
+              const isDoc = isSecurity || inCodeBlock || /^[\s]*[>❌✅|$#]/.test(line);
               diagnostics.push({
                 severity: isDoc ? "info" : "error",
                 category: "skillSafety",
@@ -251,13 +262,8 @@ export const skillSafetyRules: Rule[] = [
       // "you are now" is only suspicious if followed by jailbreak-style role changes, not normal role descriptions
       const jailbreakRolePattern = /you\s+are\s+now\s+(?:a|an|in)\s+(?:new|different|unrestricted|evil|DAN|jailbr)/i;
 
-      // Security/defense skills document attacks as examples — demote to info
-      const securitySkillPatterns = [
-        /prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i,
-      ];
-
       for (const file of skillFiles) {
-        const isSecuritySkill = securitySkillPatterns.some((p) => p.test(file.name) || p.test(file.content.substring(0, 500)));
+        const isSecurity = isSecuritySkill(file);
         let inCodeBlock = false;
 
         for (let i = 0; i < file.lines.length; i++) {
@@ -273,7 +279,7 @@ export const skillSafetyRules: Rule[] = [
               const isExample = inCodeBlock
                 || /^[\s]*[❌✅⚠️|>$#]/.test(line)
                 || /example|detect|pattern|test/i.test(line)
-                || isSecuritySkill;
+                || isSecurity;
 
               diagnostics.push({
                 severity: isExample ? "info" : "error",
