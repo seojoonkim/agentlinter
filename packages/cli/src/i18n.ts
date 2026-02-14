@@ -3,11 +3,12 @@ import ICU from "i18next-icu";
 
 import enCatalog from "./locales/en.json";
 import koCatalog from "./locales/ko.json";
+import koKpCatalog from "./locales/ko_kp.json";
 import zhHansCatalog from "./locales/zh-hans.json";
 import zhHantCatalog from "./locales/zh-hant.json";
 
 export const I18N_CONFIG = {
-  supportedLocales: ["en", "ko", "zh-Hans", "zh-Hant"] as const,
+  supportedLocales: ["en", "ko", "ko_kp", "zh-Hans", "zh-Hant"] as const,
   defaultLocale: "en" as const,
 } as const;
 
@@ -17,7 +18,7 @@ export type Locale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = I18N_CONFIG.defaultLocale;
 export const LOCALE_ENV_VAR = "AGENTLINTER_LANG";
 export const SYSTEM_LANG_ENV_VAR = "LANG";
-export const DIAGNOSTIC_OVERLAY_LOCALES = new Set<Locale>(["ko"]);
+export const DIAGNOSTIC_OVERLAY_LOCALES = new Set<Locale>(["ko", "ko_kp"]);
 export const SUPPORTED_LOCALE_HINT_COMMA = SUPPORTED_LOCALES.join(", ");
 export const SUPPORTED_LOCALE_HINT_PIPE = SUPPORTED_LOCALES.join("|");
 export const DEFAULT_LOCALE_INFO = DEFAULT_LOCALE;
@@ -32,6 +33,7 @@ export const LOCALE_RESOLUTION_ORDER = [
 const LOCALE_RESOURCES: Record<Locale, { translation: Record<string, unknown> }> = {
   en: enCatalog,
   ko: koCatalog,
+  ko_kp: koKpCatalog,
   "zh-Hans": zhHansCatalog,
   "zh-Hant": zhHantCatalog,
 };

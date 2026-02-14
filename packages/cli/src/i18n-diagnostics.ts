@@ -3,6 +3,7 @@ import { Locale, shouldApplyDiagnosticOverlay } from "./i18n";
 
 import enCatalog from "./locales/en.json";
 import koCatalog from "./locales/ko.json";
+import koKpCatalog from "./locales/ko_kp.json";
 import zhHansCatalog from "./locales/zh-hans.json";
 import zhHantCatalog from "./locales/zh-hant.json";
 
@@ -26,6 +27,7 @@ const EMPTY_DICTIONARY: DiagnosticsDictionary = {};
 const DICTIONARIES: Record<Locale, DiagnosticsDictionary> = {
   en: (enCatalog as LocaleCatalog).diagnostics ?? EMPTY_DICTIONARY,
   ko: (koCatalog as LocaleCatalog).diagnostics ?? EMPTY_DICTIONARY,
+  ko_kp: (koKpCatalog as LocaleCatalog).diagnostics ?? EMPTY_DICTIONARY,
   "zh-Hans": (zhHansCatalog as LocaleCatalog).diagnostics ?? EMPTY_DICTIONARY,
   "zh-Hant": (zhHantCatalog as LocaleCatalog).diagnostics ?? EMPTY_DICTIONARY,
 };
