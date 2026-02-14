@@ -3,11 +3,16 @@
   "version": "0.7.0",
   "description": "ESLint for AI Agents — Score, diagnose, and auto-fix your CLAUDE.md and agent workspace files",
   "private": true,
+  "bin": {
+    "agentlinter": "packages/cli/dist/bin.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:cli": "npm --prefix packages/cli run build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "npm --prefix packages/cli install --no-audit --no-fund && npm run build:cli"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1",

@@ -55,6 +55,9 @@ Your AI agent is only as good as its config files. A vague `CLAUDE.md` produces 
 
 ```bash
 npx agentlinter
+
+# Run directly from a specific GitHub branch
+npx --yes github:kargnas/agentlinter#main -- --help
 ```
 
 That's it. **Free, open source, forever.** No config. No API key. No signup. No paywall. Runs in seconds.
