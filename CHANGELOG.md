@@ -2,6 +2,115 @@
 
 All notable changes to AgentLinter will be documented in this file.
 
+## [0.7.0] - 2026-02-14
+
+### 🚀 Major Feature Release - Comprehensive Best Practices Integration
+
+This release adds **25+ new linting rules** based on extensive Claude Code research and agent workspace best practices.
+
+### Added - Best Practices Rules
+
+**A. Advanced Inspection:**
+
+- **`best-practices/instruction-counter`**: Count imperative instructions with smart severity:
+  - ⚠️ **Warning** at 100+ instructions
+  - 🔴 **Error** at 150+ instructions
+  - Prevents instruction dilution and cognitive overload
+
+- **`best-practices/context-bloat-detector`**: Multi-level bloat detection:
+  - Line count analysis (300+ lines = error)
+  - Repetition detection (same instruction 3+ times)
+  - Suggests aggressive splitting for bloated files
+
+- **`best-practices/progressive-disclosure`**: Checks for priority grouping structure
+  - Detects missing priority markers (Critical/Standard/Optional)
+  - Triggers when 20+ instructions lack organization
+
+- **`best-practices/anti-patterns`**: Comprehensive anti-pattern detection:
+  - Code style rules in CLAUDE.md (should be in `.claude/rules/`)
+  - Embedded credentials (even placeholders)
+  - Ineffective "act as" roleplay instructions
+
+**B. Auto-fix Suggestions:**
+
+- **`autofix/extract-instructions`**: Smart section extraction recommender
+  - Detects domain-specific sections (git, deploy, testing, security, etc.)
+  - Suggests optimal target paths (`skills/`, `.claude/rules/`)
+  - Triggers when sections exceed 15 lines
+
+- **`autofix/convert-code-snippets`**: Reference optimization
+  - Detects embedded code blocks >20 lines
+  - Suggests extracting to files with line references
+  - Reduces context bloat from large snippets
+
+- **`autofix/structure-optimizer`**: WHY/WHAT/HOW framework checker
+  - Validates sections have rationale/context
+  - Suggests splitting instructions by intent
+  - Improves agent comprehension
+
+- **`autofix/consolidate-duplicates`**: Duplicate detection with Jaccard similarity
+  - Finds similar instructions (>80% similarity)
+  - Suggests consolidation to single canonical version
+
+**C. Integration Validation:**
+
+- **`integration/mcp-server-validator`**: Complete MCP config validation
+  - JSON syntax checking
+  - Schema validation (`mcpServers`, `command`, `url`)
+  - Common issue detection (missing `-y` in npx, empty commands)
+
+- **`integration/skills-linter`**: SKILL.md comprehensive checker
+  - Required sections validation (What/When/How)
+  - Security pattern detection (dangerous commands)
+  - Hook file existence verification
+
+- **`integration/hooks-checker`**: Executable hook safety
+  - Shebang validation
+  - Best practices checking (`set -e`, `set -u`)
+  - Unsafe variable expansion detection
+
+- **`integration/cross-file-references`**: Broken reference detector
+  - Validates `@import`, `@include`, `@see`, `@ref` paths
+  - Reports missing files
+
+- **`integration/skill-workspace-sync`**: Documentation completeness
+  - Checks if skills/ directories are documented in main file
+  - Ensures discoverability
+
+### Changed
+
+- Updated rule registry to include new rule categories
+- Enhanced type system to support auto-fix suggestions
+- Improved diagnostic messages with actionable fixes
+
+### Performance
+
+- All new rules optimized for minimal performance impact
+- Smart pattern matching reduces false positives
+- Batch processing for cross-file validations
+
+### Migration Guide
+
+No breaking changes. New rules are automatically enabled.
+
+To disable specific rules, add to your `.agentlinter.json`:
+```json
+{
+  "rules": {
+    "best-practices/instruction-counter": "off",
+    "autofix/extract-instructions": "off"
+  }
+}
+```
+
+### References
+
+- Claude Code Best Practices: https://github.com/shanraisshan/claude-code-best-practice
+- Progressive Disclosure Pattern: LLM prompt engineering research
+- MCP Protocol Spec: Model Context Protocol documentation
+
+---
+
 ## [0.6.0] - 2026-02-11
 
 ### Added - English Config Files Rule
