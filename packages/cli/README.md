@@ -30,6 +30,19 @@ npx agentlinter ./my-project
 # Get JSON output (for CI/CD)
 npx agentlinter --json
 
+# Set CLI language (see `--help` for supported locales)
+npx agentlinter --lang ko
+
+# Chinese (Simplified / Traditional)
+npx agentlinter --lang zh-Hans
+npx agentlinter --lang zh-Hant
+
+# Or via env var
+AGENTLINTER_LANG=ko npx agentlinter
+
+# Locale resolution priority
+# --lang > AGENTLINTER_LANG > LANG > default locale (configured in i18n constants)
+
 # Upload & share your score
 npx agentlinter --share
 ```
