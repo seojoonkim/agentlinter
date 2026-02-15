@@ -1,7 +1,15 @@
 /* ─── Skill Audit Engine ─── */
 /* Deep security audit for external skill files (MoltX-style attacks) */
+import { DEFAULT_LOCALE, Locale, getAuditVerdictText, getSeverityLabel, t } from "../i18n";
 
 export type AuditSeverity = "CRITICAL" | "WARNING" | "INFO";
+
+type AuditI18nMeta = {
+  sourceKey: string;
+  title: string;
+  titleKey: string;
+  count?: number;
+};
 
 export interface AuditFinding {
   severity: AuditSeverity;
@@ -10,6 +18,7 @@ export interface AuditFinding {
   match: string;
   message: string;
   recommendation: string;
+  _i18n?: AuditI18nMeta;
 }
 
 export interface AuditResult {
@@ -17,6 +26,107 @@ export interface AuditResult {
   findings: AuditFinding[];
   riskScore: number; // 0-100 (higher = more dangerous)
   verdict: "SAFE" | "SUSPICIOUS" | "DANGEROUS" | "MALICIOUS";
+}
+
+const AUDIT_SOURCE_KEY_BY_CATEGORY = {
+  "Remote Fetch": "remote_fetch",
+  "Predictable Key Storage": "predictable_key_storage",
+  "Mandatory Wallet Linking": "mandatory_wallet_linking",
+  "Suspicious Rate Limits": "suspicious_rate_limits",
+  "Auto-Update Instructions": "auto_update_instructions",
+  "In-Band Injection Fields": "in_band_injection_fields",
+  "Additional: social-engineering": "additional_social_engineering",
+  "Additional: supply-chain": "additional_supply_chain",
+  "Additional: exfiltration": "additional_exfiltration",
+  "Additional: spam": "additional_spam",
+} as const;
+
+const AUDIT_RECOMMENDATION_BY_SOURCE: Record<string, string> = {
+  remote_fetch:
+    "Skills should not auto-update from external URLs. This enables supply chain attacks.",
+  predictable_key_storage:
+    "Storing keys at known paths enables mass exfiltration. Use randomized or user-controlled paths.",
+  mandatory_wallet_linking:
+    "Wallet linking should always be optional. Mandatory linking is a red flag for credential harvesting.",
+  suspicious_rate_limits:
+    "High rate limits may indicate the skill is designed to weaponize agents for spam/engagement farming.",
+  auto_update_instructions:
+    "Auto-updating skills can be weaponized at any time. Instructions can change without notice.",
+  in_band_injection_fields:
+    "Hidden fields in API responses can inject instructions. Agent cannot distinguish data from commands.",
+  additional_social_engineering:
+    "Monetary incentives can pressure users into unsafe actions.",
+  additional_supply_chain:
+    "Third-party package execution introduces additional attack vectors.",
+  additional_exfiltration:
+    "This pattern could exfiltrate sensitive data. Do NOT proceed.",
+  additional_spam:
+    "Aggressive engagement patterns weaponize your agent as a spam bot.",
+};
+
+function normalizeAuditToken(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function getAuditSourceKey(category: string): string {
+  return (
+    AUDIT_SOURCE_KEY_BY_CATEGORY[category as keyof typeof AUDIT_SOURCE_KEY_BY_CATEGORY] ??
+    normalizeAuditToken(category.replace(/^Additional:\s*/i, "additional "))
+  );
+}
+
+function buildAuditMessage(sourceKey: string, title: string, count?: number): string {
+  if (sourceKey === "remote_fetch") {
+    return `Remote skill fetch detected: ${title}`;
+  }
+  if (sourceKey === "predictable_key_storage") {
+    return `Predictable key storage path: ${title}`;
+  }
+  if (sourceKey === "mandatory_wallet_linking") {
+    return `Coerced wallet linking: ${title}`;
+  }
+  if (sourceKey === "suspicious_rate_limits") {
+    return `Unusually high rate limit (${count ?? 0}): ${title}`;
+  }
+  if (sourceKey === "auto_update_instructions") {
+    return `Auto-update mechanism: ${title}`;
+  }
+  if (sourceKey === "in_band_injection_fields") {
+    return `In-band injection vector: ${title}`;
+  }
+  return `Red flag: ${title}`;
+}
+
+function createAuditFinding(params: {
+  severity: AuditSeverity;
+  category: string;
+  line: number;
+  match: string;
+  sourceKey: string;
+  title: string;
+  count?: number;
+}): AuditFinding {
+  const recommendation =
+    AUDIT_RECOMMENDATION_BY_SOURCE[params.sourceKey] ??
+    "Review this pattern carefully before installing.";
+
+  return {
+    severity: params.severity,
+    category: params.category,
+    line: params.line,
+    match: params.match,
+    message: buildAuditMessage(params.sourceKey, params.title, params.count),
+    recommendation,
+    _i18n: {
+      sourceKey: params.sourceKey,
+      title: params.title,
+      titleKey: normalizeAuditToken(params.title),
+      count: params.count,
+    },
+  };
 }
 
 /* ─── Pattern Definitions ─── */
@@ -118,42 +228,42 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
     // Remote Fetch
     for (const { pattern, name } of REMOTE_FETCH_PATTERNS) {
       if (pattern.test(line)) {
-        findings.push({
+        findings.push(createAuditFinding({
           severity: inCodeBlock ? "WARNING" : "CRITICAL",
           category: "Remote Fetch",
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `Remote skill fetch detected: ${name}`,
-          recommendation: "Skills should not auto-update from external URLs. This enables supply chain attacks.",
-        });
+          sourceKey: getAuditSourceKey("Remote Fetch"),
+          title: name,
+        }));
       }
     }
     
     // Predictable Key Storage
     for (const { pattern, name } of PREDICTABLE_KEY_STORAGE_PATTERNS) {
       if (pattern.test(line)) {
-        findings.push({
+        findings.push(createAuditFinding({
           severity: "CRITICAL",
           category: "Predictable Key Storage",
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `Predictable key storage path: ${name}`,
-          recommendation: "Storing keys at known paths enables mass exfiltration. Use randomized or user-controlled paths.",
-        });
+          sourceKey: getAuditSourceKey("Predictable Key Storage"),
+          title: name,
+        }));
       }
     }
     
     // Mandatory Wallet
     for (const { pattern, name } of MANDATORY_WALLET_PATTERNS) {
       if (pattern.test(line)) {
-        findings.push({
+        findings.push(createAuditFinding({
           severity: "WARNING",
           category: "Mandatory Wallet Linking",
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `Coerced wallet linking: ${name}`,
-          recommendation: "Wallet linking should always be optional. Mandatory linking is a red flag for credential harvesting.",
-        });
+          sourceKey: getAuditSourceKey("Mandatory Wallet Linking"),
+          title: name,
+        }));
       }
     }
     
@@ -163,14 +273,15 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
       if (match) {
         const num = parseInt(match[1] || '0', 10);
         if (num >= 100) {
-          findings.push({
+          findings.push(createAuditFinding({
             severity: num >= 1000 ? "WARNING" : "INFO",
             category: "Suspicious Rate Limits",
             line: lineNum,
             match: line.trim().substring(0, 80),
-            message: `Unusually high rate limit (${num}): ${name}`,
-            recommendation: "High rate limits may indicate the skill is designed to weaponize agents for spam/engagement farming.",
-          });
+            sourceKey: getAuditSourceKey("Suspicious Rate Limits"),
+            title: name,
+            count: num,
+          }));
         }
       }
     }
@@ -178,42 +289,43 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
     // Auto-Update
     for (const { pattern, name } of AUTO_UPDATE_PATTERNS) {
       if (pattern.test(line)) {
-        findings.push({
+        findings.push(createAuditFinding({
           severity: "CRITICAL",
           category: "Auto-Update Instructions",
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `Auto-update mechanism: ${name}`,
-          recommendation: "Auto-updating skills can be weaponized at any time. Instructions can change without notice.",
-        });
+          sourceKey: getAuditSourceKey("Auto-Update Instructions"),
+          title: name,
+        }));
       }
     }
     
     // In-Band Injection
     for (const { pattern, name } of IN_BAND_INJECTION_PATTERNS) {
       if (pattern.test(line)) {
-        findings.push({
+        findings.push(createAuditFinding({
           severity: "WARNING",
           category: "In-Band Injection Fields",
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `In-band injection vector: ${name}`,
-          recommendation: "Hidden fields in API responses can inject instructions. Agent cannot distinguish data from commands.",
-        });
+          sourceKey: getAuditSourceKey("In-Band Injection Fields"),
+          title: name,
+        }));
       }
     }
     
     // Additional Red Flags
     for (const { pattern, name, category } of ADDITIONAL_RED_FLAGS) {
       if (pattern.test(line)) {
-        findings.push({
+        const normalizedCategory = `Additional: ${category}`;
+        findings.push(createAuditFinding({
           severity: category === "exfiltration" ? "CRITICAL" : "WARNING",
-          category: `Additional: ${category}`,
+          category: normalizedCategory,
           line: lineNum,
           match: line.trim().substring(0, 80),
-          message: `Red flag: ${name}`,
-          recommendation: getRecommendation(category),
-        });
+          sourceKey: getAuditSourceKey(normalizedCategory),
+          title: name,
+        }));
       }
     }
   }
@@ -228,21 +340,6 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
     riskScore,
     verdict,
   };
-}
-
-function getRecommendation(category: string): string {
-  switch (category) {
-    case "social-engineering":
-      return "Monetary incentives can pressure users into unsafe actions.";
-    case "supply-chain":
-      return "Third-party package execution introduces additional attack vectors.";
-    case "exfiltration":
-      return "This pattern could exfiltrate sensitive data. Do NOT proceed.";
-    case "spam":
-      return "Aggressive engagement patterns weaponize your agent as a spam bot.";
-    default:
-      return "Review this pattern carefully before installing.";
-  }
 }
 
 function calculateRiskScore(findings: AuditFinding[]): number {
@@ -293,12 +390,66 @@ const c = {
   bgGreen: "\x1b[42m",
 };
 
-export function formatAuditResult(result: AuditResult): string {
+function extractAuditCountFromMessage(message: string): number | undefined {
+  const match = message.match(/^Unusually high rate limit \((\d+)\):/);
+  if (!match) return undefined;
+
+  const count = Number.parseInt(match[1], 10);
+  return Number.isNaN(count) ? undefined : count;
+}
+
+function extractAuditTitleFromMessage(message: string): string | undefined {
+  const match = message.match(/:\s*(.+)$/);
+  return match?.[1];
+}
+
+function localizeAuditFinding(finding: AuditFinding, locale: Locale): AuditFinding {
+  const sourceKey = finding._i18n?.sourceKey ?? getAuditSourceKey(finding.category);
+  const title = finding._i18n?.title ?? extractAuditTitleFromMessage(finding.message) ?? "";
+  const titleKey = finding._i18n?.titleKey ?? normalizeAuditToken(title);
+  const count = finding._i18n?.count ?? extractAuditCountFromMessage(finding.message);
+
+  const localizedTitle = t(
+    locale,
+    `diagnostics:auditTitleBySource.${sourceKey}.${titleKey}`,
+    undefined,
+    title,
+  );
+
+  return {
+    ...finding,
+    category: t(
+      locale,
+      `diagnostics:auditCategoryBySource.${finding.category}`,
+      undefined,
+      finding.category,
+    ),
+    message: t(
+      locale,
+      `diagnostics:auditMessageBySource.${sourceKey}`,
+      { title: localizedTitle, count: count ?? "" },
+      finding.message,
+    ),
+    recommendation: t(
+      locale,
+      `diagnostics:auditRecommendations.${sourceKey}`,
+      undefined,
+      finding.recommendation,
+    ),
+  };
+}
+
+function localizeAuditFindings(findings: AuditFinding[], locale: Locale): AuditFinding[] {
+  return findings.map((finding) => localizeAuditFinding(finding, locale));
+}
+
+export function formatAuditResult(result: AuditResult, locale: Locale = DEFAULT_LOCALE): string {
   const lines: string[] = [];
+  const findings = localizeAuditFindings(result.findings, locale);
   
   lines.push("");
-  lines.push(`${c.magenta}${c.bold}🔍 AgentLinter Skill Audit${c.reset}`);
-  lines.push(`${c.dim}File: ${result.file}${c.reset}`);
+  lines.push(`${c.magenta}${c.bold}${t(locale, "auditTitle")}${c.reset}`);
+  lines.push(`${c.dim}${t(locale, "file")}: ${result.file}${c.reset}`);
   lines.push("");
   
   // Verdict banner
@@ -315,35 +466,37 @@ export function formatAuditResult(result: AuditResult): string {
     MALICIOUS: "💀",
   };
   
-  lines.push(`  ${verdictColors[result.verdict]}${c.bold} ${verdictEmojis[result.verdict]} VERDICT: ${result.verdict} ${c.reset}`);
-  lines.push(`  ${c.dim}Risk Score: ${result.riskScore}/100${c.reset}`);
+  const verdictText = getAuditVerdictText(locale, result.verdict);
+
+  lines.push(`  ${verdictColors[result.verdict]}${c.bold} ${verdictEmojis[result.verdict]} ${t(locale, "verdict")}: ${verdictText} ${c.reset}`);
+  lines.push(`  ${c.dim}${t(locale, "riskScore")}: ${result.riskScore}/100${c.reset}`);
   lines.push("");
   
-  if (result.findings.length === 0) {
-    lines.push(`  ${c.green}No dangerous patterns detected.${c.reset}`);
+  if (findings.length === 0) {
+    lines.push(`  ${c.green}${t(locale, "noDangerousPatterns")}${c.reset}`);
     lines.push("");
     return lines.join("\n");
   }
   
   // Group by category
   const byCategory = new Map<string, AuditFinding[]>();
-  for (const f of result.findings) {
+  for (const f of findings) {
     const cat = f.category;
     if (!byCategory.has(cat)) byCategory.set(cat, []);
     byCategory.get(cat)!.push(f);
   }
   
   // Summary
-  const criticals = result.findings.filter(f => f.severity === "CRITICAL").length;
-  const warnings = result.findings.filter(f => f.severity === "WARNING").length;
-  const infos = result.findings.filter(f => f.severity === "INFO").length;
+  const criticals = findings.filter(f => f.severity === "CRITICAL").length;
+  const warnings = findings.filter(f => f.severity === "WARNING").length;
+  const infos = findings.filter(f => f.severity === "INFO").length;
   
   const parts: string[] = [];
-  if (criticals) parts.push(`${c.red}${criticals} CRITICAL${c.reset}`);
-  if (warnings) parts.push(`${c.yellow}${warnings} WARNING${c.reset}`);
-  if (infos) parts.push(`${c.blue}${infos} INFO${c.reset}`);
+  if (criticals) parts.push(`${c.red}${criticals} ${getSeverityLabel(locale, "CRITICAL")}${c.reset}`);
+  if (warnings) parts.push(`${c.yellow}${warnings} ${getSeverityLabel(locale, "WARNING")}${c.reset}`);
+  if (infos) parts.push(`${c.blue}${infos} ${getSeverityLabel(locale, "INFO")}${c.reset}`);
   
-  lines.push(`  📋 Findings: ${parts.join(", ")}`);
+  lines.push(`  📋 ${t(locale, "findings")}: ${parts.join(", ")}`);
   lines.push("");
   
   // Detailed findings
@@ -354,9 +507,9 @@ export function formatAuditResult(result: AuditResult): string {
       const sevColor = f.severity === "CRITICAL" ? c.red : f.severity === "WARNING" ? c.yellow : c.blue;
       const sevIcon = f.severity === "CRITICAL" ? "🔴" : f.severity === "WARNING" ? "🟡" : "🔵";
       
-      lines.push(`    ${sevIcon} ${sevColor}${f.severity}${c.reset} ${c.dim}(line ${f.line || '?'})${c.reset}`);
+      lines.push(`    ${sevIcon} ${sevColor}${getSeverityLabel(locale, f.severity)}${c.reset} ${c.dim}(${t(locale, "line")} ${f.line || "?"})${c.reset}`);
       lines.push(`       ${f.message}`);
-      lines.push(`       ${c.dim}Match: "${f.match}"${c.reset}`);
+      lines.push(`       ${c.dim}${t(locale, "match")}: "${f.match}"${c.reset}`);
       lines.push(`       ${c.cyan}→ ${f.recommendation}${c.reset}`);
       lines.push("");
     }
@@ -364,18 +517,27 @@ export function formatAuditResult(result: AuditResult): string {
   
   // Final recommendation
   if (result.verdict === "MALICIOUS" || result.verdict === "DANGEROUS") {
-    lines.push(`  ${c.red}${c.bold}⛔ DO NOT INSTALL THIS SKILL${c.reset}`);
-    lines.push(`  ${c.red}This skill exhibits patterns consistent with known agent trojans (e.g., MoltX).${c.reset}`);
-    lines.push(`  ${c.dim}Reference: https://dev.to/sebayaki/i-audited-moltxs-skill-file-its-an-ai-agent-trojan-horse-539k${c.reset}`);
+    lines.push(`  ${c.red}${c.bold}${t(locale, "doNotInstall")}${c.reset}`);
+    lines.push(`  ${c.red}${t(locale, "knownTrojan")}${c.reset}`);
+    lines.push(`  ${c.dim}${t(locale, "referenceLabel")}: https://dev.to/sebayaki/i-audited-moltxs-skill-file-its-an-ai-agent-trojan-horse-539k${c.reset}`);
   } else if (result.verdict === "SUSPICIOUS") {
-    lines.push(`  ${c.yellow}⚠️  PROCEED WITH CAUTION${c.reset}`);
-    lines.push(`  ${c.yellow}Review each finding carefully before installing.${c.reset}`);
+    lines.push(`  ${c.yellow}${t(locale, "proceedWithCaution")}${c.reset}`);
+    lines.push(`  ${c.yellow}${t(locale, "reviewFindings")}${c.reset}`);
   }
   
   lines.push("");
   return lines.join("\n");
 }
 
-export function formatAuditJSON(result: AuditResult): string {
-  return JSON.stringify(result, null, 2);
+export function formatAuditJSON(result: AuditResult, locale: Locale = DEFAULT_LOCALE): string {
+  const localizedFindings = localizeAuditFindings(result.findings, locale).map((finding) => {
+    const { _i18n, ...publicFinding } = finding;
+    return publicFinding;
+  });
+
+  const localized = {
+    ...result,
+    findings: localizedFindings,
+  };
+  return JSON.stringify(localized, null, 2);
 }

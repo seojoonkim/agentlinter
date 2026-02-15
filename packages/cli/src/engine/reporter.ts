@@ -1,17 +1,27 @@
 /* ─── Output Reporter ─── */
 
-import { LintResult, CATEGORY_LABELS, Diagnostic } from "./types";
+import { LintResult } from "./types";
+import {
+  DEFAULT_LOCALE,
+  Locale,
+  getCategoryLabel,
+  getDiagnosticBadge,
+  getSuggestedFixesSummary,
+  t,
+} from "../i18n";
+import { localizeDiagnostics } from "../i18n-diagnostics";
 
 /**
  * Format lint result as terminal output
  */
-export function formatTerminal(result: LintResult): string {
+export function formatTerminal(result: LintResult, locale: Locale = DEFAULT_LOCALE): string {
   const lines: string[] = [];
+  const diagnostics = localizeDiagnostics(result.diagnostics, locale);
 
   lines.push("");
   lines.push("🔍 AgentLinter v0.1.0");
-  lines.push(`📁 Scanning workspace: ${result.workspace}`);
-  lines.push(`📄 Files found: ${result.files.map((f) => f.name).join(", ")}`);
+  lines.push(`📁 ${t(locale, "scanStart", { path: result.workspace })}`);
+  lines.push(`📄 ${t(locale, "files")}: ${result.files.map((f) => f.name).join(", ")}`);
   lines.push("");
 
   // Overall score
@@ -24,26 +34,26 @@ export function formatTerminal(result: LintResult): string {
           ? "⚠️"
           : "❌";
 
-  lines.push(`${scoreEmoji} Overall Score: ${result.totalScore}/100`);
+  lines.push(`${scoreEmoji} ${t(locale, "overallScore")}: ${result.totalScore}/100`);
   lines.push("");
 
   // Category scores
   for (const cat of result.categories) {
     const bar = makeBar(cat.score);
-    const label = CATEGORY_LABELS[cat.category].padEnd(14);
+    const label = getCategoryLabel(cat.category, locale).padEnd(14);
     lines.push(`  ${label} ${bar} ${cat.score}`);
   }
   lines.push("");
 
   // Diagnostics
-  const errors = result.diagnostics.filter((d) => d.severity === "critical");
-  const warnings = result.diagnostics.filter((d) => d.severity === "warning");
-  const infos = result.diagnostics.filter((d) => d.severity === "info");
+  const errors = diagnostics.filter((d) => d.severity === "critical");
+  const warnings = diagnostics.filter((d) => d.severity === "warning");
+  const infos = diagnostics.filter((d) => d.severity === "info");
 
   const counts = [
-    errors.length > 0 ? `${errors.length} error(s)` : null,
-    warnings.length > 0 ? `${warnings.length} warning(s)` : null,
-    infos.length > 0 ? `${infos.length} info(s)` : null,
+    errors.length > 0 ? t(locale, "criticalCount", { count: errors.length }) : null,
+    warnings.length > 0 ? t(locale, "warningCount", { count: warnings.length }) : null,
+    infos.length > 0 ? t(locale, "suggestionCount", { count: infos.length }) : null,
   ]
     .filter(Boolean)
     .join(", ");
@@ -55,28 +65,27 @@ export function formatTerminal(result: LintResult): string {
 
   // List diagnostics grouped by severity
   for (const diag of [...errors, ...warnings, ...infos]) {
-    const icon =
+    const icon = (
       diag.severity === "critical"
-        ? "❌ ERROR"
+        ? getDiagnosticBadge(locale, "critical")
         : diag.severity === "warning"
-          ? "⚠️  WARN"
-          : "ℹ️  INFO";
+          ? getDiagnosticBadge(locale, "warning")
+          : getDiagnosticBadge(locale, "info")
+    );
 
     const location = diag.line ? `${diag.file}:${diag.line}` : diag.file;
     lines.push(`  ${icon}  ${location}`);
     lines.push(`         ${diag.message}`);
     if (diag.fix) {
-      lines.push(`         💡 Fix: ${diag.fix}`);
+      lines.push(`         💡 ${t(locale, "fixLabel")}: ${diag.fix}`);
     }
     lines.push("");
   }
 
   // Auto-fixable count
-  const fixable = result.diagnostics.filter((d) => d.fix).length;
+  const fixable = diagnostics.filter((d) => d.fix).length;
   if (fixable > 0) {
-    lines.push(
-      `💡 ${fixable} issue(s) have suggested fixes above. Apply them manually to improve your score.`
-    );
+    lines.push(getSuggestedFixesSummary(locale, fixable));
     lines.push("");
   }
 
@@ -86,17 +95,19 @@ export function formatTerminal(result: LintResult): string {
 /**
  * Format lint result as JSON
  */
-export function formatJSON(result: LintResult): string {
+export function formatJSON(result: LintResult, locale: Locale = DEFAULT_LOCALE): string {
+  const diagnostics = localizeDiagnostics(result.diagnostics, locale);
+
   return JSON.stringify(
     {
       score: result.totalScore,
       categories: result.categories.map((c) => ({
-        name: CATEGORY_LABELS[c.category],
+        name: getCategoryLabel(c.category, locale),
         score: c.score,
         weight: c.weight,
         issues: c.diagnostics.length,
       })),
-      diagnostics: result.diagnostics.map((d) => ({
+      diagnostics: diagnostics.map((d) => ({
         severity: d.severity,
         category: d.category,
         rule: d.rule,
