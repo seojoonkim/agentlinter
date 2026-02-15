@@ -101,7 +101,11 @@ function computeCategoryScore(
   // Deductions (with caps to prevent info avalanche from tanking score)
   score -= criticals.length * 20; // criticals are showstoppers
   score -= errors.length * 15; // errors are severe
-  score -= warnings.length * 5; // warnings are moderate
+  
+  // Runtime: reduce warning penalty (3 instead of 5) to reward good patterns over warnings
+  const warningPenalty = category === "runtime" ? 3 : 5;
+  score -= warnings.length * warningPenalty;
+  
   score -= Math.min(infos.length * 1, 20); // infos are minor, capped at -20
 
   // Bonus points for good practices (category-specific)
@@ -172,7 +176,47 @@ function computeBonus(category: Category, files: FileInfo[]): number {
 
     case "runtime":
       // Bonus for having a runtime config
-      if (files.some((f) => f.name === "clawdbot.json" || f.name === "openclaw.json")) bonus += 5;
+      const configFile = files.find((f) => 
+        f.name === "clawdbot.json" || 
+        f.name === "openclaw.json" || 
+        f.name === ".clawdbot/clawdbot.json"
+      );
+      
+      if (configFile) {
+        bonus += 5; // Basic config exists
+        
+        try {
+          const config = JSON.parse(configFile.content);
+          
+          // +10 for using env var pattern (best practice for secrets)
+          const hasEnvVarPattern = /\$\{[A-Z_]+\}/.test(configFile.content);
+          if (hasEnvVarPattern) bonus += 10;
+          
+          // +5 for strong auth token (32+ chars or env var reference)
+          const authToken = config.gateway?.auth?.token;
+          if (authToken && (authToken.startsWith("${") || authToken.length >= 32)) {
+            bonus += 5;
+          }
+          
+          // +5 for using allowlist group policy (secure by default)
+          const channels = config.channels;
+          if (channels && typeof channels === "object") {
+            const hasAllowlistGroup = Object.values(channels).some((ch: any) => 
+              ch?.groupPolicy === "allowlist"
+            );
+            if (hasAllowlistGroup) bonus += 5;
+            
+            // +5 for restrictive DM policy (pairing or has allowFrom)
+            const hasRestrictiveDM = Object.values(channels).some((ch: any) => 
+              ch?.dmPolicy === "pairing" || 
+              (ch?.dmPolicy === "open" && Array.isArray(ch?.allowFrom) && ch.allowFrom.length > 0)
+            );
+            if (hasRestrictiveDM) bonus += 5;
+          }
+        } catch {
+          // JSON parse failed — skip bonus (config-exists rule will warn)
+        }
+      }
       break;
 
     case "skillSafety":
