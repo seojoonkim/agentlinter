@@ -315,8 +315,10 @@ export const consistencyRules: Rule[] = [
       if (!soulFile) return [];
 
       const soulContent = soulFile.content.toLowerCase();
-      const isCasual = /casual|friendly|informal|relaxed|conversational|chill/i.test(soulContent);
-      const isFormal = /formal|professional|enterprise|corporate|official/i.test(soulContent);
+      // Enhanced casual patterns: conversational phrases, personal language
+      const isCasual = /casual|friendly|informal|relaxed|conversational|chill|want to|talk to|real|honest|authentic|human|natural|approachable/i.test(soulContent);
+      // Formal patterns: exclude "corporate" as it's often used negatively ("not a corporate drone")
+      const isFormal = /\b(formal|professional|enterprise|official)\b/i.test(soulContent);
 
       if (!isCasual && !isFormal) return [];
 
@@ -584,11 +586,17 @@ export const consistencyRules: Rule[] = [
         allSections.set(file.name, headings);
       }
 
-      const SECTION_REF = /(?:section|see)\s+['"`]([^'"`]+)['"`]/gi;
+      // Only match section references (quoted text that doesn't end with .md)
+      // Skip file references like "See SECURITY.md" or `FORMATTING.md`
+      const SECTION_REF = /(?:section|see)\s+['"`]([^'"`]+?)['"`]/gi;
       for (const file of files) {
         const matches = file.content.matchAll(SECTION_REF);
         for (const m of matches) {
-          const refSection = m[1].toLowerCase();
+          const refText = m[1];
+          // Skip if it's a file reference (ends with .md)
+          if (/\.md$/i.test(refText)) continue;
+          
+          const refSection = refText.toLowerCase();
           // Check if this section exists in any file
           let found = false;
           for (const [, headings] of allSections) {
@@ -603,7 +611,7 @@ export const consistencyRules: Rule[] = [
               category: "consistency",
               rule: this.id,
               file: file.name,
-              message: `Referenced section "${m[1]}" not found in any file.`,
+              message: `Referenced section "${refText}" not found in any file.`,
               fix: "Update the reference to match an existing section heading.",
             });
           }
