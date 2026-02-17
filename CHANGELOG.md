@@ -2,6 +2,68 @@
 
 All notable changes to AgentLinter will be documented in this file.
 
+## [0.8.0] - 2026-02-17
+
+### 🔬 Claude Code 최신 스펙 반영 + 신규 린팅 룰 7개
+
+이번 릴리스는 Claude Code 공식 최신 스펙(2026-02-17) 및 Repomix 연계 힌트를 반영합니다.
+
+### Added - 신규 린팅 룰 (7개)
+
+#### Security (보안)
+- **`security/no-bypass-permissions`** ⛔ CRITICAL
+  - `allowedTools`에 Bash 무제한 허용 패턴 및 `bypassPermissions` 모드 탐지
+  - 무제한 셸 실행 권한 부여 경고
+
+- **`security/critical-rules-enforce-hooks`** ⚠️ WARNING (HIGH)
+  - CLAUDE.md/AGENTS.md의 MUST NOT / NEVER 규칙이 Hooks로 강제되는지 확인
+  - "CLAUDE.md는 확률적, Hooks는 결정적" 패러다임 반영
+
+#### Skill Safety (스킬 안전성)
+- **`skill-safety/skill-description-required`** ⚠️ WARNING (HIGH)
+  - Skills SKILL.md frontmatter에 `description` 필수 확인
+  - Claude 자동 invocation 결정 기준 필드 검증
+
+- **`skill-safety/sideeffect-skill-manual`** ⚠️ WARNING (MEDIUM)
+  - deploy/commit/publish/delete 포함 skill에 `disable-model-invocation: true` 권장
+  - 사이드이펙트 있는 스킬의 자동 실행 방지
+
+- **`skill-safety/skill-line-limit`** ℹ️ WARNING/INFO (MEDIUM)
+  - SKILL.md 500줄 초과 경고, 300줄에서 사전 경고
+  - Claude Code 공식 권장 기준
+
+#### Claude Code Spec (최신 스펙)
+- **`claude-code/agent-description-required`** 🔴 ERROR (HIGH)
+  - `.claude/agents/*.md` frontmatter에 `description` 및 `name` 필수
+  - 위임 결정 핵심 필드 검증
+
+- **`claude-code/validate-plugin-manifest`** ⚠️ WARNING (MEDIUM)
+  - `.claude-plugin/plugin.json` 필수 필드(name, version) 및 semver 형식 검증
+  - Plugin Marketplace 배포를 위한 스펙 준수
+
+### Added - Claude Code 최신 스펙 반영
+
+- **`claude-code/auto-memory-line-limit`**: Auto Memory MEMORY.md 200줄 초과 경고
+  - Claude Code는 첫 200줄만 자동 로드 — 초과 내용은 topic files로 분리 권장
+
+- **`claude-code/import-depth-limit`**: `@import` 구문 5단계 재귀 제한 체크
+  - 5단계 초과 시 silent fail 가능성 경고
+
+- **`claude-code/validate-rules-path`**: `.claude/rules/` path-specific 룰 검증
+  - paths frontmatter glob 패턴 유효성 및 누락 여부 확인
+
+- **`claude-code/memory-hierarchy-awareness`**: Memory 계층 6단계 지원
+  - Managed → Project → Rules → User → Local → Auto Memory 구조 반영
+  - `CLAUDE.local.md` gitignore 체크, `.claude/rules/` 모듈화 권장
+
+### Added - Repomix 연계 힌트
+
+- **`claude-code/repomix-skill-hint`**: Repomix로 생성된 skill 감지 시 검증 힌트 제공
+  - `references/` 구조 또는 Repomix 시그니처 패턴 탐지
+  - AgentLinter 검증 워크플로우 가이드
+
+---
+
 ## [0.7.0] - 2026-02-14
 
 ### 🚀 Major Feature Release - Comprehensive Best Practices Integration

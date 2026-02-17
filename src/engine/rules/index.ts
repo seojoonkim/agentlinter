@@ -12,6 +12,7 @@ import { skillSafetyRules } from "./skillSafety";
 import { bestPracticesRules } from "./bestPractices";
 import { autofixRules } from "./autofix";
 import { integrationRules } from "./integration";
+import { claudeCodeRules } from "./claudeCode";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -25,6 +26,7 @@ export const allRules: Rule[] = [
   ...bestPracticesRules,
   ...autofixRules,
   ...integrationRules,
+  ...claudeCodeRules,
 ];
 
 export {
@@ -39,4 +41,5 @@ export {
   bestPracticesRules,
   autofixRules,
   integrationRules,
+  claudeCodeRules,
 };

@@ -45,7 +45,145 @@ function isSecuritySkill(file: { name: string; content: string }): boolean {
   );
 }
 
+/** Side-effect keywords that warrant disable-model-invocation */
+const SIDEEFFECT_KEYWORDS =
+  /\b(deploy|deployment|publish|release|commit|push|merge|delete|rm\s+-rf|drop\s+database|truncate)\b/i;
+
 export const skillSafetyRules: Rule[] = [
+  /* ── v0.8.0: skill-description-required ── */
+  {
+    id: "skill-safety/skill-description-required",
+    category: "skillSafety",
+    severity: "warning",
+    description:
+      "Skills SKILL.md must have a 'description' frontmatter field — Claude uses this to decide when to invoke the skill automatically",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      const skillFiles = files.filter(
+        (f) => f.name.includes("skills/") && f.name.endsWith("SKILL.md")
+      );
+
+      for (const file of skillFiles) {
+        if (!file.content.startsWith("---")) {
+          diagnostics.push({
+            severity: "warning",
+            category: "skillSafety",
+            rule: this.id,
+            file: file.name,
+            message: "Skill missing YAML frontmatter — description is required for auto-invocation.",
+            fix: "Add frontmatter with description:\n---\nname: skill-name\ndescription: \"When and what this skill does\"\n---",
+          });
+          continue;
+        }
+
+        const frontmatter = file.content.split("---")[1] || "";
+        if (!frontmatter.includes("description")) {
+          diagnostics.push({
+            severity: "warning",
+            category: "skillSafety",
+            rule: this.id,
+            file: file.name,
+            message:
+              "Skill missing 'description' field — Claude cannot determine when to auto-invoke this skill.",
+            fix:
+              "Add description to frontmatter. Be specific about when to use it:\n  description: \"Use when user asks to analyze TypeScript type errors\"",
+          });
+        }
+      }
+
+      return diagnostics;
+    },
+  },
+
+  /* ── v0.8.0: sideeffect-skill-manual ── */
+  {
+    id: "skill-safety/sideeffect-skill-manual",
+    category: "skillSafety",
+    severity: "warning",
+    description:
+      "Skills with side effects (deploy, commit, publish) should have 'disable-model-invocation: true' to prevent accidental auto-execution",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      const skillFiles = files.filter(
+        (f) => f.name.includes("skills/") && f.name.endsWith("SKILL.md")
+      );
+
+      for (const file of skillFiles) {
+        // Check if the skill contains side-effect keywords
+        const hasSideEffect = SIDEEFFECT_KEYWORDS.test(file.content);
+        if (!hasSideEffect) continue;
+
+        // Check if disable-model-invocation is set
+        const hasDisableFlag =
+          file.content.includes("disable-model-invocation: true") ||
+          file.content.includes("disable-model-invocation:true");
+
+        if (!hasDisableFlag) {
+          // Find which side-effect keyword triggered this
+          const match = file.content.match(SIDEEFFECT_KEYWORDS);
+          diagnostics.push({
+            severity: "warning",
+            category: "skillSafety",
+            rule: this.id,
+            file: file.name,
+            message: `Skill contains side-effect keyword '${match?.[0] ?? ""}' but lacks 'disable-model-invocation: true'. Claude may auto-execute this skill unexpectedly.`,
+            fix:
+              "Add to frontmatter:\n  disable-model-invocation: true\nThis ensures the skill only runs when explicitly invoked by the user.",
+          });
+        }
+      }
+
+      return diagnostics;
+    },
+  },
+
+  /* ── v0.8.0: skill-line-limit ── */
+  {
+    id: "skill-safety/skill-line-limit",
+    category: "skillSafety",
+    severity: "warning",
+    description:
+      "SKILL.md files should stay under 500 lines — Claude Code official recommendation for skill file size",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      const skillFiles = files.filter(
+        (f) => f.name.includes("skills/") && f.name.endsWith("SKILL.md")
+      );
+
+      for (const file of skillFiles) {
+        if (file.lines.length > 500) {
+          diagnostics.push({
+            severity: "warning",
+            category: "skillSafety",
+            rule: this.id,
+            file: file.name,
+            message: `SKILL.md has ${file.lines.length} lines (limit: 500). Large skill files increase context window usage.`,
+            fix:
+              "Move detailed content into supporting files:\n" +
+              "  skills/my-skill/SKILL.md  ← overview only (≤500 lines)\n" +
+              "  skills/my-skill/reference.md  ← detailed reference\n" +
+              "  skills/my-skill/examples.md  ← code examples",
+          });
+        } else if (file.lines.length > 300) {
+          diagnostics.push({
+            severity: "info",
+            category: "skillSafety",
+            rule: this.id,
+            file: file.name,
+            message: `SKILL.md has ${file.lines.length} lines — approaching 500-line limit. Consider splitting long sections.`,
+            fix: "Consider extracting examples or detailed documentation into separate supporting files.",
+          });
+        }
+      }
+
+      return diagnostics;
+    },
+  },
+
+
   {
     id: "skill-safety/has-metadata",
     category: "skillSafety",

@@ -221,4 +221,144 @@ export const securityRules: Rule[] = [
       return [];
     },
   },
+
+  /* ── v0.8.0: no-bypass-permissions ── */
+  {
+    id: "security/no-bypass-permissions",
+    category: "security",
+    severity: "critical",
+    description:
+      "Detect unrestricted Bash/shell permission grants in allowedTools — bypassPermissions mode bypasses ALL security checks",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      // Patterns indicating unlimited Bash/shell execution
+      const BYPASS_PATTERNS = [
+        {
+          pattern: /permissionMode\s*:\s*["']?bypassPermissions["']?/,
+          name: "bypassPermissions mode",
+        },
+        {
+          pattern: /allowedTools\s*:\s*\[?["']Bash["']/i,
+          name: "Bash without restrictions in allowedTools",
+        },
+        {
+          pattern: /"allowedTools".*"Bash\(\*\)"/,
+          name: "Bash(*) — unrestricted shell execution",
+        },
+        {
+          pattern: /tools:\s*[\s\S]*?-\s*Bash\s*$(?!.*allow)/m,
+          name: "Bash in tools without explicit restriction",
+        },
+      ];
+
+      for (const file of files) {
+        // Check .claude/agents/*.md, settings.json, and CLAUDE.md/AGENTS.md
+        const isRelevant =
+          file.name.includes(".claude/agents/") ||
+          file.name.includes("settings.json") ||
+          file.name === "CLAUDE.md" ||
+          file.name === "AGENTS.md" ||
+          file.name.endsWith(".md");
+
+        if (!isRelevant) continue;
+
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          for (const { pattern, name } of BYPASS_PATTERNS) {
+            if (pattern.test(line)) {
+              diagnostics.push({
+                severity: "critical",
+                category: "security",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `Security risk: ${name} — this grants unrestricted shell execution to the agent.`,
+                fix:
+                  "Use specific tool restrictions instead:\n" +
+                  "  allowedTools: [\"Bash(git status)\", \"Bash(npm test)\"]\n" +
+                  "Or use permissionMode: dontAsk with an explicit allowedTools list.",
+              });
+            }
+          }
+        }
+      }
+
+      return diagnostics;
+    },
+  },
+
+  /* ── v0.8.0: critical-rules-enforce-hooks ── */
+  {
+    id: "security/critical-rules-enforce-hooks",
+    category: "security",
+    severity: "warning",
+    description:
+      "Critical rules (MUST/MUST NOT) in CLAUDE.md or AGENTS.md should be enforced via Hooks — CLAUDE.md is probabilistic, Hooks are deterministic",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      const mainFiles = files.filter(
+        (f) =>
+          f.name === "CLAUDE.md" ||
+          f.name === "AGENTS.md" ||
+          f.name.endsWith("/CLAUDE.md") ||
+          f.name.endsWith("/AGENTS.md")
+      );
+
+      if (mainFiles.length === 0) return [];
+
+      // Check if any hooks configuration exists
+      const hasHooksConfig = files.some(
+        (f) =>
+          f.name === "settings.json" ||
+          f.name.endsWith("/settings.json") ||
+          f.name.includes(".claude/hooks") ||
+          f.name.endsWith("hooks.json")
+      );
+
+      // Check for MUST/MUST NOT rules in main files
+      const CRITICAL_RULE_PATTERNS = [
+        /\bMUST\s+NOT\b/,
+        /\bMUST\s+NEVER\b/,
+        /\b절대\s+(?:하지\s+)?(?:마|금지)\b/,
+        /\b❌\s*(?:절대|NEVER|금지)/,
+        /\bNEVER\s+(?:do|use|run|execute|allow)\b/i,
+        /\bCRITICAL\s+RULE\b/i,
+        /\bHARD\s+RULE\b/i,
+      ];
+
+      for (const file of mainFiles) {
+        let criticalRuleCount = 0;
+
+        for (const line of file.lines) {
+          if (CRITICAL_RULE_PATTERNS.some((p) => p.test(line))) {
+            criticalRuleCount++;
+          }
+        }
+
+        if (criticalRuleCount > 0 && !hasHooksConfig) {
+          diagnostics.push({
+            severity: "warning",
+            category: "security",
+            rule: this.id,
+            file: file.name,
+            message: `Found ${criticalRuleCount} critical rule(s) (MUST NOT / NEVER) but no Hooks configuration detected. CLAUDE.md rules are probabilistic — Claude may not always follow them.`,
+            fix:
+              "Enforce critical rules with PreToolUse hooks in settings.json:\n" +
+              "{\n" +
+              '  "hooks": {\n' +
+              '    "PreToolUse": [{\n' +
+              '      "matcher": "Bash",\n' +
+              '      "hooks": [{ "type": "command", "command": "./hooks/validate-command.sh" }]\n' +
+              "    }]\n" +
+              "  }\n" +
+              "}",
+          });
+        }
+      }
+
+      return diagnostics;
+    },
+  },
 ];
