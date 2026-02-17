@@ -210,7 +210,9 @@ export const consistencyRules: Rule[] = [
             if (
               name.length > 2 &&
               name.length < 25 &&
-              !/^(the|a|an|this|that|your|my|it|is|are|was|string|function|class)/i.test(name)
+              !/^(the|a|an|this|that|your|my|it|is|are|was|string|function|class)/i.test(name) &&
+              // Skip strings containing Korean characters — these are context fragments, not names
+              !/[\u3131-\u3163\uac00-\ud7a3]/.test(name)
             ) {
               if (!names.has(name)) names.set(name, []);
               names.get(name)!.push(file.name);

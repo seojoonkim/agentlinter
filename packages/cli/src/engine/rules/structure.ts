@@ -65,6 +65,8 @@ export const structureRules: Rule[] = [
       const diagnostics: Diagnostic[] = [];
       for (const file of files) {
         if (!file.name.endsWith(".md")) continue;
+        // Skip agent workspace dirs — research/log docs don't need strict heading hierarchy
+        if (file.name.startsWith("compound/") || file.name.startsWith("memory/")) continue;
         let prevLevel = 0;
         for (const section of file.sections) {
           if (prevLevel > 0 && section.level > prevLevel + 1) {

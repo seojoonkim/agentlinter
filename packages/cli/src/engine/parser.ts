@@ -100,18 +100,23 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
     }
   }
 
-  // Check ~/.clawdbot/clawdbot.json (runtime config)
+  // Check ~/.openclaw/openclaw.json (runtime config)
+  // ONLY include home config when scanning the home directory itself.
+  // Scanning a project dir should NOT pull in the user's live API keys.
   const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-  const runtimeConfigPaths = [
-    path.join(homeDir, ".clawdbot", "clawdbot.json"),
-    path.join(homeDir, ".openclaw", "openclaw.json"),
-    path.join(homeDir, ".moltbot", "moltbot.json"),
-  ];
-  for (const configPath of runtimeConfigPaths) {
-    if (fs.existsSync(configPath)) {
-      const name = path.basename(configPath);
-      files.push(parseFile(configPath, name, context));
-      break; // Only read the first one found
+  const isHomeDir = homeDir && path.resolve(workspacePath) === path.resolve(homeDir);
+  if (isHomeDir) {
+    const runtimeConfigPaths = [
+      path.join(homeDir, ".clawdbot", "clawdbot.json"),
+      path.join(homeDir, ".openclaw", "openclaw.json"),
+      path.join(homeDir, ".moltbot", "moltbot.json"),
+    ];
+    for (const configPath of runtimeConfigPaths) {
+      if (fs.existsSync(configPath)) {
+        const name = path.basename(configPath);
+        files.push(parseFile(configPath, name, context));
+        break; // Only read the first one found
+      }
     }
   }
 

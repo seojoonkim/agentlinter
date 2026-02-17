@@ -498,6 +498,17 @@ export const clarityRules: Rule[] = [
         "DAN", "SYS", "INST", "EOF", "TTY", "PTY", "PID", "UID", "GID",
         "HVL", "CAPS", "CAST", "MAX", "MIN", "SRC", "DST", "TMP",
         "ZEON", "REPO", "DIR", "DEV", "OPS", "SLA", "KPI", "ROI",
+        // HTTP methods & protocols
+        "GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS",
+        "TCP", "UDP", "RPC", "SSE", "WASM", "GRPC",
+        // AI/platform protocols
+        "MCP", "RPI",
+        // Game / domain acronyms
+        "TCG",
+        // UI types
+        "GUI", "TUI",
+        // Additional file formats / langs
+        "TOML", "TSV", "PY", "SH",
         // RFC 2119 keywords (requirement levels) — NOT acronyms
         "MUST", "SHALL", "SHOULD", "MAY", "REQUIRED", "RECOMMENDED",
         "OPTIONAL", "NOT", "NEVER", "ALWAYS", "ALL", "ANY", "ONLY",

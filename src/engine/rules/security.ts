@@ -147,9 +147,11 @@ export const securityRules: Rule[] = [
             });
           }
 
-          // Check for phone number patterns (skip JSON keys, negative IDs, and pure numeric IDs)
+          // Check for phone number patterns — stricter regex to avoid false positives on bare numeric IDs.
+          // Requires separators (dash/dot/space) between digit groups OR explicit country code prefix.
+          // This prevents Telegram chat IDs like 46291309 from matching.
           const phoneMatch = line.match(
-            /(?:\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3,4}[-.\s]?\d{4}/
+            /(?:\+\d{1,3}[-.\s])\(?\d{3}\)?[-.\s]\d{3,4}[-.\s]\d{4}|\(?\d{3}\)?[-.\s]\d{3,4}[-.\s]\d{4}/
           );
           const isJsonKey = file.name.endsWith(".json") && /^\s*"[-\d]+"/.test(line);
           const isNegativeId = /^[\s"]*-\d+/.test(line.trim());

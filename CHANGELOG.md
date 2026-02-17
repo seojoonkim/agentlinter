@@ -2,6 +2,37 @@
 
 All notable changes to AgentLinter will be documented in this file.
 
+## [0.8.1] - 2026-02-17
+
+### 🐛 False Positive 버그 수정 5개
+
+#### BUG #1: HOME config 무조건 스캔 [FIXED] 🔴
+- **문제:** 어떤 프로젝트 디렉토리를 스캔해도 `~/.openclaw/openclaw.json`이 항상 포함되어 "Plaintext secret" 경고 10개씩 플러드 발생
+- **수정:** `scanWorkspace()` 에서 HOME config(`.openclaw/`, `.clawdbot/`, `.moltbot/`)는 스캔 대상이 HOME 디렉토리일 때만 포함
+- **파일:** `packages/cli/src/engine/parser.ts`, `src/engine/parser.ts`
+
+#### BUG #2: compound/, memory/ 파일에 heading rule 적용 [FIXED] 🔴
+- **문제:** 리서치/로그 문서(compound/, memory/)에 `structure/heading-hierarchy` 룰이 적용되어 의미없는 TIP 40개 이상 발생
+- **수정:** `structure/heading-hierarchy` 룰에서 `compound/**`, `memory/**` 패턴 제외
+- **파일:** `packages/cli/src/engine/rules/structure.ts`, `src/engine/rules/structure.ts`
+
+#### BUG #3: Identity false positive (한국어) [FIXED] 🟠
+- **문제:** `"messenger에서 Zeon 메시지"` 같은 한국어 문맥 fragments가 identity name으로 탐지
+- **수정:** `consistency/identity-alignment` 룰 name 추출 시 한국어 문자 포함 문자열 필터링
+- **파일:** `packages/cli/src/engine/rules/consistency.ts`, `src/engine/rules/consistency.ts`
+
+#### BUG #4: 전화번호 regex 너무 관대 [FIXED] 🟠
+- **문제:** Telegram chat ID `46291309` 같은 bare numeric ID가 전화번호 패턴에 오탐
+- **수정:** 전화번호 regex를 분리자(dash/dot/space) 필수로 변경 — 구분자 없는 순수 숫자열은 매칭 안 함
+- **파일:** `packages/cli/src/engine/rules/security.ts`, `src/engine/rules/security.ts`
+
+#### BUG #5: 약어 whitelist 부족 [FIXED] 🟠
+- **문제:** `PUT`, `MCP`, `RPI`, `TCG` 등 일반 기술 약어가 "undefined acronym"으로 플래그됨
+- **수정:** `clarity/undefined-term` whitelist에 추가: GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TCP, UDP, RPC, SSE, MCP, RPI, TCG, GUI, TUI, TOML, TSV, PY, SH
+- **파일:** `packages/cli/src/engine/rules/clarity.ts`, `src/engine/rules/clarity.ts`
+
+---
+
 ## [0.8.0] - 2026-02-17
 
 ### 🔬 Claude Code 최신 스펙 반영 + 신규 린팅 룰 7개
