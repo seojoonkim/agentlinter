@@ -18,8 +18,11 @@
   ],
   "author": "Seojoon Kim",
   "license": "MIT",
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18.0.0",
+    "i18next": "^25.6.3",
+    "i18next-icu": "^2.4.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
