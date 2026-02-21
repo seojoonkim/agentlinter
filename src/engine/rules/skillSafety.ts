@@ -31,6 +31,32 @@ const DATA_EXFIL_PATTERNS = [
   { pattern: /ngrok|localhost\.run|serveo/, name: "Tunnel service (potential exfil)" },
 ];
 
+/** v0.9.0: Enhanced credential exfiltration patterns */
+const CREDENTIAL_EXFIL_PATTERNS = [
+  { pattern: /(?:send|post|upload|forward)\s+(?:to|data\s+to)\s+https?:\/\//i, name: "Credential exfil: send to external URL", severity: "critical" as const },
+  { pattern: /POST\s+(?:to\s+)?https?:\/\//i, name: "Credential exfil: POST to external URL", severity: "critical" as const },
+  { pattern: /webhook\s*[:=]?\s*https?:\/\//i, name: "Webhook with external URL", severity: "critical" as const },
+  { pattern: /exfil/i, name: "Exfiltration keyword", severity: "critical" as const },
+];
+
+/** v0.9.0: Backdoor / override patterns */
+const BACKDOOR_PATTERNS = [
+  { pattern: /hidden\s+instruction/i, name: "Hidden instruction", severity: "critical" as const },
+  { pattern: /ignore\s+(?:all\s+)?previous/i, name: "Ignore previous instructions", severity: "critical" as const },
+  { pattern: /override\s+safety/i, name: "Override safety", severity: "critical" as const },
+  { pattern: /bypass\s+(?:security|safety|guard|filter)/i, name: "Bypass security", severity: "critical" as const },
+];
+
+/** v0.9.0: Prompt injection patterns (multilingual) */
+const PROMPT_INJECTION_PATTERNS = [
+  { pattern: /당신은\s*사실/i, name: "Korean injection: 당신은 사실", severity: "error" as const },
+  { pattern: /실제로는/i, name: "Korean injection: 실제로는", severity: "error" as const },
+  { pattern: /이전\s*지시\s*무시/i, name: "Korean injection: 이전 지시 무시", severity: "critical" as const },
+  { pattern: /you\s+are\s+actually/i, name: "English injection: you are actually", severity: "error" as const },
+  { pattern: /in\s+reality\s+you/i, name: "English injection: in reality you", severity: "error" as const },
+  { pattern: /disregard\s+(?:all\s+)?(?:previous|prior|above)/i, name: "Disregard previous", severity: "critical" as const },
+];
+
 /** Security/defense skills document attacks as examples — demote severity for these */
 const SECURITY_SKILL_PATTERNS = [
   /prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i,
@@ -514,6 +540,113 @@ export const skillSafetyRules: Rule[] = [
                 fix: isExample
                   ? "This appears to be a security example/documentation. Verify it's not executable."
                   : "This skill may contain a prompt injection attack. Do NOT install without careful review.",
+              });
+            }
+          }
+        }
+      }
+      return diagnostics;
+    },
+  },
+
+  /* ── v0.9.0: Enhanced security scanner ── */
+  {
+    id: "skill-safety/credential-exfil",
+    category: "skillSafety",
+    severity: "critical",
+    description: "Skills should not send credentials or data to external URLs",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const skillFiles = files.filter((f) => f.name.includes("skills/"));
+      for (const file of skillFiles) {
+        const isSecurity = isSecuritySkill(file);
+        let inCodeBlock = false;
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("```")) inCodeBlock = !inCodeBlock;
+          for (const { pattern, name, severity } of CREDENTIAL_EXFIL_PATTERNS) {
+            if (pattern.test(line)) {
+              const isDoc = isSecurity || inCodeBlock || /^[\s]*[>❌✅|$#]/.test(line);
+              diagnostics.push({
+                severity: isDoc ? "info" : severity,
+                category: "skillSafety",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `[CRITICAL] ${name}: "${line.trim().substring(0, 60)}"`,
+                fix: "This pattern strongly suggests credential theft. Do NOT install this skill.",
+              });
+            }
+          }
+        }
+      }
+      return diagnostics;
+    },
+  },
+
+  {
+    id: "skill-safety/backdoor-patterns",
+    category: "skillSafety",
+    severity: "critical",
+    description: "Skills should not contain backdoor or override patterns",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const skillFiles = files.filter((f) => f.name.includes("skills/"));
+      for (const file of skillFiles) {
+        const isSecurity = isSecuritySkill(file);
+        let inCodeBlock = false;
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("```")) inCodeBlock = !inCodeBlock;
+          for (const { pattern, name, severity } of BACKDOOR_PATTERNS) {
+            if (pattern.test(line)) {
+              const isDoc = isSecurity || inCodeBlock || /^[\s]*[>❌✅|$#]/.test(line) || /example|detect|pattern/i.test(line);
+              diagnostics.push({
+                severity: isDoc ? "info" : severity,
+                category: "skillSafety",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `[HIGH] Backdoor pattern: ${name} — "${line.trim().substring(0, 60)}"`,
+                fix: isDoc
+                  ? "Security documentation detected. Verify this is not executable."
+                  : "This skill contains a backdoor pattern. Do NOT install.",
+              });
+            }
+          }
+        }
+      }
+      return diagnostics;
+    },
+  },
+
+  {
+    id: "skill-safety/prompt-injection-multilingual",
+    category: "skillSafety",
+    severity: "error",
+    description: "Skills should not contain multilingual prompt injection patterns",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const skillFiles = files.filter((f) => f.name.includes("skills/"));
+      for (const file of skillFiles) {
+        const isSecurity = isSecuritySkill(file);
+        let inCodeBlock = false;
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("```")) inCodeBlock = !inCodeBlock;
+          for (const { pattern, name, severity } of PROMPT_INJECTION_PATTERNS) {
+            if (pattern.test(line)) {
+              const isDoc = isSecurity || inCodeBlock || /^[\s]*[>❌✅|$#]/.test(line) || /example|detect|pattern/i.test(line);
+              diagnostics.push({
+                severity: isDoc ? "info" : severity,
+                category: "skillSafety",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `Prompt injection: ${name} — "${line.trim().substring(0, 60)}"`,
+                fix: isDoc
+                  ? "Security documentation detected. Verify context."
+                  : "This skill contains a prompt injection attack. Do NOT install.",
               });
             }
           }

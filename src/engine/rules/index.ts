@@ -14,6 +14,9 @@ import { autofixRules } from "./autofix";
 import { integrationRules } from "./integration";
 import { claudeCodeRules } from "./claudeCode";
 import { remoteReadyRules } from "./remoteReady";
+import { tokenBudgetRules } from "./tokenBudget";
+import { instructionScopeRules } from "./instructionScope";
+import { hooksAdvisorRules } from "./hooksAdvisor";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -29,6 +32,9 @@ export const allRules: Rule[] = [
   ...integrationRules,
   ...claudeCodeRules,
   ...remoteReadyRules,
+  ...tokenBudgetRules,
+  ...instructionScopeRules,
+  ...hooksAdvisorRules,
 ];
 
 export {
@@ -45,4 +51,7 @@ export {
   integrationRules,
   claudeCodeRules,
   remoteReadyRules,
+  tokenBudgetRules,
+  instructionScopeRules,
+  hooksAdvisorRules,
 };
