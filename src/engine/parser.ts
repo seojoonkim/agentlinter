@@ -38,16 +38,24 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
     }
   }
 
-  // Check agent directories
+  // Check agent directories (recursive for .claude/, 1-level for others)
   for (const dir of AGENT_DIRS) {
     const dirPath = path.join(workspacePath, dir);
     if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
-      const dirFiles = fs.readdirSync(dirPath);
-      for (const fileName of dirFiles) {
-        if (fileName.endsWith(".md") || fileName.endsWith(".txt")) {
-          const filePath = path.join(dirPath, fileName);
-          const relativeName = `${dir}/${fileName}`;
-          files.push(parseFile(filePath, relativeName));
+      if (dir === ".claude" || dir === "claude") {
+        // Recursively scan .claude/ tree (agents/, rules/, skills/, hooks/, etc.)
+        scanDirRecursive(dirPath, files, dir, 0, 3);
+      } else {
+        // Other dirs: one level only
+        const dirFiles = fs.readdirSync(dirPath);
+        for (const fileName of dirFiles) {
+          if (fileName.endsWith(".md") || fileName.endsWith(".txt")) {
+            const filePath = path.join(dirPath, fileName);
+            const relativeName = `${dir}/${fileName}`;
+            if (!files.some((f) => f.path === filePath)) {
+              files.push(parseFile(filePath, relativeName));
+            }
+          }
         }
       }
     }
@@ -97,6 +105,46 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
   }
 
   return files;
+}
+
+/**
+ * Recursively scan a directory tree (for .claude/ and similar)
+ */
+function scanDirRecursive(
+  dir: string,
+  files: FileInfo[],
+  prefix: string,
+  depth: number,
+  maxDepth: number
+) {
+  if (depth > maxDepth) return;
+  try {
+    const entries = fs.readdirSync(dir);
+    for (const entry of entries) {
+      if (entry === "node_modules" || (entry.startsWith(".") && depth > 0)) continue;
+      const fullPath = path.join(dir, entry);
+      let stat: fs.Stats;
+      try {
+        stat = fs.statSync(fullPath);
+      } catch {
+        continue;
+      }
+      const relativeName = `${prefix}/${entry}`;
+      if (stat.isDirectory()) {
+        scanDirRecursive(fullPath, files, relativeName, depth + 1, maxDepth);
+      } else if (
+        entry.endsWith(".md") ||
+        entry.endsWith(".txt") ||
+        entry.endsWith(".json")
+      ) {
+        if (!files.some((f) => f.path === fullPath)) {
+          files.push(parseFile(fullPath, relativeName));
+        }
+      }
+    }
+  } catch {
+    // Permission denied or other error — skip
+  }
 }
 
 /**

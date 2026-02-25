@@ -1,314 +1,100 @@
-# Changelog
-
-All notable changes to AgentLinter will be documented in this file.
-
-## [0.8.2] - 2026-02-17
-
-### ✨ 신규 룰 4개 + Remote-Ready Score 카테고리
-
-#### SkillSafety - 신규 2개
-
-- **`skill-safety/skill-name-match-dir`** 🔴 ERROR
-  - SKILL.md의 `name` frontmatter 필드가 부모 디렉토리명과 일치하는지 체크
-  - ClawdHub은 디렉토리명으로 스킬을 라우팅하므로 불일치 시 배포 오류
-  - 예: `skills/weather/SKILL.md`의 name이 "weather"여야 함
-
-- **`skill-safety/skill-description-when-to-use`** ⚠️ WARNING
-  - SKILL.md의 `description` 필드에 "when to use", "use when", "when Claude" 등 사용 조건 설명 포함 여부 체크
-  - Claude의 자동 invoke 결정에 사용 조건이 명시되어야 정확한 호출 가능
-
-#### Completeness - 신규 1개
-
-- **`completeness/verification-criteria-required`** ⚠️ WARNING (HIGH)
-  - CLAUDE.md/AGENTS.md에 작업 검증 기준이 있는지 체크
-  - "how to verify", "success criteria", "done when", "verify result" 등 검증 관련 언어 탐지
-  - 검증 기준 없으면 에이전트가 작업 완료 여부를 판단할 수 없음
-
-#### Remote-Ready Score 카테고리 (신규, 5%)
-
-새 카테고리 `remoteReady` 추가. 원격/헤드리스 실행 시 필요한 설정 3가지 체크:
-
-- **`remote-ready/workspace-path-specified`** ⚠️ WARNING
-  - workspace/repo 경로 명시 여부 (예: `repo=/Users/username/project`)
-  
-- **`remote-ready/env-vars-documented`** ⚠️ WARNING
-  - 환경변수 사용 시 문서화 여부 (env vars 참조 있는데 문서 없으면 경고)
-  
-- **`remote-ready/model-settings-specified`** 💡 INFO
-  - 기본 모델 설정 명시 여부 (재현 가능한 원격 실행을 위해)
-
-### 🐛 버그 수정
-
-- **CLI: `error` severity 미표시 버그 수정**
-  - `error` 타입 diagnostic이 "💡 TIP"으로 잘못 표시되던 문제 수정
-  - `🔴 ERROR` 레이블과 빨간색으로 올바르게 표시
-  - 정렬 순서: critical → error → warning → info
-
-### ⚖️ 가중치 조정
-
-| 카테고리 | 이전 | 이후 |
-|---------|------|------|
-| clarity | 20% | 18% |
-| runtime | 13% | 10% |
-| remoteReady | - | 5% (신규) |
+# AgentLinter Changelog
 
 ---
 
-## [0.8.1] - 2026-02-17
+## v1.0.0 — 2026-02-25 🎉
 
-### 🐛 False Positive 버그 수정 5개
+> **ESLint for AI Agents — now with Claude Code deep integration**
 
-#### BUG #1: HOME config 무조건 스캔 [FIXED] 🔴
-- **문제:** 어떤 프로젝트 디렉토리를 스캔해도 `~/.openclaw/openclaw.json`이 항상 포함되어 "Plaintext secret" 경고 10개씩 플러드 발생
-- **수정:** `scanWorkspace()` 에서 HOME config(`.openclaw/`, `.clawdbot/`, `.moltbot/`)는 스캔 대상이 HOME 디렉토리일 때만 포함
-- **파일:** `packages/cli/src/engine/parser.ts`, `src/engine/parser.ts`
+### ✨ New Rules (6)
 
-#### BUG #2: compound/, memory/ 파일에 heading rule 적용 [FIXED] 🔴
-- **문제:** 리서치/로그 문서(compound/, memory/)에 `structure/heading-hierarchy` 룰이 적용되어 의미없는 TIP 40개 이상 발생
-- **수정:** `structure/heading-hierarchy` 룰에서 `compound/**`, `memory/**` 패턴 제외
-- **파일:** `packages/cli/src/engine/rules/structure.ts`, `src/engine/rules/structure.ts`
+#### 🔴 `claude-code/instruction-count`
+Counts total instructions across your core agent config files. Claude Code reserves ~50 instructions internally, leaving only 100-150 for your setup. Warns at 100+, errors at 150+. Shows top offending files so you know exactly where to trim.
 
-#### BUG #3: Identity false positive (한국어) [FIXED] 🟠
-- **문제:** `"messenger에서 Zeon 메시지"` 같은 한국어 문맥 fragments가 identity name으로 탐지
-- **수정:** `consistency/identity-alignment` 룰 name 추출 시 한국어 문자 포함 문자열 필터링
-- **파일:** `packages/cli/src/engine/rules/consistency.ts`, `src/engine/rules/consistency.ts`
+#### 🔴 `claude-code/relevance-trap`
+Detects context-specific instructions in `CLAUDE.md`/`AGENTS.md` that may be **silently ignored** by Claude Code's relevance filter. Claude Code wraps these files in a `<system-reminder>` with a note that content "may or may not be relevant" — file-specific rules, path-based conditionals, and framework-specific instructions should live in `.claude/rules/` instead.
 
-#### BUG #4: 전화번호 regex 너무 관대 [FIXED] 🟠
-- **문제:** Telegram chat ID `46291309` 같은 bare numeric ID가 전화번호 패턴에 오탐
-- **수정:** 전화번호 regex를 분리자(dash/dot/space) 필수로 변경 — 구분자 없는 순수 숫자열은 매칭 안 함
-- **파일:** `packages/cli/src/engine/rules/security.ts`, `src/engine/rules/security.ts`
+#### 🟡 `claude-code/progressive-disclosure`
+Warns when `CLAUDE.md` exceeds 50 lines without a `.claude/rules/` directory. Errors when it exceeds 200 lines. Long monolithic configs reduce signal-to-noise ratio and make Claude Code less effective.
 
-#### BUG #5: 약어 whitelist 부족 [FIXED] 🟠
-- **문제:** `PUT`, `MCP`, `RPI`, `TCG` 등 일반 기술 약어가 "undefined acronym"으로 플래그됨
-- **수정:** `clarity/undefined-term` whitelist에 추가: GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, TCP, UDP, RPC, SSE, MCP, RPI, TCG, GUI, TUI, TOML, TSV, PY, SH
-- **파일:** `packages/cli/src/engine/rules/clarity.ts`, `src/engine/rules/clarity.ts`
+#### 🟡 `claude-code/hooks-structure`
+Validates `.claude/hooks/` and `settings.json` hook configurations. Checks for:
+- Unknown/invalid hook event names (valid: `PreToolUse`, `PostToolUse`, `Stop`, `SubagentStop`, `Notification`)
+- Missing `command` field in hook entries
 
----
+#### 🟡 `claude-code/skills-vs-commands`
+Detects deprecated `.claude/commands/` usage and recommends migration to `.claude/skills/` (the standard since Claude Code Feb 2026). Also flags references in markdown files.
 
-## [0.8.0] - 2026-02-17
-
-### 🔬 Claude Code 최신 스펙 반영 + 신규 린팅 룰 7개
-
-이번 릴리스는 Claude Code 공식 최신 스펙(2026-02-17) 및 Repomix 연계 힌트를 반영합니다.
-
-### Added - 신규 린팅 룰 (7개)
-
-#### Security (보안)
-- **`security/no-bypass-permissions`** ⛔ CRITICAL
-  - `allowedTools`에 Bash 무제한 허용 패턴 및 `bypassPermissions` 모드 탐지
-  - 무제한 셸 실행 권한 부여 경고
-
-- **`security/critical-rules-enforce-hooks`** ⚠️ WARNING (HIGH)
-  - CLAUDE.md/AGENTS.md의 MUST NOT / NEVER 규칙이 Hooks로 강제되는지 확인
-  - "CLAUDE.md는 확률적, Hooks는 결정적" 패러다임 반영
-
-#### Skill Safety (스킬 안전성)
-- **`skill-safety/skill-description-required`** ⚠️ WARNING (HIGH)
-  - Skills SKILL.md frontmatter에 `description` 필수 확인
-  - Claude 자동 invocation 결정 기준 필드 검증
-
-- **`skill-safety/sideeffect-skill-manual`** ⚠️ WARNING (MEDIUM)
-  - deploy/commit/publish/delete 포함 skill에 `disable-model-invocation: true` 권장
-  - 사이드이펙트 있는 스킬의 자동 실행 방지
-
-- **`skill-safety/skill-line-limit`** ℹ️ WARNING/INFO (MEDIUM)
-  - SKILL.md 500줄 초과 경고, 300줄에서 사전 경고
-  - Claude Code 공식 권장 기준
-
-#### Claude Code Spec (최신 스펙)
-- **`claude-code/agent-description-required`** 🔴 ERROR (HIGH)
-  - `.claude/agents/*.md` frontmatter에 `description` 및 `name` 필수
-  - 위임 결정 핵심 필드 검증
-
-- **`claude-code/validate-plugin-manifest`** ⚠️ WARNING (MEDIUM)
-  - `.claude-plugin/plugin.json` 필수 필드(name, version) 및 semver 형식 검증
-  - Plugin Marketplace 배포를 위한 스펙 준수
-
-### Added - Claude Code 최신 스펙 반영
-
-- **`claude-code/auto-memory-line-limit`**: Auto Memory MEMORY.md 200줄 초과 경고
-  - Claude Code는 첫 200줄만 자동 로드 — 초과 내용은 topic files로 분리 권장
-
-- **`claude-code/import-depth-limit`**: `@import` 구문 5단계 재귀 제한 체크
-  - 5단계 초과 시 silent fail 가능성 경고
-
-- **`claude-code/validate-rules-path`**: `.claude/rules/` path-specific 룰 검증
-  - paths frontmatter glob 패턴 유효성 및 누락 여부 확인
-
-- **`claude-code/memory-hierarchy-awareness`**: Memory 계층 6단계 지원
-  - Managed → Project → Rules → User → Local → Auto Memory 구조 반영
-  - `CLAUDE.local.md` gitignore 체크, `.claude/rules/` 모듈화 권장
-
-### Added - Repomix 연계 힌트
-
-- **`claude-code/repomix-skill-hint`**: Repomix로 생성된 skill 감지 시 검증 힌트 제공
-  - `references/` 구조 또는 Repomix 시그니처 패턴 탐지
-  - AgentLinter 검증 워크플로우 가이드
+#### 🟡 `claude-code/agent-focus`
+Flags subagent definitions (`.claude/agents/*.md`) with too many responsibilities:
+- Warns at 30+ bullet-point responsibility items
+- Info at 8+ top-level H2 sections (may be doing too much)
 
 ---
 
-## [0.7.0] - 2026-02-14
+### 📊 Context Window Budget Estimator
 
-### 🚀 Major Feature Release - Comprehensive Best Practices Integration
+New **budget section** in every lint report:
 
-This release adds **25+ new linting rules** based on extensive Claude Code research and agent workspace best practices.
-
-### Added - Best Practices Rules
-
-**A. Advanced Inspection:**
-
-- **`best-practices/instruction-counter`**: Count imperative instructions with smart severity:
-  - ⚠️ **Warning** at 100+ instructions
-  - 🔴 **Error** at 150+ instructions
-  - Prevents instruction dilution and cognitive overload
-
-- **`best-practices/context-bloat-detector`**: Multi-level bloat detection:
-  - Line count analysis (300+ lines = error)
-  - Repetition detection (same instruction 3+ times)
-  - Suggests aggressive splitting for bloated files
-
-- **`best-practices/progressive-disclosure`**: Checks for priority grouping structure
-  - Detects missing priority markers (Critical/Standard/Optional)
-  - Triggers when 20+ instructions lack organization
-
-- **`best-practices/anti-patterns`**: Comprehensive anti-pattern detection:
-  - Code style rules in CLAUDE.md (should be in `.claude/rules/`)
-  - Embedded credentials (even placeholders)
-  - Ineffective "act as" roleplay instructions
-
-**B. Auto-fix Suggestions:**
-
-- **`autofix/extract-instructions`**: Smart section extraction recommender
-  - Detects domain-specific sections (git, deploy, testing, security, etc.)
-  - Suggests optimal target paths (`skills/`, `.claude/rules/`)
-  - Triggers when sections exceed 15 lines
-
-- **`autofix/convert-code-snippets`**: Reference optimization
-  - Detects embedded code blocks >20 lines
-  - Suggests extracting to files with line references
-  - Reduces context bloat from large snippets
-
-- **`autofix/structure-optimizer`**: WHY/WHAT/HOW framework checker
-  - Validates sections have rationale/context
-  - Suggests splitting instructions by intent
-  - Improves agent comprehension
-
-- **`autofix/consolidate-duplicates`**: Duplicate detection with Jaccard similarity
-  - Finds similar instructions (>80% similarity)
-  - Suggests consolidation to single canonical version
-
-**C. Integration Validation:**
-
-- **`integration/mcp-server-validator`**: Complete MCP config validation
-  - JSON syntax checking
-  - Schema validation (`mcpServers`, `command`, `url`)
-  - Common issue detection (missing `-y` in npx, empty commands)
-
-- **`integration/skills-linter`**: SKILL.md comprehensive checker
-  - Required sections validation (What/When/How)
-  - Security pattern detection (dangerous commands)
-  - Hook file existence verification
-
-- **`integration/hooks-checker`**: Executable hook safety
-  - Shebang validation
-  - Best practices checking (`set -e`, `set -u`)
-  - Unsafe variable expansion detection
-
-- **`integration/cross-file-references`**: Broken reference detector
-  - Validates `@import`, `@include`, `@see`, `@ref` paths
-  - Reports missing files
-
-- **`integration/skill-workspace-sync`**: Documentation completeness
-  - Checks if skills/ directories are documented in main file
-  - Ensures discoverability
-
-### Changed
-
-- Updated rule registry to include new rule categories
-- Enhanced type system to support auto-fix suggestions
-- Improved diagnostic messages with actionable fixes
-
-### Performance
-
-- All new rules optimized for minimal performance impact
-- Smart pattern matching reduces false positives
-- Batch processing for cross-file validations
-
-### Migration Guide
-
-No breaking changes. New rules are automatically enabled.
-
-To disable specific rules, add to your `.agentlinter.json`:
-```json
-{
-  "rules": {
-    "best-practices/instruction-counter": "off",
-    "autofix/extract-instructions": "off"
-  }
-}
+```
+📊 Context Window Budget
+  System reserved:    ~50 instructions (fixed)
+  CLAUDE.md/AGENTS.md: 63 instructions
+  .claude/rules/:     12 instructions
+  .claude/agents/:    8 instructions
+  ──────────────────────────────────────────
+  User total: 83/150  ✅ OK (55%)
 ```
 
-### References
+Programmatic API:
+```typescript
+import { estimateBudget, formatBudgetReport } from 'agentlinter';
 
-- Claude Code Best Practices: https://github.com/shanraisshan/claude-code-best-practice
-- Progressive Disclosure Pattern: LLM prompt engineering research
-- MCP Protocol Spec: Model Context Protocol documentation
-
----
-
-## [0.6.0] - 2026-02-11
-
-### Added - English Config Files Rule
-
-New rule `clarity/english-config-files` detects non-English content in core configuration files.
-
-**Why this matters:**
-- **Token efficiency**: Non-English text uses 2.5x more tokens than English
-- **Interpretation accuracy**: LLMs are trained on 95% English data, leading to better performance with English instructions
-- **Translation Tax**: Non-English inputs go through internal translation, losing fidelity
-
-**Target files:**
-- CLAUDE.md, AGENTS.md, SOUL.md, README.md, .cursorrules
-
-**Severity:**
-- 30%+ non-English content → `warning`
-- Below 30% → `info`
-
-**Research basis:**
-- EleutherAI "The Pile" (2021): 95% of LLM training data is English
-- Hugging Face benchmarks: Korean uses 2.4-3.8x more tokens
-- MMLU benchmark: 10-20% accuracy gap between English and non-English prompts
-- mT5 (NAACL 2021): English as optimal "pivot language" for 5-15% performance gains
+const budget = estimateBudget(files);
+// { status: "ok" | "warning" | "over", percentage: 55, ... }
+```
 
 ---
 
-## [0.2.0] - 2026-02-11
+### 🔍 Full `.claude/` Directory Scanning
 
-### Added - Claude Code Best Practice Rules
+Parser now recursively scans the entire `.claude/` tree (depth 3):
+- `.claude/agents/` — agent definitions
+- `.claude/skills/` — skill configurations
+- `.claude/rules/` — modular rule files
+- `.claude/hooks/` — hook configurations
 
-Based on [claude-code-best-practice](https://github.com/shanraisshan/claude-code-best-practice):
-
-- **150-line limit warning**: CLAUDE.md/AGENTS.md files exceeding 150 lines now trigger a warning. Context bloat hurts agent performance.
-- **500-line limit error**: Files over 500 lines are now flagged as errors requiring immediate splitting.
-- **`.claude/rules/` folder recommendation**: Suggests using modular rule files for better organization.
-
-### Changed
-
-- `structure/file-size` rule now has tiered severity (warning at 150+, error at 500+)
-
-### References
-
-- [Claude Code Memory Docs](https://code.claude.com/docs/en/memory)
-- [Modular Rules with .claude/rules/](https://code.claude.com/docs/en/memory#modular-rules-with-clauderules)
+Previously only 1-level deep; now fully recursive.
 
 ---
 
-## [0.1.0] - 2026-02-05
+### 📦 Breaking Changes
+None — all new rules use existing categories (`clarity`, `structure`, `runtime`). Your existing score may change slightly due to additional diagnostics from the new rules.
 
-### Initial Release
+---
 
-- Core linting engine with 8 rule categories
-- Web interface at agentlinter.com
-- CLI support via `npx agentlinter`
-- GitHub integration for public repos
-- Share functionality with unique report URLs
+### 🔧 Internal
+- `src/engine/budget.ts` — new Context Window Budget Estimator module
+- `src/engine/rules/index.ts` — 6 new rules registered
+- `src/engine/parser.ts` — `scanDirRecursive()` for full `.claude/` tree scanning
+- `src/engine/index.ts` — `estimateBudget`, `formatBudgetReport` exported
+- `src/engine/reporter.ts` — budget section added to terminal output
+- Both main engine and CLI package (`packages/cli`) updated
+
+---
+
+## v0.9.0 — 2026-02 (Previous)
+
+Advanced rules: contradiction detection, vague conditionals, section cross-reference, skill scope validation, remote-ready checks.
+
+## v0.7.0 — Previous
+
+Token budget rules, instruction scope rules, hooks advisor, advanced patterns.
+
+## v0.4.0 — Previous
+
+Integration rules, autofix rules, best practices rules, Claude Code rules.
+
+## v0.1.0 — Initial
+
+Core rules: structure, clarity, completeness, security, consistency, memory, runtime, skill safety.

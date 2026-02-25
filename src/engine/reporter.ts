@@ -1,6 +1,7 @@
 /* ─── Output Reporter ─── */
 
 import { LintResult, CATEGORY_LABELS, Diagnostic, FileInfo } from "./types";
+import { estimateBudget, formatBudgetReport } from "./budget";
 
 /**
  * Get SHIELD.md security policy summary
@@ -65,7 +66,7 @@ export function formatTerminal(result: LintResult): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push("🔍 AgentLinter v0.1.0");
+  lines.push("🔍 AgentLinter v1.0.0");
   lines.push(`📁 Scanning workspace: ${result.workspace}`);
   lines.push(`📄 Files found: ${result.files.map((f) => f.name).join(", ")}`);
   lines.push("");
@@ -94,6 +95,11 @@ export function formatTerminal(result: LintResult): string {
   // Security Policy section
   const shieldLines = getShieldSummary(result.files);
   lines.push(...shieldLines);
+  lines.push("");
+
+  // Context Budget section
+  const budget = estimateBudget(result.files);
+  lines.push(formatBudgetReport(budget));
   lines.push("");
 
   // Diagnostics

@@ -1,6 +1,7 @@
 /* ─── Output Reporter ─── */
 
 import { LintResult, CATEGORY_LABELS, Diagnostic } from "./types";
+import { estimateBudget, formatBudgetReport } from "./budget";
 
 /**
  * Format lint result as terminal output
@@ -9,7 +10,7 @@ export function formatTerminal(result: LintResult): string {
   const lines: string[] = [];
 
   lines.push("");
-  lines.push("🔍 AgentLinter v0.1.0");
+  lines.push("🔍 AgentLinter v1.0.0");
   lines.push(`📁 Scanning workspace: ${result.workspace}`);
   lines.push(`📄 Files found: ${result.files.map((f) => f.name).join(", ")}`);
   lines.push("");
@@ -33,6 +34,11 @@ export function formatTerminal(result: LintResult): string {
     const label = CATEGORY_LABELS[cat.category].padEnd(14);
     lines.push(`  ${label} ${bar} ${cat.score}`);
   }
+  lines.push("");
+
+  // Context Budget section
+  const budget = estimateBudget(result.files);
+  lines.push(formatBudgetReport(budget));
   lines.push("");
 
   // Diagnostics

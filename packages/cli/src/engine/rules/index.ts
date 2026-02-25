@@ -10,6 +10,12 @@ import { memoryRules } from "./memory";
 import { runtimeRules } from "./runtime";
 import { skillSafetyRules } from "./skillSafety";
 import { remoteReadyRules } from "./remoteReady";
+import { instructionCountRules } from "./instructionCount";
+import { relevanceTrapRules } from "./relevanceTrap";
+import { progressiveDisclosureRules } from "./progressiveDisclosure";
+import { hooksStructureRules } from "./hooksStructure";
+import { skillsVsCommandsRules } from "./skillsVsCommands";
+import { agentFocusRules } from "./agentFocus";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -21,6 +27,13 @@ export const allRules: Rule[] = [
   ...runtimeRules,
   ...skillSafetyRules,
   ...remoteReadyRules,
+  // v1.0.0 new rules
+  ...instructionCountRules,
+  ...relevanceTrapRules,
+  ...progressiveDisclosureRules,
+  ...hooksStructureRules,
+  ...skillsVsCommandsRules,
+  ...agentFocusRules,
 ];
 
 export {

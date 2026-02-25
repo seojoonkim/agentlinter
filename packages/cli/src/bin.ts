@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { scanWorkspace, lint } from './engine';
 import { formatJSON } from './engine/reporter';
+import { estimateBudget, formatBudgetReport } from './engine/budget';
 import { uploadReport } from './upload';
 import { LintResult, Diagnostic } from './engine/types';
 import { auditSkillFile, formatAuditResult, formatAuditJSON, AuditResult } from './engine/audit-skill';
@@ -217,6 +218,14 @@ function formatTerminalColored(result: LintResult): string {
 
     const bar = makeBar(cat.score);
     lines.push(`  ${label} ${barColor}${bar}${c.reset} ${cat.score} ${c.dim}${catGrade}${c.reset}`);
+  }
+  lines.push("");
+
+  // Context Budget section
+  const budget = estimateBudget(result.files);
+  const budgetLines = formatBudgetReport(budget).split("\n");
+  for (const bl of budgetLines) {
+    lines.push(bl);
   }
   lines.push("");
 
