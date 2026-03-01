@@ -24,6 +24,9 @@ import { progressiveDisclosureRules } from "./progressiveDisclosure";
 import { hooksStructureRules } from "./hooksStructure";
 import { skillsVsCommandsRules } from "./skillsVsCommands";
 import { agentFocusRules } from "./agentFocus";
+import { positionRiskRules } from "./positionRisk";
+import { tokenEfficiencyRules } from "./tokenEfficiency";
+import { secretScanRules } from "./secretScan";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -50,6 +53,10 @@ export const allRules: Rule[] = [
   ...hooksStructureRules,
   ...skillsVsCommandsRules,
   ...agentFocusRules,
+  // v1.1.0 new rules
+  ...positionRiskRules,
+  ...tokenEfficiencyRules,
+  ...secretScanRules,
 ];
 
 export {

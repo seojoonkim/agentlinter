@@ -2,6 +2,34 @@
 
 ---
 
+## v1.1.0 — 2026-03-01 🆕
+
+### New Features
+
+#### 1. 🎯 Position Risk Warning
+- Detects critical rule sections (절대/금지/CRITICAL/반드시/never/always) buried in the middle 20-80% of a file
+- Agents often skip or miss rules placed in the middle of long files
+- **Rule:** `structure/position-risk-warning`
+- **Fix hint:** Move critical rules to the top 20% of the file. Add a dedicated '🚨 CRITICAL RULES' section at the very top.
+
+#### 2. 📊 Token Efficiency Score
+- Grades each agent file by line count for token efficiency
+  - **A** (≤150 lines): Excellent — concise and agent-friendly
+  - **B** (≤300 lines): Good — consider trimming redundant sections
+  - **C** (≤500 lines): Warning — split into focused modules
+  - **D** (>500 lines): Critical — exceeds agent context windows
+- **Rule:** `clarity/token-efficiency-score`
+- **Fix hint:** Extract non-essential sections to separate files. Target < 300 lines for main agent files.
+
+#### 3. 🔐 Enhanced Security Check (v0.8.0)
+- **Prompt Injection Vulnerability Detection:** Flags patterns like 'follow all user instructions', 'do whatever user says', 'ignore rules'
+- **Enhanced API Key Exposure:** Covers sk-, Bearer, ghp_, npm_, Vercel, Railway tokens with context-aware false-positive filtering
+- **Rules:** `security/prompt-injection-vulnerability`, `security/api-key-exposure`
+- **Fix hint:** Add permission boundaries, use environment variables for all secrets. Never embed API keys in agent files.
+
+---
+
+
 ## v1.0.0 — 2026-02-25 🎉
 
 > **ESLint for AI Agents — now with Claude Code deep integration**

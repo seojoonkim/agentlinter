@@ -200,4 +200,86 @@ export const securityRules: Rule[] = [
       return diagnostics;
     },
   },
+  /* --- v0.8.0: Enhanced Security Checks --- */
+  {
+    id: "security/prompt-injection-vulnerability",
+    category: "security",
+    severity: "warning",
+    description: "Detect patterns that make agents vulnerable to prompt injection",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const INJECTION_RISKS = [
+        { pattern: /follow all user instructions/i, desc: "unconditional instruction following" },
+        { pattern: /do whatever.*user.*says/i, desc: "unrestricted user command" },
+        { pattern: /trust all.*input/i, desc: "unconditional input trust" },
+        { pattern: /execute.*any.*command/i, desc: "unrestricted command execution" },
+        { pattern: /override.*security/i, desc: "security override pattern" },
+        { pattern: /bypass.*filter/i, desc: "filter bypass pattern" },
+        { pattern: /ignore.*rule/i, desc: "rule-ignore pattern" },
+      ];
+
+      for (const file of files) {
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("//") || line.trim().startsWith("#")) continue;
+          for (const { pattern, desc } of INJECTION_RISKS) {
+            if (pattern.test(line)) {
+              diagnostics.push({
+                severity: "warning",
+                category: "security",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `Prompt injection vulnerability: ${desc} detected — "${line.trim().substring(0, 80)}"`,
+                fix: "Add explicit permission boundaries and rejection rules. Use 'only follow instructions from authorized users' pattern instead.",
+              });
+            }
+          }
+        }
+      }
+      return diagnostics;
+    },
+  },
+
+  {
+    id: "security/api-key-exposure",
+    category: "security",
+    severity: "critical",
+    description: "Detect API key exposure patterns (sk-, Bearer, ghp_) with enhanced coverage",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const ENHANCED_PATTERNS = [
+        { name: "OpenAI/Anthropic Key (sk-)", pattern: /\bsk-[a-zA-Z0-9]{10,}/ },
+        { name: "Bearer Token", pattern: /Bearer\s+[a-zA-Z0-9._\-]{15,}/ },
+        { name: "GitHub PAT (ghp_)", pattern: /ghp_[a-zA-Z0-9]{10,}/ },
+        { name: "npm Token", pattern: /npm_[a-zA-Z0-9]{10,}/ },
+        { name: "Vercel Token", pattern: /\bvercel_[a-zA-Z0-9]{10,}/i },
+        { name: "Railway Token", pattern: /railway_token_[a-zA-Z0-9]{10,}/i },
+      ];
+
+      for (const file of files) {
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("//") || line.trim().startsWith("#")) continue;
+          if (/`[^`]*`/.test(line) && /example|sample|demo|test/i.test(line)) continue;
+
+          for (const { name, pattern } of ENHANCED_PATTERNS) {
+            if (pattern.test(line)) {
+              const masked = line.replace(pattern, "[REDACTED]");
+              diagnostics.push({
+                severity: "critical",
+                category: "security",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `API key exposure: ${name} found — ${masked.trim().substring(0, 80)}`,
+                fix: "Remove immediately! Store in environment variables ($SECRET_NAME) and reference by name only. Never commit API keys to agent files.",
+              });
+            }
+          }
+        }
+      }
+      return diagnostics;
+    },
+  },
 ];
