@@ -1279,6 +1279,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Changelog ── */}
+      <section id="changelog" className="py-16 px-5 sm:px-8 border-t border-[var(--border)]">
+        <div className="max-w-[720px] mx-auto">
+          <FadeIn>
+            <p className="text-[12px] mono text-[var(--accent)] mb-2 tracking-wider uppercase">Release History</p>
+            <h2 className="text-[28px] font-bold text-[var(--text-primary)] mb-10">Changelog</h2>
+          </FadeIn>
+          <div className="space-y-8">
+            {[
+              { version: "v1.1.0", date: "2026-03-01", badge: "Latest", items: ["🎯 Position Risk Warning — detects critical rules buried in the middle of files", "📊 Token Efficiency Score — grades files by line count (A/B/C/D)", "🔐 Enhanced Security — prompt injection + API key exposure detection"] },
+              { version: "v1.0.0", date: "2026-02-25", badge: "Stable", items: ["6 new Claude Code rules: instruction-count, relevance-trap, progressive-disclosure, hooks-structure, skills-vs-commands, agent-focus", "📊 Context Window Budget Estimator in every report", "🔍 Full .claude/ directory recursive scanning"] },
+              { version: "v0.9.0", date: "2026-02", badge: "", items: ["Token Budget Checker, Instruction Scope, Skills Security+, Hooks Advisor", "Contradiction detection, vague conditional detection, Remote-Ready Score"] },
+              { version: "v0.8.2", date: "2026-02", badge: "", items: ["4 new runtime rules: gateway-exposure, tool-policy-audit, session-limits, credential-rotation", "New Remote-Ready Score category"] },
+              { version: "v0.8.1", date: "2026-02", badge: "", items: ["Fixed 5 false positive bugs: api-key-exposure, vague-instructions, file-reference, retention-strategy, tone-mismatch"] },
+              { version: "v0.8.0", date: "2026-02", badge: "", items: ["7 new rules: prompt injection, enhanced API key exposure, MCP validator, skills linter, hooks checker, cross-file refs, workspace sync", "Claude Code Feb 2026 spec update"] },
+              { version: "v0.7.0", date: "2026-02-14", badge: "", items: ["25+ new rules: instruction counter, context bloat, progressive disclosure, anti-patterns, auto-fix suggestions, MCP/skills/hooks integration", "Research-based: Song et al. (TMLR 2026) LLM failure modes"] },
+              { version: "v0.6.0", date: "2026-02-11", badge: "", items: ["english-config-files rule (2.4-3.8× token savings)", "CLI share by default, all 8 scoring dimensions live"] },
+              { version: "v0.5.0", date: "2026-02-10", badge: "", items: ["Skill Safety as 8th dimension, --audit-skill trojan detection", "Dangerous pattern scanner: curl|bash, ~/.ssh, webhook.site"] },
+              { version: "v0.3.0", date: "2026-02-07", badge: "", items: ["Auto Agent/Project mode detection", "OpenClaw + Moltbot framework support"] },
+              { version: "v0.1.0", date: "2026-02-05", badge: "Initial", items: ["8 scoring dimensions, ~30 core rules", "Web interface, npx CLI, GitHub repo analysis, share URLs", "Local-first: file contents never leave your machine"] },
+            ].map((release) => (
+              <FadeIn key={release.version}>
+                <div className="flex gap-4 sm:gap-6">
+                  <div className="flex flex-col items-center">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent)] mt-1.5 shrink-0" />
+                    <div className="w-px flex-1 bg-[var(--border)] mt-1" />
+                  </div>
+                  <div className="pb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[15px] font-bold text-[var(--text-primary)] mono">{release.version}</span>
+                      <span className="text-[11px] text-[var(--text-dim)] mono">{release.date}</span>
+                      {release.badge && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent)]/20 text-[var(--accent)] mono">{release.badge}</span>}
+                    </div>
+                    <ul className="space-y-1">
+                      {release.items.map((item, i) => (
+                        <li key={i} className="text-[13px] text-[var(--text-secondary)] leading-[1.6] flex gap-2">
+                          <span className="text-[var(--border)] shrink-0">—</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+          <FadeIn>
+            <div className="mt-4 ml-9">
+              <a href="https://github.com/seojoonkim/agentlinter/releases" target="_blank" className="text-[13px] text-[var(--accent)] hover:underline mono">
+                → View all releases on GitHub ↗
+              </a>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ── Acknowledgments ── */}
       <section className="py-10 px-5 sm:px-8 border-t border-[var(--border)]">
         <div className="max-w-[600px] mx-auto text-center">
