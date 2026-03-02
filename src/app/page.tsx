@@ -445,6 +445,11 @@ export default function Home() {
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
+              <a href="/analyze"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[var(--accent)] text-black text-[15px] font-semibold hover:brightness-110 transition-all w-full sm:w-auto">
+                <Search className="w-4 h-4" />
+                Analyze Your AGENTS.md
+              </a>
               <div className="inline-flex items-center gap-3 px-5 py-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-all w-full sm:w-auto justify-center sm:justify-start">
                 <Terminal className="w-4 h-4 text-[var(--text-dim)]" />
                 <CopyCommand command="npx agentlinter" className="text-[15px]" />
