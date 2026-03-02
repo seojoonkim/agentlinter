@@ -178,7 +178,7 @@ function analyzeCognitiveLoad(sections: V2Section[], content: string): Cognitive
   }
 
   const positionWarnings: { section: string; issue: string }[] = [];
-  const criticalPatterns = /critical|must|required|never|always|\u274C|\u{1F534}|\u{1F6A8}/iu;
+  const criticalPatterns = /critical|must|required|never|always|금지|절대|반드시|\u274C|\u{1F534}|\u{1F6A8}/iu;
   const topThreshold = Math.ceil(sections.length * 0.3);
   sections.forEach((s, i) => {
     if (i >= topThreshold && criticalPatterns.test(s.content)) {
@@ -193,7 +193,7 @@ function analyzeCognitiveLoad(sections: V2Section[], content: string): Cognitive
   const top20Tokens = top20Sections.reduce((a, b) => a + b.tokenEstimate, 0);
 
   let score = 0;
-  score += Math.min(sections.length * 3, 30);
+  score += Math.min(Math.max(0, sections.length - 4) * 3, 30);
   score += Math.min(avgComplexity * 8, 30);
   score += duplicates.length * 10;
   score += positionWarnings.length * 5;
