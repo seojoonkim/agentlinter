@@ -4,17 +4,19 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, BarChart3, Layers, Shield, Users, ArrowLeft,
-  AlertTriangle, FileText, Zap, Sparkles,
+  AlertTriangle, FileText, Zap, Sparkles, Eye, Lightbulb, Award,
 } from "lucide-react";
 import { analyzeV2, V2AnalysisResult } from "../../engine/v2/analyzer";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: Sparkles },
   { id: "cognitive", label: "Cognitive Load", icon: Brain },
+  { id: "clarity", label: "Instruction Clarity", icon: Eye },
   { id: "tokens", label: "Token Map", icon: BarChart3 },
   { id: "modularity", label: "Modularity", icon: Layers },
   { id: "roles", label: "Roles", icon: Users },
   { id: "security", label: "Security", icon: Shield },
+  { id: "suggestions", label: "Suggestions", icon: Lightbulb },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -33,21 +35,28 @@ function CognitiveScoreBadge({ score }: { score: number }) {
 }
 
 function OverviewTab({ result }: { result: V2AnalysisResult }) {
-  const { cognitiveLoad, tokenHeatmap, modularity, roleComplexity, securityScan, overallScore } = result;
+  const { cognitiveLoad, tokenHeatmap, modularity, roleComplexity, securityScan, instructionClarity, overallScore } = result;
   const scoreColor = overallScore >= 80 ? "#4ade80" : overallScore >= 60 ? "#fbbf24" : "#ef4444";
   const cards = [
     { label: "Cognitive Load", value: String(cognitiveLoad.score), desc: `${cognitiveLoad.sectionCount} sections, ${cognitiveLoad.duplicates.length} duplicates`, color: cognitiveLoad.score <= 40 ? "#4ade80" : cognitiveLoad.score <= 70 ? "#fbbf24" : "#ef4444" },
+    { label: "Instruction Clarity", value: String(instructionClarity.score), desc: `${instructionClarity.ambiguousCount} ambiguous terms`, color: instructionClarity.score >= 80 ? "#4ade80" : instructionClarity.score >= 60 ? "#fbbf24" : "#ef4444" },
     { label: "Token Usage", value: tokenHeatmap.totalTokens.toLocaleString(), desc: `${tokenHeatmap.gpt4ContextPct}% of GPT-4 context`, color: "#a78bfa" },
-    { label: "Modularity", value: String(modularity.suggestions.length), desc: modularity.shouldModularize ? `${modularity.totalLines} lines \u2014 split recommended` : `${modularity.totalLines} lines \u2014 OK`, color: modularity.suggestions.length === 0 ? "#4ade80" : "#fbbf24" },
+    { label: "Modularity", value: String(modularity.suggestions.length), desc: modularity.shouldModularize ? `${modularity.totalLines} lines — split recommended` : `${modularity.totalLines} lines — OK`, color: modularity.suggestions.length === 0 ? "#4ade80" : "#fbbf24" },
     { label: "Roles", value: String(roleComplexity.roleCount), desc: roleComplexity.warning ? "Too many roles!" : "Manageable", color: roleComplexity.warning ? "#fbbf24" : "#4ade80" },
     { label: "Security Issues", value: String(securityScan.criticalCount + securityScan.warningCount), desc: `${securityScan.criticalCount} critical, ${securityScan.warningCount} warnings`, color: securityScan.criticalCount > 0 ? "#ef4444" : securityScan.warningCount > 0 ? "#fbbf24" : "#4ade80" },
   ];
+
+  const badgeUrl = `https://agentlinter.vercel.app/api/badge?score=${overallScore}&label=AgentLinter`;
+  const badgeMarkdown = `[![AgentLinter](https://img.shields.io/endpoint?url=${encodeURIComponent(badgeUrl)})](https://agentlinter.vercel.app)`;
 
   return (
     <div className="space-y-8">
       <div className="text-center py-6">
         <div className="text-[13px] text-[var(--text-dim,#666)] mono mb-2 uppercase tracking-wider">Overall Health Score</div>
         <div className="text-[64px] font-bold mono leading-none" style={{ color: scoreColor }}>{overallScore}</div>
+        <div className="text-[12px] text-[var(--text-dim,#666)] mono mt-3">
+          cognitive×0.4 + clarity×0.25 + modularity×0.15 + security×0.15 + role×0.05
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map(c => (
@@ -57,6 +66,15 @@ function OverviewTab({ result }: { result: V2AnalysisResult }) {
             <div className="text-[13px] text-[var(--text-secondary,#999)] mt-1">{c.desc}</div>
           </div>
         ))}
+      </div>
+      {/* Badge section */}
+      <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+        <h3 className="text-[15px] font-semibold mb-3 flex items-center gap-2"><Award className="w-4 h-4 text-[var(--accent,#a78bfa)]" />GitHub Badge</h3>
+        <div className="text-[13px] text-[var(--text-secondary,#999)] mb-2">Add this to your README:</div>
+        <div className="bg-black/30 p-3 rounded-lg overflow-x-auto">
+          <code className="text-[12px] mono text-[#4ade80] break-all">{badgeMarkdown}</code>
+        </div>
+        <button onClick={() => navigator.clipboard.writeText(badgeMarkdown)} className="mt-2 px-3 py-1 rounded-lg text-[12px] bg-white/5 hover:bg-white/10 text-[var(--text-dim,#666)] transition-colors">Copy</button>
       </div>
     </div>
   );
@@ -101,6 +119,76 @@ function CognitiveTab({ result }: { result: V2AnalysisResult }) {
   );
 }
 
+function ClarityTab({ result }: { result: V2AnalysisResult }) {
+  const { instructionClarity } = result;
+  const scoreColor = instructionClarity.score >= 80 ? "#4ade80" : instructionClarity.score >= 60 ? "#fbbf24" : "#ef4444";
+  return (
+    <div className="space-y-8">
+      <div className="text-center py-4">
+        <div className="text-[72px] font-bold mono leading-none" style={{ color: scoreColor }}>{instructionClarity.score}</div>
+        <div className="text-[16px] mt-2 font-medium" style={{ color: scoreColor }}>
+          {instructionClarity.score >= 80 ? "🟢 Clear" : instructionClarity.score >= 60 ? "🟡 Some Ambiguity" : "🔴 Too Vague"}
+        </div>
+        <div className="text-[13px] text-[var(--text-dim,#666)] mt-1">{instructionClarity.ambiguousCount} ambiguous terms found (−5 pts each)</div>
+      </div>
+      {instructionClarity.findings.length > 0 ? (
+        <div className="space-y-3">
+          {instructionClarity.findings.map((f, i) => (
+            <div key={i} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] mono px-1.5 py-0.5 rounded font-bold text-[#fbbf24] bg-[#fbbf24]/10">AMBIGUOUS</span>
+                <span className="text-[12px] mono text-[var(--text-dim,#666)]">Line {f.line}</span>
+                <span className="text-[11px] mono px-1.5 py-0.5 rounded bg-[#ef4444]/10 text-[#ef4444]">&ldquo;{f.ambiguousTerm}&rdquo;</span>
+              </div>
+              <div className="text-[12px] mono text-[var(--text-dim,#666)] bg-white/[0.02] px-3 py-1.5 rounded-lg overflow-x-auto mb-2">{f.lineContent}</div>
+              <div className="text-[13px] text-[#4ade80]">💡 {f.suggestion}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-8 rounded-2xl bg-[var(--bg-card,#111)] border border-[#4ade80]/20 text-center">
+          <Eye className="w-10 h-10 text-[#4ade80] mx-auto mb-3" />
+          <div className="text-[18px] font-semibold text-[#4ade80]">Crystal Clear</div>
+          <div className="text-[13px] text-[var(--text-dim,#666)] mt-1">No ambiguous instructions detected</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SuggestionsTab({ result }: { result: V2AnalysisResult }) {
+  const { suggestions } = result;
+  const priorityColor = { high: '#ef4444', medium: '#fbbf24', low: '#4ade80' };
+  const priorityLabel = { high: 'HIGH', medium: 'MED', low: 'LOW' };
+  return (
+    <div className="space-y-6">
+      <div className="text-center py-4">
+        <div className="text-[42px] font-bold mono leading-none text-[var(--accent,#a78bfa)]">{suggestions.length}</div>
+        <div className="text-[13px] text-[var(--text-dim,#666)] mt-2">Actionable suggestions</div>
+      </div>
+      {suggestions.length > 0 ? (
+        <div className="space-y-3">
+          {suggestions.map((s, i) => (
+            <div key={i} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] mono px-1.5 py-0.5 rounded font-bold" style={{ color: priorityColor[s.priority], backgroundColor: `${priorityColor[s.priority]}15` }}>{priorityLabel[s.priority]}</span>
+                <span className="text-[11px] mono text-[var(--text-dim,#666)]">{s.category}</span>
+              </div>
+              <div className="text-[14px] text-[var(--text-secondary,#999)]">{s.icon} {s.message}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-8 rounded-2xl bg-[var(--bg-card,#111)] border border-[#4ade80]/20 text-center">
+          <Lightbulb className="w-10 h-10 text-[#4ade80] mx-auto mb-3" />
+          <div className="text-[18px] font-semibold text-[#4ade80]">Looking Good!</div>
+          <div className="text-[13px] text-[var(--text-dim,#666)] mt-1">No actionable improvements found</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TokenTab({ result }: { result: V2AnalysisResult }) {
   const { tokenHeatmap } = result;
   const maxTokens = Math.max(...tokenHeatmap.sections.map(s => s.tokens), 1);
@@ -108,32 +196,26 @@ function TokenTab({ result }: { result: V2AnalysisResult }) {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)] text-center">
-          <div className="text-[36px] font-bold mono text-[#a78bfa]">{tokenHeatmap.totalTokens.toLocaleString()}</div>
-          <div className="text-[12px] text-[var(--text-dim,#666)] mono mt-1">Total Tokens</div>
+          <div className="text-[28px] font-bold mono text-[#a78bfa]">{tokenHeatmap.totalTokens.toLocaleString()}</div>
+          <div className="text-[11px] text-[var(--text-dim,#666)] mono mt-1">Total Tokens</div>
         </div>
         <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)] text-center">
-          <div className="text-[36px] font-bold mono" style={{ color: tokenHeatmap.gpt4ContextPct > 20 ? "#fbbf24" : "#4ade80" }}>{tokenHeatmap.gpt4ContextPct}%</div>
-          <div className="text-[12px] text-[var(--text-dim,#666)] mono mt-1">of GPT-4 128k Context</div>
+          <div className="text-[28px] font-bold mono text-[#a78bfa]">{tokenHeatmap.gpt4ContextPct}%</div>
+          <div className="text-[11px] text-[var(--text-dim,#666)] mono mt-1">GPT-4 Context</div>
         </div>
       </div>
-      <div className="space-y-3">
-        {tokenHeatmap.sections.map((s, i) => {
-          const widthPct = Math.max(3, (s.tokens / maxTokens) * 100);
-          const intensity = s.tokens / maxTokens;
-          const barColor = intensity > 0.7 ? "#ef4444" : intensity > 0.4 ? "#fbbf24" : "#4ade80";
-          return (
-            <div key={i} className="group">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[13px] text-[var(--text-secondary,#999)] truncate max-w-[60%]">{s.heading}</span>
-                <span className="text-[12px] mono text-[var(--text-dim,#666)]">{s.tokens} tokens ({s.pct}%)</span>
-              </div>
-              <div className="w-full h-6 bg-white/[0.03] rounded-lg overflow-hidden">
-                <motion.div className="h-full rounded-lg" initial={{ width: 0 }} animate={{ width: `${widthPct}%` }} transition={{ duration: 0.5, delay: i * 0.05 }} style={{ backgroundColor: barColor, opacity: 0.8 }} />
-              </div>
-              <div className="text-[11px] text-[var(--text-dim,#666)] mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">{s.savingsMessage} &middot; Density: {s.density} tok/line</div>
+      <div className="space-y-2">
+        {tokenHeatmap.sections.map((s, i) => (
+          <div key={i} className="p-3 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[13px] mono truncate max-w-[60%]">{s.heading}</span>
+              <span className="text-[12px] mono text-[var(--text-dim,#666)]">{s.tokens} tok ({s.pct}%)</span>
             </div>
-          );
-        })}
+            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-[#a78bfa]" style={{ width: `${(s.tokens / maxTokens) * 100}%` }} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -143,34 +225,18 @@ function ModularityTab({ result }: { result: V2AnalysisResult }) {
   const { modularity } = result;
   return (
     <div className="space-y-6">
-      <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
-        <div className="flex items-center gap-3 mb-3">
-          <FileText className="w-5 h-5 text-[var(--text-dim,#666)]" />
-          <div>
-            <div className="text-[15px] font-semibold">{modularity.totalLines} lines total</div>
-            <div className="text-[13px] text-[var(--text-dim,#666)]">{modularity.shouldModularize ? "Exceeds 150-line threshold" : "Under 150 lines \u2014 OK"}</div>
-          </div>
-        </div>
-        <div className="w-full h-3 bg-white/[0.03] rounded-full overflow-hidden">
-          <div className="h-full rounded-full" style={{ width: `${Math.min(100, (modularity.totalLines / 300) * 100)}%`, backgroundColor: modularity.shouldModularize ? "#fbbf24" : "#4ade80" }} />
-        </div>
+      <div className="text-center py-4">
+        <div className="text-[42px] font-bold mono" style={{ color: modularity.shouldModularize ? "#fbbf24" : "#4ade80" }}>{modularity.totalLines}</div>
+        <div className="text-[13px] text-[var(--text-dim,#666)] mt-1">Total Lines {modularity.shouldModularize ? "— Consider splitting" : "— OK"}</div>
       </div>
-      {modularity.suggestions.length > 0 ? (
+      {modularity.suggestions.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-[15px] font-semibold">Suggested Splits</h3>
           {modularity.suggestions.map((s, i) => (
             <div key={i} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[12px] mono px-2 py-0.5 rounded bg-[#a78bfa]/10 text-[#a78bfa]">{s.suggestedFile}</span>
-                <span className="text-[13px] text-[var(--text-secondary,#999)]">&larr; {s.section}</span>
-              </div>
-              <div className="text-[12px] text-[var(--text-dim,#666)]">{s.reason}</div>
+              <div className="flex items-center gap-2 mb-2"><FileText className="w-4 h-4 text-[#fbbf24]" /><span className="text-[14px] font-medium">{s.section}</span></div>
+              <div className="text-[13px] text-[var(--text-secondary,#999)]">→ {s.suggestedFile}: {s.reason}</div>
             </div>
           ))}
-        </div>
-      ) : (
-        <div className="p-6 rounded-2xl bg-[var(--bg-card,#111)] border border-[#4ade80]/20 text-center">
-          <div className="text-[15px] font-semibold text-[#4ade80]">{"\u2705"} No modularization needed</div>
         </div>
       )}
     </div>
@@ -179,30 +245,19 @@ function ModularityTab({ result }: { result: V2AnalysisResult }) {
 
 function RolesTab({ result }: { result: V2AnalysisResult }) {
   const { roleComplexity } = result;
-  const colors = ["#a78bfa", "#5eead4", "#fbbf24", "#f472b6", "#60a5fa", "#4ade80", "#f97316"];
   return (
     <div className="space-y-6">
-      <div className={`p-5 rounded-2xl border ${roleComplexity.warning ? "border-[#fbbf24]/30 bg-[#fbbf24]/5" : "border-[var(--border,#222)] bg-[var(--bg-card,#111)]"}`}>
-        <div className="flex items-center gap-3">
-          {roleComplexity.warning && <AlertTriangle className="w-5 h-5 text-[#fbbf24]" />}
-          <div>
-            <div className="text-[18px] font-bold">{roleComplexity.roleCount} Role{roleComplexity.roleCount !== 1 ? "s" : ""} Detected</div>
-            <div className="text-[14px] text-[var(--text-secondary,#999)]">{roleComplexity.message}</div>
-          </div>
+      <div className="text-center py-4">
+        <div className="text-[42px] font-bold mono" style={{ color: roleComplexity.warning ? "#fbbf24" : "#4ade80" }}>{roleComplexity.roleCount}</div>
+        <div className="text-[13px] text-[var(--text-dim,#666)] mt-1">{roleComplexity.message}</div>
+      </div>
+      {roleComplexity.roles.map((r, i) => (
+        <div key={i} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+          <div className="text-[15px] font-semibold mb-2">{r.name}</div>
+          <div className="flex flex-wrap gap-1 mb-2">{r.keywords.map(k => (<span key={k} className="px-2 py-0.5 rounded-lg bg-[var(--accent,#a78bfa)]/10 text-[var(--accent,#a78bfa)] text-[11px] mono">{k}</span>))}</div>
+          <div className="text-[12px] text-[var(--text-dim,#666)]">Found in: {r.sections.join(", ")}</div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {roleComplexity.roles.map((r, i) => (
-          <div key={r.name} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[i % colors.length] }} />
-              <span className="text-[15px] font-semibold">{r.name}</span>
-            </div>
-            <div className="flex flex-wrap gap-1 mb-3">{r.keywords.map(k => (<span key={k} className="px-1.5 py-0.5 rounded text-[11px] mono bg-white/[0.04] text-[var(--text-dim,#666)]">{k}</span>))}</div>
-            <div className="text-[11px] text-[var(--text-dim,#666)]">Found in: {r.sections.slice(0, 3).join(", ")}{r.sections.length > 3 ? ` +${r.sections.length - 3}` : ""}</div>
-          </div>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
@@ -213,13 +268,18 @@ function SecurityTab({ result }: { result: V2AnalysisResult }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-3 gap-4">
-        {[{ l: "Critical", c: securityScan.criticalCount, cl: "#ef4444" }, { l: "Warnings", c: securityScan.warningCount, cl: "#fbbf24" }, { l: "Info", c: securityScan.infoCount, cl: "#60a5fa" }].map(s => (
-          <div key={s.l} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)] text-center">
-            <div className="text-[28px] font-bold mono" style={{ color: s.cl }}>{s.c}</div>
-            <div className="text-[11px] mono mt-1" style={{ color: s.cl }}>{s.l}</div>
+        {[
+          { label: "Critical", value: securityScan.criticalCount, color: "#ef4444" },
+          { label: "Warnings", value: securityScan.warningCount, color: "#fbbf24" },
+          { label: "Info", value: securityScan.infoCount, color: "#60a5fa" },
+        ].map(s => (
+          <div key={s.label} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)] text-center">
+            <div className="text-[24px] font-bold mono" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-[11px] text-[var(--text-dim,#666)] mono mt-1">{s.label}</div>
           </div>
         ))}
       </div>
+      <div className="text-[12px] text-[var(--text-dim,#666)] mono text-center">{SECURITY_PATTERNS_COUNT} security patterns checked</div>
       {securityScan.findings.length > 0 ? (
         <div className="space-y-3">{securityScan.findings.map((f, i) => (
           <div key={i} className="p-4 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
@@ -243,6 +303,8 @@ function SecurityTab({ result }: { result: V2AnalysisResult }) {
   );
 }
 
+const SECURITY_PATTERNS_COUNT = 25;
+
 export default function AnalyzePage() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<V2AnalysisResult | null>(null);
@@ -259,10 +321,12 @@ export default function AnalyzePage() {
     switch (activeTab) {
       case "overview": return <OverviewTab result={result} />;
       case "cognitive": return <CognitiveTab result={result} />;
+      case "clarity": return <ClarityTab result={result} />;
       case "tokens": return <TokenTab result={result} />;
       case "modularity": return <ModularityTab result={result} />;
       case "roles": return <RolesTab result={result} />;
       case "security": return <SecurityTab result={result} />;
+      case "suggestions": return <SuggestionsTab result={result} />;
     }
   };
 
@@ -304,6 +368,8 @@ export default function AnalyzePage() {
                     <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[13px] whitespace-nowrap transition-all ${activeTab === tab.id ? "bg-[var(--accent,#a78bfa)]/15 text-[var(--accent,#a78bfa)] font-medium" : "text-[var(--text-dim,#666)] hover:text-[var(--text-secondary,#999)] hover:bg-white/[0.03]"}`}>
                       <Icon className="w-3.5 h-3.5" />{tab.label}
                       {tab.id === "security" && result.securityScan.criticalCount > 0 && <span className="w-2 h-2 rounded-full bg-[#ef4444]" />}
+                      {tab.id === "clarity" && result.instructionClarity.ambiguousCount > 0 && <span className="w-2 h-2 rounded-full bg-[#fbbf24]" />}
+                      {tab.id === "suggestions" && result.suggestions.length > 0 && <span className="ml-1 text-[10px] mono px-1 rounded bg-[var(--accent,#a78bfa)]/20 text-[var(--accent,#a78bfa)]">{result.suggestions.length}</span>}
                     </button>
                   );
                 })}
