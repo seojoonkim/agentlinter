@@ -27,6 +27,7 @@ import { agentFocusRules } from "./agentFocus";
 import { positionRiskRules } from "./positionRisk";
 import { tokenEfficiencyRules } from "./tokenEfficiency";
 import { secretScanRules } from "./secretScan";
+import { claudeIgnoreRules } from "./claudeIgnore";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -57,6 +58,8 @@ export const allRules: Rule[] = [
   ...positionRiskRules,
   ...tokenEfficiencyRules,
   ...secretScanRules,
+  // v1.2.0 new rules
+  ...claudeIgnoreRules,
 ];
 
 export {
@@ -77,4 +80,5 @@ export {
   instructionScopeRules,
   hooksAdvisorRules,
   advancedRules,
+  claudeIgnoreRules,
 };
