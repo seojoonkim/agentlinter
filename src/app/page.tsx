@@ -400,7 +400,7 @@ export default function Home() {
             <span className="text-[19px]" style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 600, letterSpacing: "-0.01em" }}>
               Agent<span className="text-[var(--accent)]">Linter</span>
             </span>
-            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v1.1.0</span>
+            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v2.0.0</span>
           </div>
           <div className="hidden sm:flex items-center gap-6 flex-1 justify-center">
             <a href="#why" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors">Why</a>
@@ -648,7 +648,7 @@ export default function Home() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--red)]/30 text-[var(--red)] text-[12px] sm:text-[13px] mono mb-4">
               <Shield className="w-3 h-3" />
-              <span>NEW in v1.1.0</span>
+              <span>NEW in v2.0.0</span>
             </div>
             <p className="text-[14px] mono text-[var(--red)] mb-4 tracking-wider uppercase">Security Scanner</p>
             <h2 className="display text-[32px] sm:text-[48px] lg:text-[56px] leading-[1.1] tracking-tight mb-5">
@@ -1231,53 +1231,6 @@ export default function Home() {
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--border-hover)] transition-all w-full sm:w-auto">
                 <FileText className="w-4 h-4" />
                 Read the Docs
-              </a>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════
-         SPREAD THE WORD
-         ══════════════════════════════════════ */}
-      <section className="py-12 sm:py-16 px-5 sm:px-8 border-t border-[var(--border)]">
-        <div className="max-w-[600px] mx-auto text-center">
-          <FadeIn>
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[var(--teal-dim)] mb-5">
-              <Share2 className="w-5 h-5 text-[var(--teal)]" />
-            </div>
-            <h3 className="display text-[22px] sm:text-[28px] leading-[1.2] mb-4">
-              Help us help more agents
-            </h3>
-            <p className="text-[15px] sm:text-[16px] text-[var(--text-secondary)] leading-[1.7] mb-8 max-w-[480px] mx-auto">
-              If AgentLinter helped improve your agent setup, share it with fellow developers.
-              Every share helps the open-source agent ecosystem grow stronger.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href={`https://x.com/intent/tweet?text=${encodeURIComponent("Just discovered AgentLinter — it's like ESLint for AI agents. Scores your CLAUDE.md, AGENTS.md and agent workspace files.\n\nFree & open source:\nnpx agentlinter\n\nagentlinter.com")}`}
-                target="_blank"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--border-hover)] transition-all w-full sm:w-auto"
-              >
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                Share on X
-              </a>
-              <a
-                href="https://github.com/seojoonkim/agentlinter"
-                target="_blank"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--border-hover)] transition-all w-full sm:w-auto"
-              >
-                <Github className="w-3.5 h-3.5" />
-                Star on GitHub
-                <GitHubStarsBadge stars={stars} />
-              </a>
-              <a
-                href="https://github.com/seojoonkim/agentlinter/discussions"
-                target="_blank"
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] text-[14px] hover:text-white hover:border-[var(--border-hover)] transition-all w-full sm:w-auto"
-              >
-                <Users className="w-3.5 h-3.5" />
-                Join Community
               </a>
             </div>
           </FadeIn>
