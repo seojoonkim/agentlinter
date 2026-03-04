@@ -2,7 +2,57 @@
 
 ---
 
-## v1.1.0 — 2026-03-01 🆕
+## v2.0.0 — 2026-03-04 🚀
+
+### Major: v2 Analysis Engine
+
+#### 🧠 v2 Analyzers (5 modules)
+- **Cognitive Load** — measures instruction density and mental overhead
+- **Token Heatmap** — visualizes token distribution across file sections
+- **Modularity** — evaluates separation of concerns and file organization
+- **Role Complexity** — detects over-complex role/persona definitions
+- **Security Scan** — deep security analysis with 25 patterns (up from 15)
+
+#### 🎯 Clarity Score
+- 17 ambiguous pattern detections (Korean + English)
+- Weighted scoring with rewrite suggestions
+- Korean token correction for accurate estimation
+
+#### 💡 Actionable Suggestions
+- Every issue tagged with priority: HIGH / MED / LOW
+- Fix hints with concrete rewrite examples
+
+#### 🏷️ Badge API
+- `/api/badge?score=N` endpoint — embed SVG score badge in README
+
+#### 🔐 Security Patterns Expanded
+- 25 patterns total (AWS, JWT, injection, role-hijacking, etc.)
+
+#### 🌏 Korean Token Correction
+- Accurate token estimation for Korean agent files
+
+#### 🖥️ Token Map UI
+- Budget gauge visualization
+- .claudeignore card display
+- v2 analyzer integration in web UI
+
+---
+
+## v1.2.0 — 2026-03-03
+
+### New Features
+
+#### 📦 Token Budget Estimator
+- Calculates token usage per file with budget gauge
+- Visual breakdown of token allocation in reports
+
+#### 🚫 .claudeignore Rules
+- Define files to exclude from context window analysis
+- Integrated into Token Map UI
+
+---
+
+## v1.1.0 — 2026-03-01
 
 ### New Features
 
