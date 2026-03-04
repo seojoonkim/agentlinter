@@ -527,8 +527,27 @@ MIT
 
 ---
 
+## 📋 Version History
+
+| Version | Date | Highlights |
+|---------|------|-----------|
+| **v2.0.0** | 2026-03-04 | v2 Deep Analysis Engine (Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan), Token Map UI, Budget Gauge |
+| **v1.2.0** | 2026-03-03 | Token Budget Estimator, .claudeignore Rules, Korean agent file scoring |
+| **v1.1.0** | 2026-03-01 | Position Risk Warning, Token Efficiency Score, Enhanced Security (prompt injection + API key) |
+| **v1.0.0** | 2026-02-25 | 6 Claude Code rules, Context Window Budget Estimator, Full .claude/ recursive scanning |
+| **v0.9.0** | 2026-02 | Token Budget Checker, Instruction Scope, Hooks Advisor, Contradiction detection |
+| **v0.8.0** | 2026-02 | 7 new rules: prompt injection, MCP validator, skills linter, hooks checker, Claude Code Feb 2026 |
+| **v0.7.0** | 2026-02-14 | 25+ new rules, instruction counter, context bloat, auto-fix suggestions, MCP/skills/hooks |
+| **v0.6.0** | 2026-02-11 | english-config-files rule, CLI share by default, all 8 scoring dimensions |
+| **v0.5.0** | 2026-02-10 | Skill Safety 8th dimension, trojan detection, dangerous pattern scanner |
+| **v0.1.0** | 2026-02-05 | Initial release: 8 scoring dimensions, ~30 rules, web interface, npx CLI |
+
+> Full changelog: [CHANGELOG.md](./CHANGELOG.md)
+
+---
+
 <p align="center">
-  <a href="https://github.com/seojoonkim/agentlinter">⭐ Star on GitHub</a> · 
+  <a href="https://github.com/seojoonkim/agentlinter">⭐ Star on GitHub</a> ·
   <a href="https://twitter.com/simonkim_nft">@simonkim_nft</a>
   <br /><br />
   Built on <a href="https://code.claude.com/docs/en/memory">Anthropic's CLAUDE.md standard</a> · <a href="https://agentskills.io">Agent Skills open standard</a>
