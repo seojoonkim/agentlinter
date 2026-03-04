@@ -30,7 +30,7 @@ export const claudeIgnoreRules: Rule[] = [
     },
   },
   {
-    id: "best-practices/claude-ignore-incomplete",
+    id: "best-practices/claude-ignore-patterns",
     category: "completeness",
     severity: "info",
     description: ".claudeignore is missing some recommended patterns for optimization.",

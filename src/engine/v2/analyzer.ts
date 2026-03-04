@@ -79,6 +79,15 @@ export interface Suggestion {
   priority: 'high' | 'medium' | 'low';
 }
 
+export interface TokenBudgetEstimate {
+  totalTokens: number;
+  tokenLimit: number;
+  tokenPercentage: number;
+  tokenStatus: "ok" | "warning" | "over";
+  savingsIfModular: number;
+  savingsPct: number;
+}
+
 export interface V2AnalysisResult {
   sections: V2Section[];
   cognitiveLoad: CognitiveLoadResult;
@@ -89,6 +98,7 @@ export interface V2AnalysisResult {
   instructionClarity: InstructionClarityResult;
   suggestions: Suggestion[];
   overallScore: number;
+  tokenBudget: TokenBudgetEstimate;
 }
 
 function estimateTokens(text: string): number {
@@ -497,5 +507,20 @@ export function analyzeV2(content: string): V2AnalysisResult {
     roleScore * 0.05
   );
 
-  return { sections, cognitiveLoad, tokenHeatmap, modularity, roleComplexity, securityScan, instructionClarity, suggestions, overallScore };
+  // Token budget estimate
+  const TOKEN_LIMIT = 5000;
+  const totalTokens = tokenHeatmap.totalTokens;
+  const tokenPercentage = Math.round((totalTokens / TOKEN_LIMIT) * 100);
+  const savingsIfModular = Math.round(totalTokens * 0.3);
+  const savingsPct = totalTokens > 0 ? Math.round((savingsIfModular / totalTokens) * 100) : 0;
+  const tokenBudget: TokenBudgetEstimate = {
+    totalTokens,
+    tokenLimit: TOKEN_LIMIT,
+    tokenPercentage,
+    tokenStatus: tokenPercentage >= 100 ? "over" : tokenPercentage >= 80 ? "warning" : "ok",
+    savingsIfModular,
+    savingsPct,
+  };
+
+  return { sections, cognitiveLoad, tokenHeatmap, modularity, roleComplexity, securityScan, instructionClarity, suggestions, overallScore, tokenBudget };
 }

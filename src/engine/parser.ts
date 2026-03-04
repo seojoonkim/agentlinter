@@ -16,6 +16,7 @@ const AGENT_FILES = [
   "HEARTBEAT.md",
   "MEMORY.md",
   "BOOTSTRAP.md",
+  ".claudeignore",
   ".clauderc",
   ".agentlinterrc",
   "clawdbot.json",

@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, BarChart3, Layers, Shield, Users, ArrowLeft,
   AlertTriangle, FileText, Zap, Sparkles, Eye, Lightbulb, Award,
+  Copy, Check,
 } from "lucide-react";
 import { analyzeV2, V2AnalysisResult } from "../../engine/v2/analyzer";
+import { RECOMMENDED_CLAUDEIGNORE_PATTERNS } from "../../engine/budget";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: Sparkles },
@@ -190,10 +192,64 @@ function SuggestionsTab({ result }: { result: V2AnalysisResult }) {
 }
 
 function TokenTab({ result }: { result: V2AnalysisResult }) {
-  const { tokenHeatmap } = result;
+  const { tokenHeatmap, tokenBudget } = result;
   const maxTokens = Math.max(...tokenHeatmap.sections.map(s => s.tokens), 1);
+  const [copied, setCopied] = useState(false);
+
+  const gaugeColor = tokenBudget.tokenStatus === "over" ? "#ef4444" : tokenBudget.tokenStatus === "warning" ? "#fbbf24" : "#4ade80";
+  const gaugeWidth = Math.min(tokenBudget.tokenPercentage, 100);
+  const claudeIgnoreContent = RECOMMENDED_CLAUDEIGNORE_PATTERNS.join("\n");
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(claudeIgnoreContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Budget Gauge */}
+      <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
+        <h3 className="text-[15px] font-semibold mb-4 flex items-center gap-2">
+          <Zap className="w-4 h-4" style={{ color: gaugeColor }} />Token Budget
+        </h3>
+        <div className="flex items-end justify-between mb-2">
+          <div>
+            <span className="text-[28px] font-bold mono" style={{ color: gaugeColor }}>{tokenBudget.totalTokens.toLocaleString()}</span>
+            <span className="text-[14px] text-[var(--text-dim,#666)] mono"> / {tokenBudget.tokenLimit.toLocaleString()} tok</span>
+          </div>
+          <span className="text-[13px] font-medium mono" style={{ color: gaugeColor }}>
+            {tokenBudget.tokenStatus === "over" ? "Over limit!" : tokenBudget.tokenStatus === "warning" ? "Near limit" : "OK"} ({tokenBudget.tokenPercentage}%)
+          </span>
+        </div>
+        <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${gaugeWidth}%`, backgroundColor: gaugeColor }} />
+        </div>
+        {tokenBudget.savingsIfModular > 0 && (
+          <div className="mt-3 text-[13px] text-[var(--text-secondary,#999)]">
+            <Layers className="w-3.5 h-3.5 inline mr-1 text-[#a78bfa]" />
+            Modular split savings: ~{tokenBudget.savingsIfModular.toLocaleString()} tokens ({tokenBudget.savingsPct}% reduction)
+          </div>
+        )}
+      </div>
+
+      {/* .claudeignore Recommendation Card */}
+      <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[#fbbf24]/30">
+        <h3 className="text-[15px] font-semibold mb-3 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-[#fbbf24]" />.claudeignore Recommendation
+        </h3>
+        <p className="text-[13px] text-[var(--text-secondary,#999)] mb-3">
+          A <code className="text-[12px] mono text-[#a78bfa] bg-white/5 px-1.5 py-0.5 rounded">.claudeignore</code> file prevents Claude from loading unnecessary files into context, saving tokens and improving performance.
+        </p>
+        <div className="bg-black/30 p-3 rounded-lg mb-3">
+          <pre className="text-[12px] mono text-[#4ade80] whitespace-pre">{claudeIgnoreContent}</pre>
+        </div>
+        <button onClick={handleCopy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] bg-white/5 hover:bg-white/10 text-[var(--text-dim,#666)] hover:text-white transition-colors">
+          {copied ? <><Check className="w-3.5 h-3.5 text-[#4ade80]" />Copied!</> : <><Copy className="w-3.5 h-3.5" />Copy .claudeignore</>}
+        </button>
+      </div>
+
+      {/* Token Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-5 rounded-2xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)] text-center">
           <div className="text-[28px] font-bold mono text-[#a78bfa]">{tokenHeatmap.totalTokens.toLocaleString()}</div>
@@ -204,6 +260,8 @@ function TokenTab({ result }: { result: V2AnalysisResult }) {
           <div className="text-[11px] text-[var(--text-dim,#666)] mono mt-1">GPT-4 Context</div>
         </div>
       </div>
+
+      {/* Per-section Heatmap */}
       <div className="space-y-2">
         {tokenHeatmap.sections.map((s, i) => (
           <div key={i} className="p-3 rounded-xl bg-[var(--bg-card,#111)] border border-[var(--border,#222)]">
