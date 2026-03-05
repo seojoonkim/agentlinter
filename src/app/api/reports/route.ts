@@ -40,8 +40,8 @@ function validateReport(data: any): string | null {
   if (data.diagnostics.length > 500) {
     return "Too many diagnostics (max 500)";
   }
-  if (data.fileNames.length > 200) {
-    return "Too many files (max 200)";
+  if (data.fileNames.length > 1000) {
+    return "Too many files (max 1000)";
   }
   if (JSON.stringify(data).length > 500_000) {
     return "Payload too large (max 500KB)";
