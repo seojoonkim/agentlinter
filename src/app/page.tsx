@@ -109,8 +109,10 @@ const AGENT_NAMES = ["agent", "Claude Code", "Cursor", "Clawdbot", "Windsurf", "
 
 function RotatingAgentName() {
   const [index, setIndex] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % AGENT_NAMES.length);
     }, 2800);
@@ -118,26 +120,32 @@ function RotatingAgentName() {
   }, []);
 
   return (
-    <span className="relative inline-block align-bottom">
+    <span className="relative inline-block align-bottom" suppressHydrationWarning>
       {/* Invisible sizer — always reserves width of the widest name */}
       <span className="invisible whitespace-nowrap" aria-hidden="true">Claude Code</span>
       {/* Animated name — smooth entrance with spring-like easing */}
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={AGENT_NAMES[index]}
-          className="absolute left-0 bottom-0 whitespace-nowrap bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)] bg-clip-text"
-          initial={{ opacity: 0, y: 24, filter: "blur(8px)", scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-          exit={{ opacity: 0, y: -20, filter: "blur(6px)", scale: 1.02 }}
-          transition={{
-            duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
-            opacity: { duration: 0.4 },
-          }}
-        >
-          {AGENT_NAMES[index]}
-        </motion.span>
-      </AnimatePresence>
+      {isMounted ? (
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={AGENT_NAMES[index]}
+            className="absolute left-0 bottom-0 whitespace-nowrap bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)] bg-clip-text"
+            initial={{ opacity: 0, y: 24, filter: "blur(8px)", scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+            exit={{ opacity: 0, y: -20, filter: "blur(6px)", scale: 1.02 }}
+            transition={{
+              duration: 0.5,
+              ease: [0.22, 1, 0.36, 1],
+              opacity: { duration: 0.4 },
+            }}
+          >
+            {AGENT_NAMES[index]}
+          </motion.span>
+        </AnimatePresence>
+      ) : (
+        <span className="absolute left-0 bottom-0 whitespace-nowrap bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)] bg-clip-text">
+          {AGENT_NAMES[0]}
+        </span>
+      )}
     </span>
   );
 }
@@ -147,11 +155,16 @@ function RotatingAgentName() {
    ════════════════════════════════════════ */
 function Counter({ target, suffix = "", duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
   const [count, setCount] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (!inView) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !inView) return;
     let start = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
@@ -164,7 +177,7 @@ function Counter({ target, suffix = "", duration = 2000 }: { target: number; suf
       }
     }, 16);
     return () => clearInterval(timer);
-  }, [inView, target, duration]);
+  }, [isMounted, inView, target, duration]);
 
   return <span ref={ref}>{count}{suffix}</span>;
 }
