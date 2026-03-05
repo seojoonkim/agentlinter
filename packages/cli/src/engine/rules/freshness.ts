@@ -41,8 +41,11 @@ export const freshnessRules: Rule[] = [
     description: "Checks that file paths referenced in markdown actually exist on disk",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+      );
 
-      for (const file of files) {
+      for (const file of targetFiles) {
         const workspaceDir = file.path ? path.dirname(file.path) : ".";
         // Walk up to find workspace root (where the agent file is)
         const rootDir = file.path
@@ -73,8 +76,11 @@ export const freshnessRules: Rule[] = [
               } else if (refPath.startsWith("./") || refPath.startsWith("../")) {
                 resolved = path.resolve(workspaceDir, refPath);
               } else {
-                // Try relative to root
+                // Try relative to root, then fall back to workspaceDir
                 resolved = path.resolve(rootDir, refPath);
+                if (!fs.existsSync(resolved)) {
+                  resolved = path.resolve(workspaceDir, refPath);
+                }
               }
 
               if (!fs.existsSync(resolved)) {
@@ -105,8 +111,10 @@ export const freshnessRules: Rule[] = [
     description: "Detects dates older than 90 days (warning) or 180 days (error) in agent files",
     check(files) {
       const diagnostics: Diagnostic[] = [];
-
-      for (const file of files) {
+      const coreFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/")
+      );
+      for (const file of coreFiles) {
         let codeBlock = false;
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i];

@@ -30,8 +30,11 @@ export const positionRiskRules: Rule[] = [
       "Critical rules buried in the middle of a file (20-80%) are easy to miss. Place them near the top.",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+      );
 
-      for (const file of files) {
+      for (const file of targetFiles) {
         const total = file.lines.length;
         if (total < 10) continue;
 

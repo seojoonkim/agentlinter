@@ -85,6 +85,18 @@ const IN_BAND_INJECTION_PATTERNS = [
   { pattern: /response.*includes?.*(?:instruction|guide|hint)/i, name: "response includes instructions" },
 ];
 
+const SECURITY_SKILL_PATTERNS = [
+  /prompt[- ]?guard/i, /security/i, /injection/i, /defense/i, /detect/i,
+  /shield/i, /protect/i, /hive[- ]?fence/i, /guard/i, /firewall/i,
+  /threat/i, /attack/i, /vulnerability/i, /red[- ]?team/i, /pentest/i,
+];
+
+function isSecuritySkill(content: string, filename: string): boolean {
+  return SECURITY_SKILL_PATTERNS.some(
+    (p) => p.test(filename) || p.test(content.substring(0, 500))
+  );
+}
+
 const ADDITIONAL_RED_FLAGS = [
   { pattern: /\$\d+\s*(?:USDC|USD|ETH|reward|bonus)/i, name: "monetary incentive", category: "social-engineering" },
   { pattern: /npx\s+[a-z-]+\s+generate.*key/i, name: "npx key generation", category: "supply-chain" },
@@ -103,7 +115,8 @@ const ADDITIONAL_RED_FLAGS = [
 export function auditSkillFile(content: string, filename: string): AuditResult {
   const lines = content.split('\n');
   const findings: AuditFinding[] = [];
-  
+  const isSecurity = isSecuritySkill(content, filename);
+
   // Track code blocks to adjust severity
   let inCodeBlock = false;
   
@@ -119,7 +132,7 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
     for (const { pattern, name } of REMOTE_FETCH_PATTERNS) {
       if (pattern.test(line)) {
         findings.push({
-          severity: inCodeBlock ? "WARNING" : "CRITICAL",
+          severity: isSecurity ? "INFO" : (inCodeBlock ? "WARNING" : "CRITICAL"),
           category: "Remote Fetch",
           line: lineNum,
           match: line.trim().substring(0, 80),
@@ -179,7 +192,7 @@ export function auditSkillFile(content: string, filename: string): AuditResult {
     for (const { pattern, name } of AUTO_UPDATE_PATTERNS) {
       if (pattern.test(line)) {
         findings.push({
-          severity: "CRITICAL",
+          severity: isSecurity ? "INFO" : "CRITICAL",
           category: "Auto-Update Instructions",
           line: lineNum,
           match: line.trim().substring(0, 80),

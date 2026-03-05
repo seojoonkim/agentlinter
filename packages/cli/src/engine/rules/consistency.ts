@@ -10,6 +10,10 @@ export const consistencyRules: Rule[] = [
     description: "Files referenced in agent configs should exist",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      // Skip compound/memory files — they are working docs, not agent config
+      const checkFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/")
+      );
       const fileNames = new Set(files.map((f) => f.name));
       // Also track lowercase versions and base names (without path)
       const fileNamesLower = new Set(files.map((f) => f.name.toLowerCase()));
@@ -27,7 +31,7 @@ export const consistencyRules: Rule[] = [
         "BOOTSTRAP.md", "WORKSPACE.md", "CONFIG.md", "RULES.md",
       ]);
 
-      for (const file of files) {
+      for (const file of checkFiles) {
         // Find references to other .md files
         const refs = file.content.matchAll(
           /(?:see|read|check|refer to|load|include)\s+[`"']?([A-Z][A-Za-z_-]+\.md)(?:#[a-z0-9-]+)?[`"']?/gi

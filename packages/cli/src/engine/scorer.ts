@@ -15,7 +15,7 @@ import { allRules } from "./rules";
  */
 export function lint(workspacePath: string, files: FileInfo[]): LintResult {
   // Separate core agent files from skill files
-  const coreFiles = files.filter((f) => !f.name.startsWith("skills/"));
+  const coreFiles = files.filter((f) => !f.name.startsWith("skills/") && !f.name.includes("/skills/"));
   const skillFiles = files.filter((f) => f.name.startsWith("skills/"));
 
   // Detect workspace context
@@ -101,12 +101,24 @@ function computeCategoryScore(
 
   // Deductions (with caps to prevent info avalanche from tanking score)
   score -= criticals.length * 20; // criticals are showstoppers
-  score -= errors.length * 15; // errors are severe
-  
-  // Runtime: reduce warning penalty (3 instead of 5) to reward good patterns over warnings
-  const warningPenalty = category === "runtime" ? 3 : 5;
-  score -= warnings.length * warningPenalty;
-  
+
+  // skillSafety scaling: cap error/warning deductions when many skills exist
+  if (category === "skillSafety") {
+    const skillCount = files.filter((f) => f.name.includes("skills/")).length;
+    if (skillCount > 5) {
+      score -= Math.min(errors.length * 15, 60);
+      score -= Math.min(warnings.length * 2, 25);
+    } else {
+      score -= errors.length * 15;
+      score -= warnings.length * 5;
+    }
+  } else {
+    score -= errors.length * 15; // errors are severe
+    // Runtime: reduce warning penalty (3 instead of 5) to reward good patterns over warnings
+    const warningPenalty = category === "runtime" ? 3 : 5;
+    score -= warnings.length * warningPenalty;
+  }
+
   score -= Math.min(infos.length * 1, 20); // infos are minor, capped at -20
 
   // Bonus points for good practices (category-specific)

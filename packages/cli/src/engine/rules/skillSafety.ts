@@ -193,6 +193,7 @@ export const skillSafetyRules: Rule[] = [
       const skillFiles = files.filter((f) => f.name.includes("skills/"));
 
       for (const file of skillFiles) {
+        const isSecurity = isSecuritySkill(file);
         let inCodeBlock = false;
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i];
@@ -200,9 +201,11 @@ export const skillSafetyRules: Rule[] = [
 
           for (const { pattern, name, severity } of DANGEROUS_EXEC_PATTERNS) {
             if (pattern.test(line)) {
-              // Demote if inside code block, documentation line, or install instructions
-              const isDoc = inCodeBlock
+              // Demote if inside code block, documentation line, security skill, or install instructions
+              const isDoc = isSecurity
+                || inCodeBlock
                 || /^[\s]*[>$#❌✅|]/.test(line)
+                || /CHANGELOG|README|RELEASE/i.test(file.name)
                 || /install|prerequisite|setup|dependency/i.test(file.lines[Math.max(0, i - 3)]?.concat(file.lines[Math.max(0, i - 2)] || "", file.lines[Math.max(0, i - 1)] || "") || "");
 
               diagnostics.push({

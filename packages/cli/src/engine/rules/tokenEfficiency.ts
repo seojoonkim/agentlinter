@@ -115,8 +115,11 @@ export const tokenEfficiencyRules: Rule[] = [
       "Grades each agent file by line count to ensure token efficiency (A≤150, B≤300, C≤500, D>500)",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+      );
 
-      for (const file of files) {
+      for (const file of targetFiles) {
         const lineCount = file.lines.length;
         if (lineCount < 5) continue;
 
@@ -146,6 +149,9 @@ export const tokenEfficiencyRules: Rule[] = [
       "Detects duplicate sections within and across files using 3-gram Jaccard similarity (≥ 0.6)",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+      );
 
       // Collect all sections with their ngrams
       const sectionData: Array<{
@@ -155,7 +161,7 @@ export const tokenEfficiencyRules: Rule[] = [
         ngrams: Set<string>;
       }> = [];
 
-      for (const file of files) {
+      for (const file of targetFiles) {
         for (const section of file.sections) {
           const content = section.content.trim();
           if (content.split(/\s+/).length < 10) continue; // skip tiny sections
@@ -246,8 +252,11 @@ export const tokenEfficiencyRules: Rule[] = [
       "Estimates actual token count (English: 4 chars/token, Korean: 1.5 chars/token) and grades A≤2K, B≤5K, C≤10K, D>10K",
     check(files) {
       const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+      );
 
-      for (const file of files) {
+      for (const file of targetFiles) {
         if (file.lines.length < 5) continue;
 
         const tokenCount = estimateTokens(file.content);

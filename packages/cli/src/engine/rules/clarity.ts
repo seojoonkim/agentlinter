@@ -287,7 +287,7 @@ export const clarityRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const ABSOLUTE_PATTERNS = /\b(never|always|must|under no circumstances|absolutely|without exception)\b/i;
-      const ESCAPE_PATTERNS = /\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b/i;
+      const ESCAPE_PATTERNS = /(?:\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b|예외|단,?\s|특수한\s*경우|불가피|형이?\s*직접|형\s*지시)/i;
       const SECURITY_TERMS = /\b(api.?key|token|secret|password|credential|private.?key|leak|expose)\b/i;
       const coreFiles = files.filter(
         (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
@@ -299,7 +299,7 @@ export const clarityRules: Rule[] = [
           // Skip security rules — absolute is correct there
           if (SECURITY_TERMS.test(line)) continue;
           // Check 3-line window for escape hatch
-          const window = file.lines.slice(i, i + 4).join(" ");
+          const window = file.lines.slice(Math.max(0, i - 1), i + 5).join(" ");
           if (!ESCAPE_PATTERNS.test(window)) {
             diagnostics.push({
               severity: "warning",
