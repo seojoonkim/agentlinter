@@ -253,6 +253,15 @@ const CATEGORY_META: Record<string, {
       { id: "runtime/has-timeout-settings", severity: "info", description: "API timeout settings configured" },
     ],
   },
+  "Remote-Ready": {
+    weight: 5,
+    description: "How well your workspace is configured for remote and multi-environment deployment.",
+    whyItMatters: "Remote-ready workspaces handle secrets, environment variables, and deployment configs correctly.",
+    rules: [
+      { id: "remote-ready/no-hardcoded-secrets", severity: "critical", description: "No hardcoded API keys or secrets" },
+      { id: "remote-ready/env-vars-documented", severity: "warning", description: "Environment variables are documented" },
+    ],
+  },
   "Skill Safety": {
     weight: 10,
     description: "Safety and quality of custom skills — documentation, environment checks, error handling, security docs, and safe defaults.",
@@ -608,6 +617,7 @@ https://agentlinter.com`;
               {data.categories.map((cat) => {
                 const catTier = getTier(cat.score);
                 const meta = CATEGORY_META[cat.name];
+                if (!meta) return null;
                 return (
                   <div key={cat.name} className="flex items-center gap-3">
                     <div className="flex items-center gap-2 w-[120px] text-right">
@@ -1027,6 +1037,7 @@ https://agentlinter.com`;
               <div className="mt-3 text-[12px] mono text-[var(--text-dim)] space-y-1">
                 {data.categories.map((cat) => {
                   const meta = CATEGORY_META[cat.name];
+                if (!meta) return null;
                   return (
                     <div key={cat.name} className="flex gap-2">
                       <span className="text-[var(--text-secondary)]">{cat.name}:</span>
