@@ -298,6 +298,10 @@ export const clarityRules: Rule[] = [
           if (!ABSOLUTE_PATTERNS.test(line)) continue;
           // Skip security rules — absolute is correct there
           if (SECURITY_TERMS.test(line)) continue;
+          // Skip short bold principle statements (design slogans ≤ 15 words)
+          const plainText = line.replace(/[*#_`>-]/g, "").trim();
+          const wordCount = plainText.split(/\s+/).length;
+          if (wordCount <= 15 && /\*\*/.test(line)) continue;
           // Check 3-line window for escape hatch
           const window = file.lines.slice(Math.max(0, i - 1), i + 5).join(" ");
           if (!ESCAPE_PATTERNS.test(window)) {

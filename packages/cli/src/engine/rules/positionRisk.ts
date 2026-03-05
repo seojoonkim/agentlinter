@@ -38,7 +38,7 @@ export const positionRiskRules: Rule[] = [
         const total = file.lines.length;
         if (total < 10) continue;
 
-        const startLine = Math.floor(total * 0.2);
+        const startLine = Math.floor(total * 0.25);
         const endLine = Math.floor(total * 0.8);
 
         for (let i = startLine; i < endLine; i++) {

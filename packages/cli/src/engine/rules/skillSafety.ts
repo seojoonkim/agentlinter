@@ -111,6 +111,10 @@ export const skillSafetyRules: Rule[] = [
         const hasWhenToUse =
           /when\s+to\s+use/i.test(description) ||
           /use\s+when/i.test(description) ||
+          /use\s+(?:\w+\s+)?when/i.test(description) ||
+          /use\s+(?:for|to)\s/i.test(description) ||
+          /whenever\s/i.test(description) ||
+          /요청\s*시|사용\s*시|필요\s*시/i.test(description) ||
           /when\s+claude/i.test(description) ||
           /when\s+(?:the\s+)?(?:user|agent)/i.test(description) ||
           /for\s+(?:when|situations?\s+where)/i.test(description) ||
