@@ -451,6 +451,33 @@ export default function ReportPage({ data }: { data: ReportData }) {
   const totalRules = Object.values(CATEGORY_META).reduce((sum, c) => sum + c.rules.length, 0);
   const passedRules = totalRules - data.diagnostics.length;
 
+  // Token efficiency stats from diagnostics
+  const tokenBudgetDiags = data.diagnostics.filter((d) => d.rule === "clarity/token-budget-range");
+  const tokenFiles: { tokens: number; grade: string }[] = tokenBudgetDiags
+    .map((d) => {
+      const tokMatch = d.message?.match(/~([\d,]+)\s*estimated tokens/);
+      const gradeMatch = d.message?.match(/Grade\s+([A-D])/);
+      if (!tokMatch) return null;
+      return { tokens: parseInt(tokMatch[1].replace(/,/g, ""), 10), grade: gradeMatch?.[1] || "?" };
+    })
+    .filter(Boolean) as { tokens: number; grade: string }[];
+  const totalTokens = tokenFiles.reduce((s, f) => s + f.tokens, 0);
+  const gradeOrder = ["A", "B", "C", "D"];
+  const avgGradeIdx = tokenFiles.length > 0
+    ? Math.round(tokenFiles.reduce((s, f) => s + gradeOrder.indexOf(f.grade), 0) / tokenFiles.length)
+    : 0;
+  const avgGrade = tokenFiles.length > 0 ? gradeOrder[Math.min(avgGradeIdx, 3)] : null;
+  const potentialSavings = tokenFiles.length > 0
+    ? Math.round(
+        tokenFiles.reduce((s, f) => {
+          if (f.grade === "B") return s + f.tokens * 0.3;
+          if (f.grade === "C") return s + f.tokens * 0.5;
+          if (f.grade === "D") return s + f.tokens * 0.6;
+          return s;
+        }, 0) / Math.max(totalTokens, 1) * 100
+      )
+    : 0;
+
   // Build category breakdown for share text
   const labels: Record<string, string> = {
     structure: "📁",
@@ -545,6 +572,30 @@ https://agentlinter.com`;
                     Top <span className="mono font-medium" style={{ color: tier.color }}>{percentile}%</span> of all agent workspaces
                   </p>
                 </div>
+                {tokenFiles.length > 0 && (
+                  <div className="mt-4 rounded-lg border border-[var(--green)]/20 bg-[var(--green)]/5 px-4 py-3">
+                    <div className="text-[11px] font-medium text-[var(--green)] mb-2 flex items-center gap-1.5">
+                      <Zap className="w-3 h-3" />
+                      Token Efficiency
+                    </div>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1">
+                      <span>
+                        <span className="text-[18px] font-bold mono text-[var(--green)]">{totalTokens.toLocaleString()}</span>{" "}
+                        <span className="text-[11px] text-[var(--green)]/70">total tokens</span>
+                      </span>
+                      <span>
+                        <span className="text-[18px] font-bold mono text-[var(--green)]">{avgGrade}</span>{" "}
+                        <span className="text-[11px] text-[var(--green)]/70">avg grade</span>
+                      </span>
+                      {potentialSavings > 0 && (
+                        <span>
+                          <span className="text-[18px] font-bold mono text-[var(--green)]">~{potentialSavings}%</span>{" "}
+                          <span className="text-[11px] text-[var(--green)]/70">potential savings</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[var(--teal)]">
                   <Lock className="w-3 h-3" />
                   <span>Results only — your files never uploaded</span>
