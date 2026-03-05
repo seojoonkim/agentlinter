@@ -19,7 +19,7 @@ export type Category =
  * - openclaw-runtime: Workspace-scoped (AGENTS.md, USER.md, ~/.openclaw/)
  * - universal: Applies to both contexts
  */
-export type LintContext = "claude-code" | "openclaw-runtime" | "universal";
+export type LintContext = "claude-code" | "openclaw-runtime" | "universal" | "cursor" | "copilot";
 
 export interface Diagnostic {
   severity: Severity;

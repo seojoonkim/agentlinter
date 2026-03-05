@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v2.0.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v2.1.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
 <h1 align="center">🧬 AgentLinter</h1>
@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/github/stars/seojoonkim/agentlinter?style=flat-square&color=f59e0b" alt="GitHub Stars" />
   <img src="https://img.shields.io/badge/node-18%2B-brightgreen?style=flat-square" alt="Node 18+" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" />
-  <img src="https://img.shields.io/badge/frameworks-Claude_Code_%7C_OpenClaw_%7C_Moltbot_%7C_Cursor_%7C_Windsurf-purple?style=flat-square" alt="Frameworks" />
+  <img src="https://img.shields.io/badge/frameworks-Claude_Code_%7C_OpenClaw_%7C_Moltbot_%7C_Cursor_%7C_Windsurf_%7C_Copilot-purple?style=flat-square" alt="Frameworks" />
 </p>
 
 ---
@@ -107,7 +107,38 @@ npx agentlinter share
 
 ---
 
-## 🆕 What's New in v2.0.0
+## 🆕 What's New in v2.1.0
+
+**30 rules** (13 new) with freshness detection, import validation, multi-framework support, and research-backed linting.
+
+### 📊 Token Bloat Score Enhanced (+3 rules)
+- **`clarity/duplicate-content`** — 3-gram Jaccard similarity detects duplicate sections (>= 60%)
+- **`clarity/obvious-statements`** — Flags "be accurate", "follow instructions" etc. that waste tokens
+- **`clarity/token-budget-range`** — Token-estimated grading (Korean-corrected): A<=2K, B<=5K, C<=10K, D>10K
+
+### 🕐 Freshness / Staleness Detector (+3 rules, NEW)
+- **`consistency/stale-file-reference`** — Validates file paths referenced in markdown
+- **`consistency/stale-date`** — 90d+ warning, 180d+ error for outdated dates
+- **`consistency/stale-package-reference`** — Cross-checks packages against package.json
+
+### 📎 Import Validator (+2 rules, NEW)
+- **`structure/dead-import`** — Validates @file.md references exist
+- **`structure/circular-import`** — DFS cycle detection in import graph
+
+### 🔀 Multi-Framework Support (+4 rules, NEW)
+- **Cursor** (.cursorrules): `cursor/rules-format`, `cursor/no-conflicting-claude`
+- **GitHub Copilot** (.github/copilot-instructions.md): `copilot/instructions-format`, `copilot/no-conflicting-claude`
+
+### ✍️ Descriptive Ratio (+1 rule)
+- **`claude-code/descriptive-ratio`** — Warns when >60% of content is descriptive instead of imperative
+
+### 📚 Research-backed
+- Rules grounded in prompt engineering best practices
+- Reference: Gloaguen et al. (2026) — "A Taxonomy of Agent Instruction Failures"
+
+---
+
+## What's in v2.0.0
 
 Major upgrade with v2 analysis engine, advanced scoring, and new APIs.
 
@@ -458,6 +489,7 @@ Score changes are posted as PR comments automatically.
 | **Moltbot** | `AGENTS.md`, `SOUL.md`, `moltbot.json` | ✅ Full support |
 | **Clawdbot** | `AGENTS.md`, `SOUL.md`, `USER.md`, `TOOLS.md`, `clawdbot.json` | ✅ Full support |
 | **Cursor** | `.cursorrules`, `.cursor/rules/` | ✅ Full support |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | ✅ Full support |
 | **Windsurf** | `.windsurfrules`, `.windsurf/rules/` | ✅ Full support |
 | **Any Agent Skills** | `SKILL.md` with frontmatter | ✅ Full support |
 
@@ -499,6 +531,8 @@ Score changes are posted as PR comments automatically.
 - [x] Badge API (`/api/badge?score=N`)
 - [x] v2 Analyzers (Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan)
 - [x] Token Budget Estimator + .claudeignore
+- [x] Freshness/Staleness Detector + Import Validator
+- [x] Multi-framework support (Cursor, Copilot)
 - [ ] Leaderboard
 
 ---
@@ -531,6 +565,7 @@ MIT
 
 | Version | Date | Highlights |
 |---------|------|-----------|
+| **v2.1.0** | 2026-03-05 | 13 new rules (freshness, import validator, multi-framework, token bloat), research-backed linting, 30 total rules |
 | **v2.0.0** | 2026-03-04 | v2 Deep Analysis Engine (Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan), Token Map UI, Budget Gauge |
 | **v1.2.0** | 2026-03-03 | Token Budget Estimator, .claudeignore Rules, Korean agent file scoring |
 | **v1.1.0** | 2026-03-01 | Position Risk Warning, Token Efficiency Score, Enhanced Security (prompt injection + API key) |

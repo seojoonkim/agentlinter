@@ -18,13 +18,16 @@ const AGENT_FILES = [
   "BOOTSTRAP.md",
   ".clauderc",
   ".agentlinterrc",
+  // Multi-framework config files
+  ".cursorrules",
+  ".github/copilot-instructions.md",
   // Runtime configs
   "clawdbot.json",
   "openclaw.json",
   "moltbot.json",
 ];
 
-const AGENT_DIRS = [".claude", "claude", ".cursor", ".windsurf"];
+const AGENT_DIRS = [".claude", "claude", ".cursor", ".windsurf", ".github"];
 
 /**
  * Detect lint context based on files present
@@ -33,6 +36,16 @@ function detectContext(fileNames: string[]): LintContext {
   // CLAUDE.md → claude-code context
   if (fileNames.includes("CLAUDE.md")) {
     return "claude-code";
+  }
+
+  // .cursorrules → cursor context
+  if (fileNames.includes(".cursorrules") || fileNames.some(f => f.startsWith(".cursor/"))) {
+    return "cursor";
+  }
+
+  // copilot-instructions.md → copilot context
+  if (fileNames.includes(".github/copilot-instructions.md") || fileNames.some(f => f.includes("copilot-instructions"))) {
+    return "copilot";
   }
 
   // AGENTS.md or runtime config → agent-runtime context

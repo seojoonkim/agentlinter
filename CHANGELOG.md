@@ -2,6 +2,46 @@
 
 ---
 
+## v2.1.0 — 2026-03-05 🚀
+
+### 🆕 New: 13 Rules Added (17 → 30 total)
+
+#### 📊 Token Bloat Score Enhanced (+3 rules)
+- **`clarity/duplicate-content`** — Detects duplicate sections via 3-gram Jaccard similarity (>= 0.6)
+- **`clarity/obvious-statements`** — Flags unnecessary "obvious" instructions ("be accurate", "follow instructions" etc.)
+- **`clarity/token-budget-range`** — Token-estimated grading (English: 4 chars/token, Korean: 1.5 chars/token)
+
+#### 🕐 Freshness / Staleness Detector (+3 rules, NEW)
+- **`consistency/stale-file-reference`** — Validates file paths referenced in markdown exist on disk
+- **`consistency/stale-date`** — 90d+ warning, 180d+ error for outdated dates
+- **`consistency/stale-package-reference`** — Cross-checks referenced packages against package.json
+
+#### 📎 @ Import Validator (+2 rules, NEW)
+- **`structure/dead-import`** — Validates @file.md import references point to existing files
+- **`structure/circular-import`** — DFS cycle detection in @import graph
+
+#### 🔀 Multi-Framework Support (+4 rules, NEW)
+- **Cursor** (.cursorrules) scanning + rules
+  - `cursor/rules-format` — .cursorrules structure validation
+  - `cursor/no-conflicting-claude` — .cursorrules vs CLAUDE.md conflict detection
+- **GitHub Copilot** (.github/copilot-instructions.md) scanning + rules
+  - `copilot/instructions-format` — copilot-instructions.md format validation
+  - `copilot/no-conflicting-claude` — copilot-instructions vs CLAUDE.md conflict detection
+
+#### ✍️ Describe vs Command Classifier (+1 rule)
+- **`claude-code/descriptive-ratio`** — Warns when >60% descriptive statements (should be imperative)
+
+### 🔬 Enhanced
+- Token Efficiency Score: line-based + token-estimated grading (Korean correction)
+- Parser: .cursorrules, .github/copilot-instructions.md, .github/ directory scanning
+- LintContext type: added `cursor`, `copilot` contexts
+
+### 📚 Research-backed
+- Website "Research-backed linting" banner
+- Reference: Gloaguen et al. (2026) — "A Taxonomy of Agent Instruction Failures"
+
+---
+
 ## v2.0.0 — 2026-03-04 🚀
 
 ### Major: v2 Analysis Engine

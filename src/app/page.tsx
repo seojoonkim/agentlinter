@@ -33,6 +33,7 @@ import {
   Layers,
   GitBranch,
   Star,
+  BookOpen,
 } from "lucide-react";
 
 /* ════════════════════════════════════════
@@ -475,6 +476,23 @@ export default function Home() {
 
         {/* Spacer after hero */}
         <div className="h-16 sm:h-24" />
+      </section>
+
+      {/* ── Research-backed Banner ── */}
+      <section className="py-6 sm:py-8 px-5 sm:px-8 border-t border-[var(--border)] bg-[var(--violet)]/5">
+        <div className="max-w-[800px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--violet)]/10 border border-[var(--violet)]/20 mb-3">
+            <BookOpen className="w-4 h-4 text-[var(--violet)]" />
+            <span className="text-[13px] sm:text-[14px] text-[var(--violet)] font-medium">Research-backed</span>
+          </div>
+          <p className="text-[13px] sm:text-[14px] text-[var(--text-dim)] leading-relaxed">
+            Linting rules grounded in prompt engineering best practices and empirical research.
+            <br className="hidden sm:block" />
+            <span className="text-[var(--text-secondary)]">
+              Reference: Gloaguen et al. (2026) &mdash; &ldquo;A Taxonomy of Agent Instruction Failures&rdquo;
+            </span>
+          </p>
+        </div>
       </section>
 
       {/* ── Trust Bar ── */}

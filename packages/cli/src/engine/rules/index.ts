@@ -19,6 +19,12 @@ import { agentFocusRules } from "./agentFocus";
 // v0.8.0 new rules
 import { positionRiskRules } from "./positionRisk";
 import { tokenEfficiencyRules } from "./tokenEfficiency";
+// v2.1.0 new rules
+import { freshnessRules } from "./freshness";
+import { importValidatorRules } from "./importValidator";
+// v2.1.0 framework rules
+import { cursorRules } from "../frameworks/cursor";
+import { copilotRules } from "../frameworks/copilot";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -40,6 +46,11 @@ export const allRules: Rule[] = [
   // v0.8.0 new rules
   ...positionRiskRules,
   ...tokenEfficiencyRules,
+  // v2.1.0 new rules
+  ...freshnessRules,
+  ...importValidatorRules,
+  ...cursorRules,
+  ...copilotRules,
 ];
 
 export {
@@ -54,4 +65,8 @@ export {
   remoteReadyRules,
   positionRiskRules,
   tokenEfficiencyRules,
+  freshnessRules,
+  importValidatorRules,
+  cursorRules,
+  copilotRules,
 };
