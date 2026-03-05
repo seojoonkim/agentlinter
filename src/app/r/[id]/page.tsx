@@ -80,6 +80,7 @@ async function fetchReport(id: string): Promise<ReportData | null> {
         categories = rawCategories.map((c: any) => ({
           name: c?.name || "Unknown",
           score: typeof c?.score === "number" ? c.score : 0,
+          weight: typeof c?.weight === "number" ? c.weight : 0.1,
         }));
       } else if (typeof rawCategories === "string") {
         categories = JSON.parse(rawCategories).map((c: any) => ({
