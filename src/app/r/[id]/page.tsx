@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import ReportPage, { ReportData } from "./ReportClient";
+import ReportClientLoader from "./ReportClientLoader";
+import type { ReportData } from "./ReportClient";
 
 // Demo fallback data
 const DEMO_DATA: ReportData = {
@@ -162,7 +163,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       notFound();
     }
 
-    return <ReportPage data={data} />;
+    return <ReportClientLoader data={data} />;
   } catch (error) {
     console.error("Page render error:", error);
     notFound();
