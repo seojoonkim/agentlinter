@@ -582,7 +582,7 @@ export const clarityRules: Rule[] = [
         
         if (nonEnglishLines > 0) {
           const percentage = Math.round((nonEnglishLines / file.lines.length) * 100);
-          const severity = percentage >= 30 ? "warning" : "info";
+          const severity = percentage >= 60 ? "warning" : "info";
           diagnostics.push({
             severity,
             category: "clarity",

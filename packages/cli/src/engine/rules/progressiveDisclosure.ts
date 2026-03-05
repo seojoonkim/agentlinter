@@ -26,7 +26,7 @@ export const progressiveDisclosureRules: Rule[] = [
           message: `CLAUDE.md is ${lineCount} lines — extremely long. Claude Code may not process all instructions effectively.`,
           fix: "Keep CLAUDE.md under 150 lines. Move details to .claude/rules/*.md",
         });
-      } else if (lineCount > 50 && !hasRulesDir) {
+      } else if (lineCount > 150 && !hasRulesDir) {
         // Warning: long without modularization
         diagnostics.push({
           severity: "warning",

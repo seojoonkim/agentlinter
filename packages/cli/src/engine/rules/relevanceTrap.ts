@@ -6,7 +6,7 @@ import { Rule, Diagnostic } from "../types";
 // (likely to be filtered out by Claude Code's relevance filter)
 const SPECIFIC_PATH_RE = /(?:src\/|lib\/|app\/|pages\/|components\/|api\/)[a-zA-Z0-9_/.-]+\.[a-zA-Z]+/;
 const SPECIFIC_FILE_RE = /(?:when editing|in file|for file|only in|specific to)\s+[`"]?[a-zA-Z0-9_/.-]+\.[a-zA-Z]+/i;
-const CONDITIONAL_CONTEXT_RE = /(?:if working on|when (?:using|modifying|touching|editing)|only for)\s+(?:the\s+)?[a-zA-Z0-9_/.-]+/i;
+const CONDITIONAL_CONTEXT_RE = /(?:if working on|when (?:using|modifying|touching|editing)|only for)\s+(?:the\s+)?[a-zA-Z0-9_/.-]+\.[a-zA-Z]{2,4}\b/i;
 const FRAMEWORK_SPECIFIC_RE = /(?:in (?:Next\.js|React|Vue|Svelte|Django|Rails|Express|FastAPI|Nuxt|Remix|Astro)(?:\s+(?:projects?|apps?|code))?)/i;
 
 export const relevanceTrapRules: Rule[] = [
@@ -44,6 +44,9 @@ export const relevanceTrapRules: Rule[] = [
             { re: CONDITIONAL_CONTEXT_RE, reason: "context-conditional instruction" },
             { re: FRAMEWORK_SPECIFIC_RE, reason: "framework-specific instruction" },
           ];
+
+          // Skip home-dir workspace paths (e.g., ~/clawd/...) — these are intentional operational instructions
+          if (/~\/[a-zA-Z]|\/Users\/[a-zA-Z]/.test(line)) continue;
 
           for (const { re, reason } of patterns) {
             if (re.test(line)) {
