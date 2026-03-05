@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2,
   Github,
@@ -382,21 +381,13 @@ function Collapsible({ title, children, defaultOpen = false, badge, icon }: {
           style={{ transform: open ? "rotate(180deg)" : "rotate(0)" }}
         />
       </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-3 sm:px-5 pb-4 sm:pb-5 border-t border-[var(--border)]">
-              {children}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {open && (
+        <div className="overflow-hidden border-t border-[var(--border)]">
+          <div className="px-3 sm:px-5 pb-4 sm:pb-5">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -512,7 +503,7 @@ https://agentlinter.com`;
 
       {/* Content */}
       <main className="max-w-[720px] mx-auto px-4 sm:px-6 py-8 sm:py-14 space-y-6 sm:space-y-8">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <div className="animate-fade-in">
 
           {/* ═══════ Score Hero ═══════ */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 sm:p-8 mb-6 sm:mb-8">
@@ -626,12 +617,9 @@ https://agentlinter.com`;
                       </span>
                     </div>
                     <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: catTier.color }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${cat.score}%` }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                      <div
+                        className="h-full rounded-full transition-all duration-700 ease-out"
+                        style={{ backgroundColor: catTier.color, width: `${cat.score}%` }}
                       />
                     </div>
                     <div className="flex items-center gap-2 w-[80px]">
@@ -653,15 +641,10 @@ https://agentlinter.com`;
               })}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* ═══════ Share on X CTA ═══════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="rounded-xl border border-[#1d9bf0]/30 bg-gradient-to-r from-[#1d9bf0]/8 to-[#1d9bf0]/3 p-4 sm:p-6"
-        >
+        <div className="animate-fade-in rounded-xl border border-[#1d9bf0]/30 bg-gradient-to-r from-[#1d9bf0]/8 to-[#1d9bf0]/3 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1">
               <h3 className="text-[15px] font-semibold text-white mb-1.5 flex items-center gap-2">
@@ -681,16 +664,11 @@ https://agentlinter.com`;
               Post on X
             </a>
           </div>
-        </motion.div>
+        </div>
 
         {/* ═══════ Fix with AI Agent CTA ═══════ */}
         {data.diagnostics.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="rounded-xl border border-[var(--accent)]/30 bg-gradient-to-r from-[var(--accent)]/8 to-[var(--accent)]/3 p-4 sm:p-6"
-          >
+          <div className="animate-fade-in rounded-xl border border-[var(--accent)]/30 bg-gradient-to-r from-[var(--accent)]/8 to-[var(--accent)]/3 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1">
                 <h3 className="text-[15px] font-semibold text-white mb-1.5 flex items-center gap-2">
@@ -712,7 +690,7 @@ https://agentlinter.com`;
                 Copy Link
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ═══════ Table of Contents ═══════ */}
