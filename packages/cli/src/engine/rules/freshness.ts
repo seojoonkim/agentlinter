@@ -68,6 +68,9 @@ export const freshnessRules: Rule[] = [
               const refPath = match[1];
               // Skip URLs, anchors, wildcards
               if (refPath.includes("://") || refPath.startsWith("#") || refPath.includes("*")) continue;
+              // Skip dynamic placeholder paths
+              const DYNAMIC_PLACEHOLDERS = /YYYY|MM[-\/]DD|HH:mm|\{[^}]+\}|\$\{[^}]+\}|<[^>]+>/;
+              if (DYNAMIC_PLACEHOLDERS.test(refPath)) continue;
 
               // Resolve path relative to workspace
               let resolved = refPath;

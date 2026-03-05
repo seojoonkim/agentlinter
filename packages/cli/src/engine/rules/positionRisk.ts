@@ -50,8 +50,12 @@ export const positionRiskRules: Rule[] = [
           const hasCriticalKeyword = CRITICAL_KEYWORDS.some((kw) => kw.test(line));
           if (!hasCriticalKeyword) continue;
 
+          const hasEarlyCritical = file.lines
+            .slice(0, startLine)
+            .some(l => /^#{1,4}\s/.test(l) && CRITICAL_KEYWORDS.some(kw => kw.test(l)));
+
           diagnostics.push({
-            severity: "warning",
+            severity: hasEarlyCritical ? "info" : "warning",
             category: "structure",
             rule: this.id,
             file: file.name,

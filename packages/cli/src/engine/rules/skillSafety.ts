@@ -45,6 +45,26 @@ function isSecuritySkill(file: { name: string; content: string }): boolean {
   );
 }
 
+function extractDescription(frontmatter: string): string | null {
+  // Case 1: YAML multiline block (> or |)
+  const multilineMatch = frontmatter.match(/^description:\s*[>|]-?\s*\n((?:[ \t]+.+\n?)+)/m);
+  if (multilineMatch) return multilineMatch[1].replace(/\n[ \t]+/g, ' ').trim();
+
+  // Case 2: Double-quoted string
+  const dqMatch = frontmatter.match(/^description:\s*"((?:[^"\\]|\\.)*)"/m);
+  if (dqMatch) return dqMatch[1].replace(/\\"/g, '"').trim();
+
+  // Case 3: Single-quoted string
+  const sqMatch = frontmatter.match(/^description:\s*'((?:[^'\\]|\\.)*)'/m);
+  if (sqMatch) return sqMatch[1].trim();
+
+  // Case 4: Plain string (allow apostrophes)
+  const plainMatch = frontmatter.match(/^description:\s*([^\n>|].+)/m);
+  if (plainMatch) return plainMatch[1].trim();
+
+  return null;
+}
+
 export const skillSafetyRules: Rule[] = [
   {
     id: "skill-safety/skill-name-match-dir",
@@ -102,10 +122,8 @@ export const skillSafetyRules: Rule[] = [
         if (!file.content.startsWith("---")) continue;
 
         const frontmatter = file.content.split("---")[1] || "";
-        const descMatch = frontmatter.match(/^description:\s*["']?([^\n"']+)["']?/m);
-        if (!descMatch) continue; // missing description handled by has-metadata
-
-        const description = descMatch[1].trim();
+        const description = extractDescription(frontmatter);
+        if (!description) continue; // missing description handled by has-metadata
 
         // Check if description includes "when to use" guidance
         const hasWhenToUse =

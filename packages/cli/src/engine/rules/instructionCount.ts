@@ -31,6 +31,8 @@ export const instructionCountRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
 
+      const ALWAYS_LOADED = new Set(["CLAUDE.md", "AGENTS.md", "SOUL.md", "IDENTITY.md", "USER.md"]);
+
       // Count across core agent config files only (not memory, compound, or skills)
       const coreFiles = files.filter(
         (f) =>
@@ -42,17 +44,24 @@ export const instructionCountRules: Rule[] = [
           (f.name.endsWith(".md") || f.name.endsWith(".txt"))
       );
 
-      let totalInstructions = 0;
+      let alwaysLoadedTotal = 0;
+      let otherCoreTotal = 0;
       const perFile: { name: string; count: number }[] = [];
 
       for (const file of coreFiles) {
         const count = countInstructions(file.content);
-        totalInstructions += count;
         perFile.push({ name: file.name, count });
+        if (ALWAYS_LOADED.has(file.name)) {
+          alwaysLoadedTotal += count;
+        } else {
+          otherCoreTotal += count;
+        }
       }
 
-      if (totalInstructions >= 150) {
+      // Always-loaded files: 150 limit (error)
+      if (alwaysLoadedTotal >= 150) {
         const topFiles = perFile
+          .filter((f) => ALWAYS_LOADED.has(f.name))
           .sort((a, b) => b.count - a.count)
           .slice(0, 3)
           .map((f) => `${f.name}(${f.count})`)
@@ -62,17 +71,35 @@ export const instructionCountRules: Rule[] = [
           category: "clarity",
           rule: "claude-code/instruction-count",
           file: "workspace",
-          message: `${totalInstructions} instructions detected (top files: ${topFiles}). Claude Code reserves ~50 instructions internally, leaving ~100-150 for your config. You are over the reliable limit.`,
+          message: `${alwaysLoadedTotal} instructions in always-loaded files (${topFiles}). Claude Code reserves ~50 instructions internally, leaving ~100-150 for your config. You are over the reliable limit.`,
           fix: "Split instructions into .claude/rules/*.md files for context-aware loading",
         });
-      } else if (totalInstructions >= 100) {
+      } else if (alwaysLoadedTotal >= 100) {
         diagnostics.push({
           severity: "warning",
           category: "clarity",
           rule: "claude-code/instruction-count",
           file: "workspace",
-          message: `${totalInstructions} instructions detected. Claude Code reserves ~50 instructions internally (budget: ${totalInstructions}/150). Consider splitting into .claude/rules/*.md`,
+          message: `${alwaysLoadedTotal} instructions in always-loaded files. Claude Code reserves ~50 instructions internally (budget: ${alwaysLoadedTotal}/150). Consider splitting into .claude/rules/*.md`,
           fix: "Move context-specific rules to .claude/rules/{context}.md",
+        });
+      }
+
+      // Other core files: 350 limit (warning)
+      if (otherCoreTotal >= 350) {
+        const topFiles = perFile
+          .filter((f) => !ALWAYS_LOADED.has(f.name))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3)
+          .map((f) => `${f.name}(${f.count})`)
+          .join(", ");
+        diagnostics.push({
+          severity: "warning",
+          category: "clarity",
+          rule: "claude-code/instruction-count",
+          file: "workspace",
+          message: `${otherCoreTotal} instructions in auxiliary core files (${topFiles}). Consider consolidating or archiving less-used files.`,
+          fix: "Move infrequently-used instructions to compound/ or archive them.",
         });
       }
 
