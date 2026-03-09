@@ -55,9 +55,12 @@ export function estimateBudget(files: FileInfo[]): BudgetReport {
     0
   );
 
-  const userTotal = claudeMdCount + rulesCount + agentsCount + skillsCount;
+  // Only count non-skills files against the hard limit
+  // Skills are on-demand loaded and should not cause over-limit
+  const coreTotal = claudeMdCount + rulesCount + agentsCount;
+  const userTotal = coreTotal + skillsCount;
   const totalCount = SYSTEM_RESERVED + userTotal;
-  const percentage = Math.round((userTotal / LIMIT) * 100);
+  const percentage = Math.round((coreTotal / LIMIT) * 100);
 
   return {
     systemReserved: SYSTEM_RESERVED,
@@ -83,11 +86,10 @@ export function formatBudgetReport(report: BudgetReport): string {
         ? "⚠️ "
         : "✅";
 
-  const userTotal =
+  const coreTotal =
     report.claudeMdCount +
     report.rulesCount +
-    report.agentsCount +
-    report.skillsCount;
+    report.agentsCount;
 
   const statusText =
     report.status === "over"
@@ -108,11 +110,11 @@ export function formatBudgetReport(report: BudgetReport): string {
     report.agentsCount > 0
       ? `  .claude/agents/:    ${report.agentsCount} instructions`
       : null,
-    report.skillsCount > 0
-      ? `  .claude/skills/:    ${report.skillsCount} instructions`
-      : null,
     `  ${divider}`,
-    `  User total: ${userTotal}/${report.limit}  ${statusIcon} ${statusText}`,
+    `  Core total: ${coreTotal}/${report.limit}  ${statusIcon} ${statusText}`,
+    report.skillsCount > 0
+      ? `  .claude/skills/:    ${report.skillsCount} instructions (on-demand, not counted against limit)`
+      : null,
   ]
     .filter((l) => l !== null)
     .join("\n");

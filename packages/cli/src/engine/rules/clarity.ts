@@ -287,7 +287,7 @@ export const clarityRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const ABSOLUTE_PATTERNS = /\b(never|always|must|under no circumstances|absolutely|without exception)\b/i;
-      const ESCAPE_PATTERNS = /(?:\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b|예외|단,?\s|특수한\s*경우|불가피|형이?\s*직접|형\s*지시)/i;
+      const ESCAPE_PATTERNS = /(?:\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b|예외|단,?\s|특수한\s*경우|불가피|형이?\s*직접|형\s*지시|때만|경우에만|지시할\s*때|상황에서만|허용|예외\s*없음)/i;
       const SECURITY_TERMS = /\b(api.?key|token|secret|password|credential|private.?key|leak|expose)\b/i;
       const coreFiles = files.filter(
         (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
@@ -302,8 +302,8 @@ export const clarityRules: Rule[] = [
           const plainText = line.replace(/[*#_`>-]/g, "").trim();
           const wordCount = plainText.split(/\s+/).length;
           if (wordCount <= 15 && /\*\*/.test(line)) continue;
-          // Check 3-line window for escape hatch
-          const window = file.lines.slice(Math.max(0, i - 1), i + 5).join(" ");
+          // Check 7-line window for escape hatch
+          const window = file.lines.slice(Math.max(0, i - 2), i + 7).join(" ");
           if (!ESCAPE_PATTERNS.test(window)) {
             diagnostics.push({
               severity: "warning",
@@ -582,7 +582,7 @@ export const clarityRules: Rule[] = [
         
         if (nonEnglishLines > 0) {
           const percentage = Math.round((nonEnglishLines / file.lines.length) * 100);
-          const severity = percentage >= 60 ? "warning" : "info";
+          const severity: "warning" | "info" = "info";
           diagnostics.push({
             severity,
             category: "clarity",

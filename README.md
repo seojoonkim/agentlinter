@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v2.2.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v2.3.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
 <h1 align="center">🧬 AgentLinter</h1>
@@ -107,7 +107,29 @@ npx agentlinter share
 
 ---
 
-## 🆕 What's New in v2.2.0
+## 🆕 What's New in v2.3.0
+
+**Algorithm fairness** — Korean workspace support, false positive filtering, and skills budget separation.
+
+### 🇰🇷 Korean Workspace Support
+- **Expanded escape hatch detection** — Korean escape patterns (때만, 경우에만, 지시할 때, 상황에서만, 허용, 예외 없음) now recognized
+- **Wider context window** — Escape hatch search expanded from 3 to 7 lines for better Korean document structure
+- **Non-English severity downgrade** — `english-config-files` now reports as `info` instead of `warning`
+
+### 🎯 False Positive Filtering
+- **Backtick reference filtering** — Skips JS property access (`process.env`), domains (`.com`, `.kr`), OAuth IDs (5+ digits), URL patterns, and code patterns
+- **MEMORY.md cleanup** — Removed stale file path references that triggered false positives
+
+### 📊 Skills Budget Separation
+- **On-demand skills excluded from hard limit** — Only core files (CLAUDE.md + rules + agents) count against the 150-instruction budget
+- **Skills shown separately** — Skills display with "(on-demand, not counted against limit)" label
+
+### 🏷️ Skill Author Field
+- **Batch author addition** — All skill files now include `author` in frontmatter for proper attribution
+
+---
+
+## What's in v2.2.0
 
 **38+ rules** with token budget analysis, injection defense, cognitive blueprint validation, and multi-framework export.
 
@@ -625,6 +647,7 @@ MIT
 
 | Version | Date | Highlights |
 |---------|------|-----------|
+| **v2.3.0** | 2026-03-09 | Algorithm fairness: Korean workspace support, false positive filtering, skills budget separation |
 | **v2.2.0** | 2026-03-09 | Token Budget+, Injection Defense, Cognitive Blueprint (new category), Multi-Framework Export, 38+ rules |
 | **v2.1.0** | 2026-03-05 | 13 new rules (freshness, import validator, multi-framework, token bloat), research-backed linting, 30 total rules |
 | **v2.0.0** | 2026-03-04 | v2 Deep Analysis Engine (Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan), Token Map UI, Budget Gauge |

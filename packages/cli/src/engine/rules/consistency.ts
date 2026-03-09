@@ -59,11 +59,29 @@ export const consistencyRules: Rule[] = [
 
         // Also check backtick references like `SOUL.md` or `SOUL.md#section`
         const backtickRefs = file.content.matchAll(
-          /`([A-Z][A-Za-z_-]+\.md)(?:#[a-z0-9-]+)?`/g
+          /`([A-Za-z_-]+\.[A-Za-z]+)(?:#[a-z0-9-]+)?`/g
         );
         for (const match of backtickRefs) {
           const refName = match[1];
           if (PATTERN_REFS.has(refName)) continue; // skip generic patterns
+          // Filter out non-file references (false positives)
+          // Skip JS property access like `process.env`, `from.id` (lowercase letter + dot)
+          if (/^[a-z]/.test(refName) && /^[a-z]+\.[a-z]+$/i.test(refName)) continue;
+          // Skip if contains 5+ consecutive digits (OAuth IDs, port numbers)
+          if (/\d{5,}/.test(refName)) continue;
+          // Skip domain names
+          if (/\.(com|kr|io|org|net)$/i.test(refName)) continue;
+          // Skip URL patterns
+          if (refName.includes("://")) continue;
+          // Skip code patterns (parentheses, brackets)
+          if (/[()[\]]/.test(refName)) continue;
+          // Skip CamelCase method/class patterns (e.g., Emulation.setVisibleSize, Page.captureScreenshot)
+          if (/^[A-Z][a-z]+\.[a-z]/.test(refName)) continue;
+          // Skip non-file extensions (only check common file extensions)
+          const ext = refName.split(".").pop()?.toLowerCase() || "";
+          if (!["md", "js", "ts", "json", "yaml", "yml", "txt", "toml", "css", "html", "py", "sh", "mjs", "cjs", "jsx", "tsx"].includes(ext)) continue;
+          // Must start with uppercase for .md files
+          if (refName.endsWith(".md") && !/^[A-Z]/.test(refName)) continue;
           // Check all variants
           const exists = fileNames.has(refName) 
             || fileNamesLower.has(refName.toLowerCase())

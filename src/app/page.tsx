@@ -414,7 +414,7 @@ export default function Home() {
             <span className="text-[19px]" style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 600, letterSpacing: "-0.01em" }}>
               Agent<span className="text-[var(--accent)]">Linter</span>
             </span>
-            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v2.2.0</span>
+            <span className="ml-1.5 text-[10px] mono text-[var(--text-dim)] bg-white/[0.04] px-1.5 py-0.5 rounded-md">v2.3.0</span>
           </div>
           <div className="hidden sm:flex items-center gap-6 flex-1 justify-center">
             <a href="#why" className="text-[13px] text-[var(--text-dim)] hover:text-[var(--text-secondary)] transition-colors">Why</a>
@@ -679,7 +679,7 @@ export default function Home() {
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--red)]/30 text-[var(--red)] text-[12px] sm:text-[13px] mono mb-4">
               <Shield className="w-3 h-3" />
-              <span>NEW in v2.2.0</span>
+              <span>NEW in v2.3.0</span>
             </div>
             <p className="text-[14px] mono text-[var(--red)] mb-4 tracking-wider uppercase">Security Scanner</p>
             <h2 className="display text-[32px] sm:text-[48px] lg:text-[56px] leading-[1.1] tracking-tight mb-5">
@@ -1277,7 +1277,8 @@ export default function Home() {
           </FadeIn>
           <div className="space-y-8">
             {[
-              { version: "v2.2.0", date: "2026-03-09", badge: "Latest", items: ["🪙 Token Budget+ — per-section token weight analysis with compression suggestions", "🛡️ Prompt Injection Defense — SECURITY.md presence check + injection phrase detection", "🧠 Cognitive Blueprint — 6-element agent coverage check (identity/goals/constraints/memory/planning/validation)", "📤 Multi-Framework Export — agentlinter export --format cursor/copilot/gemini"] },
+              { version: "v2.3.0", date: "2026-03-09", badge: "Latest", items: ["🇰🇷 Korean Workspace Support — expanded escape hatch patterns + wider context window", "🎯 False Positive Filtering — skip JS properties, domains, OAuth IDs in backtick refs", "📊 Skills Budget Separation — on-demand skills excluded from hard instruction limit", "🏷️ Skill Author Field — batch author attribution across all skill files"] },
+              { version: "v2.2.0", date: "2026-03-09", badge: "", items: ["🪙 Token Budget+ — per-section token weight analysis with compression suggestions", "🛡️ Prompt Injection Defense — SECURITY.md presence check + injection phrase detection", "🧠 Cognitive Blueprint — 6-element agent coverage check (identity/goals/constraints/memory/planning/validation)", "📤 Multi-Framework Export — agentlinter export --format cursor/copilot/gemini"] },
               { version: "v2.1.0", date: "2026-03-06", badge: "", items: ["🔧 Self-improvement loop — AgentLinter lints itself", "📊 Community Benchmarks foundation — Supabase benchmarks table + API", "🌍 Language Efficiency score — non-English ratio → token savings %"] },
               { version: "v2.0.0", date: "2026-03-04", badge: "", items: ["🧠 v2 Analyzers: Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan", "🎯 Clarity Score — 17 ambiguous patterns detected (Korean + English)", "💡 Actionable Suggestions — HIGH/MED/LOW priority fix hints", "🏷️ Badge API — embed your score in README (/api/badge?score=N)", "🔐 Security patterns expanded to 25 (AWS, JWT, injection, role-hijacking)", "🌏 Korean token correction — accurate estimation for Korean agent files"] },
               { version: "v1.2.0", date: "2026-03-03", badge: "", items: ["📦 Token Budget Estimator — calculates token usage per file with budget gauge", "🚫 .claudeignore Rules — exclude files from context window analysis", "🖥️ Token Map UI — visual breakdown of token allocation"] },
