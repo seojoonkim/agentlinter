@@ -2,6 +2,30 @@
 
 ---
 
+## [2.2.0] - 2026-03-09
+
+### Added
+- **Token Budget Linter Enhanced** (+4 rules): section-weight analysis, compression suggestions, under-150 sparse file warning, padding phrase detection
+  - `token-budget/total-tokens` — byte/token measurement with 3000-token recommendation
+  - `token-budget/section-weight` — identifies heaviest sections by token proportion
+  - `token-budget/compressible-padding` — detects "Always remember to", "Make sure to" and other filler phrases
+  - `token-budget/under-150-tokens` — warns when files are too sparse to be useful
+- **Prompt Injection Defense** (+1 rule): `security/no-injection-defense` — checks for injection defense keywords, external content handling, and NEVER/DO NOT permission boundaries
+- **Cognitive Blueprint Validation** (+3 rules, NEW category "blueprint"): 6-element coverage check
+  - `blueprint/coverage` — identity, goals, constraints, memory, planning, validation coverage
+  - `blueprint/identity-defined` — agent identity/role definition check
+  - `blueprint/constraints-defined` — explicit NEVER/DO NOT constraints check
+- **Multi-Framework Export**: `agentlinter export --format <cursor|copilot|gemini>`
+  - `cursor` → `.cursorrules`
+  - `copilot` → `.github/copilot-instructions.md`
+  - `gemini` → `GEMINI.md`
+
+### Changed
+- Category weights rebalanced to accommodate new "blueprint" category (0.08)
+- Scoring now covers 10 dimensions (was 9)
+
+---
+
 ## v2.1.0 — 2026-03-05 🚀
 
 ### 🆕 New: 13 Rules Added (17 → 30 total)

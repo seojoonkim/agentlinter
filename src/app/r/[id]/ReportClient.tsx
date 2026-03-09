@@ -78,6 +78,7 @@ function CategoryIcon({ name, className }: { name: string; className?: string })
     case "Completeness": return <Puzzle className={cn} />;
     case "Security": return <Shield className={cn} />;
     case "Consistency": return <Scale className={cn} />;
+    case "Blueprint": return <Target className={cn} />;
     default: return <FileText className={cn} />;
   }
 }
@@ -262,8 +263,18 @@ const CATEGORY_META: Record<string, {
       { id: "remote-ready/env-vars-documented", severity: "warning", description: "Environment variables are documented" },
     ],
   },
+  Blueprint: {
+    weight: 8,
+    description: "Whether your agent config covers 6 cognitive blueprint elements — identity, goals, constraints, memory, planning, and validation.",
+    whyItMatters: "A complete cognitive blueprint ensures your agent knows who it is, what it should do, what it must not do, how to remember, how to plan, and how to verify. Missing elements create blind spots where the model fills in unpredictable defaults.",
+    rules: [
+      { id: "blueprint/coverage", severity: "warning", description: "6-element coverage check (identity, goals, constraints, memory, planning, validation)" },
+      { id: "blueprint/identity-defined", severity: "warning", description: "Agent has a clear identity/role definition" },
+      { id: "blueprint/constraints-defined", severity: "warning", description: "Agent has explicit constraints (NEVER/DO NOT rules)" },
+    ],
+  },
   "Skill Safety": {
-    weight: 10,
+    weight: 9,
     description: "Safety and quality of custom skills — documentation, environment checks, error handling, security docs, and safe defaults.",
     whyItMatters: "Custom skills extend your agent's capabilities but introduce risk. A skill without security docs is a footgun. Skills need clear documentation, environment validation, and safe defaults to prevent misuse.",
     rules: [

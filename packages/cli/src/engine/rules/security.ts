@@ -242,6 +242,68 @@ export const securityRules: Rule[] = [
   },
 
   {
+    id: "security/no-injection-defense",
+    category: "security",
+    severity: "warning",
+    description: "Workspace should have explicit injection defense measures",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const allContent = files.map((f) => f.content).join("\n");
+      const hasSecurityFile = files.some((f) => f.name === "SECURITY.md");
+
+      // Check for injection defense keywords
+      const injectionDefensePatterns = [
+        /prompt\s*injection/i,
+        /injection/i,
+        /untrusted\s*input/i,
+        /external\s*content/i,
+        /malicious\s*(?:prompt|input|content)/i,
+        /jailbreak/i,
+        /adversarial/i,
+      ];
+      const hasDefenseKeywords = injectionDefensePatterns.some((p) => p.test(allContent));
+
+      // Check for sub-agent / external URL handling patterns
+      const externalHandlingPatterns = [
+        /sub.?agent/i,
+        /sandbox/i,
+        /isolat/i,
+        /external\s*(?:URL|link|content|source)/i,
+        /fetch.*(?:sanitiz|validat|check)/i,
+      ];
+      const hasExternalHandling = externalHandlingPatterns.some((p) => p.test(allContent));
+
+      // Check for permission boundaries (NEVER/DO NOT patterns)
+      const neverPatterns = allContent.match(/\b(?:NEVER|DO NOT|MUST NOT|FORBIDDEN|PROHIBITED|SHALL NOT)\b/g) || [];
+      const hasPermissionBoundaries = neverPatterns.length >= 2;
+
+      const issues: string[] = [];
+      if (!hasSecurityFile && !hasDefenseKeywords) {
+        issues.push("no injection defense keywords found (mention 'prompt injection', 'untrusted input', etc.)");
+      }
+      if (!hasExternalHandling) {
+        issues.push("no external content/URL handling guidance (sub-agent isolation, sanitization)");
+      }
+      if (!hasPermissionBoundaries) {
+        issues.push(`only ${neverPatterns.length} NEVER/DO NOT boundary rules found (recommend ≥2)`);
+      }
+
+      if (issues.length > 0 && !hasSecurityFile) {
+        diagnostics.push({
+          severity: "warning",
+          category: "security",
+          rule: this.id,
+          file: "(workspace)",
+          message: `Weak injection defense: ${issues.join("; ")}.`,
+          fix: "Add a SECURITY.md file or include injection defense instructions in CLAUDE.md. Define NEVER/DO NOT rules for permission boundaries.",
+        });
+      }
+
+      return diagnostics;
+    },
+  },
+
+  {
     id: "security/api-key-exposure",
     category: "security",
     severity: "critical",

@@ -11,7 +11,8 @@ export type Category =
   | "memory"
   | "runtime"
   | "skillSafety"
-  | "remoteReady";
+  | "remoteReady"
+  | "blueprint";
 
 export interface Diagnostic {
   severity: Severity;
@@ -64,15 +65,16 @@ export interface Rule {
 }
 
 export const CATEGORY_WEIGHTS: Record<Category, number> = {
-  structure: 0.12,
-  clarity: 0.18,
-  completeness: 0.12,
-  security: 0.15,
-  consistency: 0.08,
-  memory: 0.10,
-  runtime: 0.10,
-  skillSafety: 0.10,
+  structure: 0.11,
+  clarity: 0.17,
+  completeness: 0.11,
+  security: 0.14,
+  consistency: 0.07,
+  memory: 0.09,
+  runtime: 0.09,
+  skillSafety: 0.09,
   remoteReady: 0.05,
+  blueprint: 0.08,
 };
 
 export const CATEGORY_LABELS: Record<Category, string> = {
@@ -85,4 +87,5 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   runtime: "Runtime Config",
   skillSafety: "Skill Safety",
   remoteReady: "Remote-Ready",
+  blueprint: "Blueprint",
 };

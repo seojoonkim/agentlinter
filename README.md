@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/AgentLinter-v2.1.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
+  <img src="https://img.shields.io/badge/AgentLinter-v2.2.0-7c3aed?style=for-the-badge&logoColor=white" alt="AgentLinter" />
 </p>
 
 <h1 align="center">🧬 AgentLinter</h1>
@@ -107,7 +107,55 @@ npx agentlinter share
 
 ---
 
-## 🆕 What's New in v2.1.0
+## 🆕 What's New in v2.2.0
+
+**38+ rules** with token budget analysis, injection defense, cognitive blueprint validation, and multi-framework export.
+
+### 📊 Token Budget Linter Enhanced (+4 rules)
+- **`token-budget/total-tokens`** — Byte/token measurement with numeric thresholds (current: X tokens, recommended: ≤3000)
+- **`token-budget/section-weight`** — Identifies heaviest sections by token proportion (e.g., "## Tools dominates at 45%")
+- **`token-budget/compressible-padding`** — Detects filler phrases: "Always remember to", "Make sure to", "It is important to"
+- **`token-budget/under-150-tokens`** — Warns when files have fewer than 150 tokens (too sparse)
+
+### 🛡 Prompt Injection Defense (+1 rule)
+- **`security/no-injection-defense`** — Comprehensive injection defense check:
+  - Injection defense keywords (prompt injection, untrusted input, jailbreak)
+  - External content/URL handling guidance (sub-agent isolation, sanitization)
+  - Permission boundaries: NEVER/DO NOT pattern count (recommend ≥2)
+  - Suggests SECURITY.md file if missing
+
+### 🧠 Cognitive Blueprint (+3 rules, NEW category)
+- **`blueprint/coverage`** — 6-element cognitive blueprint coverage check:
+  - **Identity**: Agent name/role/persona definition
+  - **Goals**: Purpose/mission/objectives
+  - **Constraints**: NEVER/forbidden boundaries
+  - **Memory**: Persistence/retention strategy
+  - **Planning**: Step/workflow/procedure definitions
+  - **Validation**: Verify/check/confirm procedures
+- **`blueprint/identity-defined`** — Dedicated identity check
+- **`blueprint/constraints-defined`** — Dedicated constraints check
+- Coverage ≤3/6 → error, <6/6 → warning
+- Output: `Blueprint Coverage: 4/6 (Identity ✅ Goals ✅ Constraints ✅ Memory ❌ Planning ✅ Validation ❌)`
+
+### 📤 Multi-Framework Export (NEW)
+Convert your CLAUDE.md to other framework formats:
+
+```bash
+# Export to Cursor
+npx agentlinter export --format cursor    # → .cursorrules
+
+# Export to GitHub Copilot
+npx agentlinter export --format copilot   # → .github/copilot-instructions.md
+
+# Export to Gemini CLI
+npx agentlinter export --format gemini    # → GEMINI.md
+```
+
+Strips Claude-specific directives while preserving coding style, project structure, and rules.
+
+---
+
+## What's in v2.1.0
 
 **30 rules** (13 new) with freshness detection, import validation, multi-framework support, and research-backed linting.
 
@@ -256,7 +304,7 @@ Every issue comes with a prescription. Most are auto-fixable with `--fix`:
 
 ---
 
-## Eight Scoring Dimensions
+## Ten Scoring Dimensions
 
 Each dimension checks specific, documented rules:
 
@@ -350,6 +398,16 @@ Each dimension checks specific, documented rules:
 | Sensitive path access | Warning | `Skill accesses ~/.ssh` |
 | Data exfiltration | Warning | `Skill sends data to external URL` |
 | Prompt injection vectors | Warning | `Skill vulnerable to injection` |
+
+### Blueprint — 8%
+
+> Cognitive blueprint coverage — does the agent config define all essential elements?
+
+| Rule | Severity | Example |
+|------|----------|---------|
+| Blueprint coverage | Warning/Error | `Blueprint Coverage: 3/6 — missing memory, planning, validation` |
+| Identity defined | Warning | `No agent identity/role definition found` |
+| Constraints defined | Warning | `No NEVER/DO NOT constraints found` |
 
 ---
 
@@ -533,6 +591,8 @@ Score changes are posted as PR comments automatically.
 - [x] Token Budget Estimator + .claudeignore
 - [x] Freshness/Staleness Detector + Import Validator
 - [x] Multi-framework support (Cursor, Copilot)
+- [x] Cognitive Blueprint Validation (10th scoring dimension)
+- [x] Multi-Framework Export (cursor, copilot, gemini)
 - [ ] Leaderboard
 
 ---
@@ -565,6 +625,7 @@ MIT
 
 | Version | Date | Highlights |
 |---------|------|-----------|
+| **v2.2.0** | 2026-03-09 | Token Budget+, Injection Defense, Cognitive Blueprint (new category), Multi-Framework Export, 38+ rules |
 | **v2.1.0** | 2026-03-05 | 13 new rules (freshness, import validator, multi-framework, token bloat), research-backed linting, 30 total rules |
 | **v2.0.0** | 2026-03-04 | v2 Deep Analysis Engine (Cognitive Load, Token Heatmap, Modularity, Role Complexity, Security Scan), Token Map UI, Budget Gauge |
 | **v1.2.0** | 2026-03-03 | Token Budget Estimator, .claudeignore Rules, Korean agent file scoring |

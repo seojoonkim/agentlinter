@@ -9,6 +9,7 @@ import { estimateBudget, formatBudgetReport } from './engine/budget';
 import { uploadReport } from './upload';
 import { LintResult, Diagnostic } from './engine/types';
 import { auditSkillFile, formatAuditResult, formatAuditJSON, AuditResult } from './engine/audit-skill';
+import { exportConfig, ExportFormat, getSupportedFormats } from './engine/exporter';
 
 const { version: VERSION } = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf-8')
@@ -36,6 +37,7 @@ async function main() {
   let local = false;
   let auditSkillPath: string | null = null;
   let noAudit = false; // --no-audit flag
+  let exportFormat: ExportFormat | null = null;
 
   // Parse args
   for (let i = 0; i < args.length; i++) {
@@ -50,12 +52,25 @@ async function main() {
       // scan <file|url> subcommand
       auditSkillPath = args[++i];
     }
+    else if (arg === 'export') {
+      // export --format <cursor|copilot|gemini>
+      continue;
+    }
+    else if (arg === '--format') {
+      exportFormat = args[++i] as ExportFormat;
+    }
     else if (arg === 'score') continue;
     else if (arg === '--help' || arg === '-h') {
       printHelp();
       process.exit(0);
     }
     else if (!arg.startsWith('-')) targetDir = path.resolve(process.cwd(), arg);
+  }
+
+  // Export Mode
+  if (args.includes('export') && exportFormat) {
+    runExport(targetDir, exportFormat);
+    return;
   }
 
   // Skill Audit Mode
@@ -121,7 +136,7 @@ async function main() {
           // Build rich share text
           const catLabels: Record<string, string> = {
             structure: "📁",
-            clarity: "💡", 
+            clarity: "💡",
             completeness: "📋",
             security: "🔒",
             consistency: "🔗",
@@ -129,6 +144,7 @@ async function main() {
             runtime: "⚙️",
             skillSafety: "🛡️",
             remoteReady: "🌐",
+            blueprint: "🧬",
           };
           const allCats = result.categories
             .sort((a, b) => b.score - a.score)
@@ -326,6 +342,31 @@ async function runSkillAudit(skillPath: string, jsonOutput: boolean) {
   }
 }
 
+function runExport(workspaceDir: string, format: ExportFormat) {
+  const supported = getSupportedFormats();
+  if (!supported.includes(format)) {
+    console.error(`${c.red}Error: Unknown format "${format}". Supported: ${supported.join(", ")}${c.reset}`);
+    process.exit(1);
+  }
+
+  try {
+    const result = exportConfig(workspaceDir, format);
+
+    // Ensure parent directory exists
+    const parentDir = path.dirname(result.outputPath);
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true });
+    }
+
+    fs.writeFileSync(result.outputPath, result.content, "utf-8");
+    console.log(`${c.green}✅ Exported to ${result.outputPath}${c.reset}`);
+    console.log(`${c.dim}Format: ${format} | Source: CLAUDE.md/AGENTS.md${c.reset}`);
+  } catch (err) {
+    console.error(`${c.red}Error: ${err instanceof Error ? err.message : String(err)}${c.reset}`);
+    process.exit(1);
+  }
+}
+
 function printHelp() {
   console.log(`
 ${c.bold}AgentLinter CLI${c.reset}
@@ -336,15 +377,21 @@ Usage:
   npx agentlinter --no-audit          Skip skills security scan
   npx agentlinter --json              JSON output to stdout
   npx agentlinter scan <file|url>     Audit external skill file
+  npx agentlinter export --format <fmt>  Export to other frameworks
 
 Commands:
   scan <file|url>      Deep security audit for skill files (MoltX-style attack detection)
                        Alias for --audit-skill
                        Detects: remote fetch, key harvesting, mandatory wallet, auto-update
+  export               Convert agent config to other framework formats
+                       --format cursor    → .cursorrules
+                       --format copilot   → .github/copilot-instructions.md
+                       --format gemini    → GEMINI.md
 
 Options:
   --no-share           Skip report upload (default: share enabled)
   --no-audit           Skip skills folder auto-scan
+  --format <fmt>       Export format (cursor, copilot, gemini)
   --json               JSON output to stdout
   -h, --help           Show this help
 
@@ -360,6 +407,9 @@ Examples:
   npx agentlinter --no-audit               # Skip skill scan
   npx agentlinter scan skill.md            # Audit a skill file
   npx agentlinter scan https://example.com/skill.md --json
+  npx agentlinter export --format cursor   # Export to .cursorrules
+  npx agentlinter export --format copilot  # Export to Copilot instructions
+  npx agentlinter export --format gemini   # Export to GEMINI.md
 `);
 }
 

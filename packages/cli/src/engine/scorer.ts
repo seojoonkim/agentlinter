@@ -53,6 +53,7 @@ export function lint(workspacePath: string, files: FileInfo[]): LintResult {
     "runtime",
     "skillSafety",
     "remoteReady",
+    "blueprint",
   ];
 
   const categoryScores: CategoryScore[] = categories.map((cat) => {

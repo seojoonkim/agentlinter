@@ -25,6 +25,9 @@ import { importValidatorRules } from "./importValidator";
 // v2.1.0 framework rules
 import { cursorRules } from "../frameworks/cursor";
 import { copilotRules } from "../frameworks/copilot";
+// v2.2.0 new rules
+import { tokenBudgetRules } from "./tokenBudget";
+import { blueprintRules } from "./blueprint";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -51,6 +54,9 @@ export const allRules: Rule[] = [
   ...importValidatorRules,
   ...cursorRules,
   ...copilotRules,
+  // v2.2.0 new rules
+  ...tokenBudgetRules,
+  ...blueprintRules,
 ];
 
 export {
@@ -69,4 +75,6 @@ export {
   importValidatorRules,
   cursorRules,
   copilotRules,
+  tokenBudgetRules,
+  blueprintRules,
 };
