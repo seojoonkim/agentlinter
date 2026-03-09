@@ -117,7 +117,11 @@ function computeCategoryScore(
     score -= errors.length * 15; // errors are severe
     // Runtime: reduce warning penalty (3 instead of 5) to reward good patterns over warnings
     const warningPenalty = category === "runtime" ? 3 : 5;
-    score -= warnings.length * warningPenalty;
+    const rawWarningDeduction = warnings.length * warningPenalty;
+    // Clarity cap: token/size warnings for large workspaces shouldn't tank to 0
+    // Multi-agent setups legitimately have large memory/heartbeat/tools files
+    const warningCap = category === "clarity" ? 40 : Infinity;
+    score -= Math.min(rawWarningDeduction, warningCap);
   }
 
   score -= Math.min(infos.length * 1, 20); // infos are minor, capped at -20
@@ -233,16 +237,23 @@ function computeBonus(category: Category, files: FileInfo[]): number {
       }
       break;
 
-    case "skillSafety":
-      // Bonus for having skills with proper metadata
+    case "skillSafety": {
       const skillFiles = files.filter((f) => f.name.includes("skills/") && f.name.endsWith("SKILL.md"));
-      if (skillFiles.length > 0) {
+      if (skillFiles.length === 0) {
+        bonus += 10; // No skills — nothing to check
+      } else {
         const withFrontmatter = skillFiles.filter((f) => f.content.startsWith("---"));
-        if (withFrontmatter.length === skillFiles.length) bonus += 5;
+        if (withFrontmatter.length >= skillFiles.length * 0.8) bonus += 10;
+        else if (withFrontmatter.length > 0) bonus += 5;
+
+        const withDescription = skillFiles.filter(f => {
+          const fm = f.content.split("---")[1] || "";
+          return fm.includes("description");
+        });
+        if (withDescription.length >= skillFiles.length * 0.8) bonus += 5;
       }
-      // If no skills present, give full marks (nothing to check)
-      if (skillFiles.length === 0) bonus += 10;
       break;
+    }
 
     case "remoteReady": {
       // Bonus for having explicit workspace path

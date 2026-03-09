@@ -241,9 +241,17 @@ export function parseFile(filePath: string, name: string, context: LintContext):
 function parseSections(lines: string[]): Section[] {
   const sections: Section[] = [];
   let currentSection: Section | null = null;
+  let inCodeBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // Track code block state — skip heading detection inside code blocks
+    if (line.trimStart().startsWith("```")) {
+      inCodeBlock = !inCodeBlock;
+    }
+    if (inCodeBlock) continue;
+
     const headingMatch = line.match(/^(#{1,6})\s+(.+)/);
 
     if (headingMatch) {

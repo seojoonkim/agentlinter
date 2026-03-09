@@ -187,7 +187,9 @@ export const clarityRules: Rule[] = [
         )
       ).length;
 
-      if (imperatives > 30) {
+      const hasTierStructure = /TIER\s*[0-9]|P[0-3]|Priority\s*[0-9]/i.test(mainFile.content);
+      const threshold = hasTierStructure ? 50 : 30;
+      if (imperatives > threshold) {
         return [
           {
             severity: "info",
@@ -287,14 +289,17 @@ export const clarityRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const ABSOLUTE_PATTERNS = /\b(never|always|must|under no circumstances|absolutely|without exception)\b/i;
-      const ESCAPE_PATTERNS = /(?:\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b|예외|단,?\s|특수한\s*경우|불가피|형이?\s*직접|형\s*지시|때만|경우에만|지시할\s*때|상황에서만|허용|예외\s*없음)/i;
+      const ESCAPE_PATTERNS = /\b(unless|except|in emergency|escalate|ask the user|if unavoidable|override|exception)\b|예외|제외|경우에만|때만|직접.*지시|지시.*경우|허용|단,\s|단\s+(?:형|사용자)/i;
       const SECURITY_TERMS = /\b(api.?key|token|secret|password|credential|private.?key|leak|expose)\b/i;
       const coreFiles = files.filter(
         (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
       );
       for (const file of coreFiles) {
+        let inCodeBlock = false;
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i];
+          if (line.trimStart().startsWith('```')) { inCodeBlock = !inCodeBlock; continue; }
+          if (inCodeBlock) continue;
           if (!ABSOLUTE_PATTERNS.test(line)) continue;
           // Skip security rules — absolute is correct there
           if (SECURITY_TERMS.test(line)) continue;
@@ -502,6 +507,16 @@ export const clarityRules: Rule[] = [
         "DAN", "SYS", "INST", "EOF", "TTY", "PTY", "PID", "UID", "GID",
         "HVL", "CAPS", "CAST", "MAX", "MIN", "SRC", "DST", "TMP",
         "ZEON", "REPO", "DIR", "DEV", "OPS", "SLA", "KPI", "ROI",
+        "CLAWD", "TG", "ZSH", "BASH", "BOT", "KR", "EN", "JA", "ZH",
+        "KO", "TW", "RTX", "MVP", "PRD", "OKR", "B2B", "B2C",
+        "SaaS", "IOS", "APK", "FCM", "APN", "KV", "TTL", "LRU", "OOM", "GC",
+        "VITE", "ESM", "CJS", "HMR", "CSR", "SSR", "ISR",
+        "PNPM", "BUN", "DENO", "ESL", "LINT",
+        "UAE", "KSA", "IRN", "YEM", "LBN",
+        "GDELT", "FIRMS", "ACLED", "OSINT", "VIX", "WTI",
+        "OODA", "CDP", "RDP", "VNC", "SFTP",
+        "TIER", "CRON", "PLIST", "PIDs",
+        "ACP", "MIM", "BFURI", "SION", "MION", "SANO",
         // HTTP methods & protocols
         "GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS",
         "TCP", "UDP", "RPC", "SSE", "WASM", "GRPC",
@@ -554,7 +569,7 @@ export const clarityRules: Rule[] = [
   {
     id: "clarity/english-config-files",
     category: "clarity",
-    severity: "warning",
+    severity: "info",
     description: "Core config files should be written in English for better token efficiency and interpretation accuracy",
     check(files) {
       const diagnostics: Diagnostic[] = [];
@@ -580,11 +595,10 @@ export const clarityRules: Rule[] = [
           }
         }
         
-        if (nonEnglishLines > 0) {
-          const percentage = Math.round((nonEnglishLines / file.lines.length) * 100);
-          const severity: "warning" | "info" = "info";
+        const percentage = Math.round((nonEnglishLines / file.lines.length) * 100);
+        if (percentage >= 50) {
           diagnostics.push({
-            severity,
+            severity: "info",
             category: "clarity",
             rule: this.id,
             file: file.name,
