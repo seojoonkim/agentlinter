@@ -25,7 +25,7 @@ export default function TabBar({
   const tier = getTier(score);
 
   return (
-    <div className="sticky top-[56px] z-40 bg-[var(--bg)]/80 backdrop-blur-xl border-b border-[var(--border)]">
+    <div className="sticky top-[56px] z-40 bg-[var(--bg)] border-b-2 border-[var(--border)]">
       <div className="max-w-[760px] mx-auto px-4 sm:px-6">
         <div
           className="relative grid grid-cols-4 gap-1 overflow-x-auto scrollbar-hide"
