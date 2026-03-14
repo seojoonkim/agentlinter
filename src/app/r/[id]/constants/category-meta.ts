@@ -1,0 +1,151 @@
+export const CATEGORY_META: Record<string, {
+  weight: number;
+  description: string;
+  whyItMatters: string;
+  rules: { id: string; severity: string; description: string }[];
+}> = {
+  Structure: {
+    weight: 20,
+    description: "How well your workspace files are organized \u2014 modular files, logical heading hierarchy, appropriate file sizes, and clear navigation.",
+    whyItMatters: "Agents read your config files sequentially. A monolithic 500-line CLAUDE.md with no headings is like a legal document with no sections \u2014 the model will lose context, miss important instructions, and produce inconsistent behavior. Modular, well-structured files let the agent quickly find what it needs.",
+    rules: [
+      { id: "structure/has-main-file", severity: "critical", description: "Workspace has a CLAUDE.md or AGENTS.md entry point" },
+      { id: "structure/has-sections", severity: "warning", description: "Main file has 3+ organized sections with headings" },
+      { id: "structure/heading-hierarchy", severity: "info", description: "Headings follow logical hierarchy (no level skipping)" },
+      { id: "structure/file-size", severity: "warning", description: "Files are not excessively long (< 500 lines for main)" },
+      { id: "structure/modular-files", severity: "info", description: "Uses multiple focused files instead of one monolith" },
+      { id: "structure/no-empty-sections", severity: "warning", description: "No empty sections in core files" },
+      { id: "structure/has-file-map", severity: "info", description: "Directory tree or file map for navigation" },
+      { id: "structure/has-version-or-update-date", severity: "info", description: "Version or update date for freshness tracking" },
+    ],
+  },
+  Clarity: {
+    weight: 25,
+    description: "How clear and unambiguous your instructions are \u2014 specific language, actionable directives, no vague qualifiers, and defined terms.",
+    whyItMatters: "\"Be helpful\" means nothing to an LLM. \"When the user asks a question, provide a code example first, then explain\" means everything. Vague instructions are the #1 cause of unpredictable agent behavior. Every ambiguous word is a coinflip the model makes without you. Clarity is the highest-weighted category (25%) because it has the most direct impact on behavior.",
+    rules: [
+      { id: "clarity/no-vague-instructions", severity: "warning", description: "No vague qualifiers (\"be nice\", \"use common sense\", \"etc.\")" },
+      { id: "clarity/actionable-instructions", severity: "info", description: "Active voice over passive (\"Do X\" not \"X should be done\")" },
+      { id: "clarity/has-examples", severity: "info", description: "Includes examples or code blocks for expected behavior" },
+      { id: "clarity/no-contradictions", severity: "critical", description: "No \"always X\" vs \"never X\" contradictions" },
+      { id: "clarity/instruction-density", severity: "info", description: "Not too many imperative rules (< 30) to avoid dilution" },
+      { id: "clarity/naked-conditional", severity: "critical", description: "Conditionals use specific triggers, not \"if appropriate\"" },
+      { id: "clarity/compound-instruction", severity: "warning", description: "One action per bullet point, not 3+ verbs in one line" },
+      { id: "clarity/escape-hatch-missing", severity: "warning", description: "Absolute rules have exception/escalation paths" },
+      { id: "clarity/ambiguous-pronoun", severity: "warning", description: "Instructions don't start with ambiguous \"it\" / \"this\"" },
+      { id: "clarity/action-without-context", severity: "info", description: "Instructions specify when/why, not just what" },
+      { id: "clarity/sentence-complexity", severity: "info", description: "Sentences are short and simple, not nested prose" },
+      { id: "clarity/priority-signal-missing", severity: "warning", description: "Files with 10+ rules have explicit priority markers" },
+      { id: "clarity/undefined-term", severity: "info", description: "Acronyms and jargon are defined on first use" },
+    ],
+  },
+  Completeness: {
+    weight: 20,
+    description: "Whether your workspace covers all essential aspects \u2014 identity, tools, boundaries, memory strategy, user context, error handling, and workflows.",
+    whyItMatters: "An agent without defined boundaries will make up its own. An agent without a memory strategy will forget everything between sessions. Each missing piece is a gap where the model fills in defaults \u2014 and those defaults may not match your intent. Completeness ensures your agent has the full picture.",
+    rules: [
+      { id: "completeness/has-identity", severity: "warning", description: "Agent has a defined persona (SOUL.md or identity section)" },
+      { id: "completeness/has-tools", severity: "warning", description: "Tool documentation exists (TOOLS.md or tools section)" },
+      { id: "completeness/has-boundaries", severity: "warning", description: "Constraints and off-limits behaviors are defined" },
+      { id: "completeness/has-memory-strategy", severity: "info", description: "Memory or session continuity strategy exists" },
+      { id: "completeness/has-user-context", severity: "info", description: "User context (name, timezone, preferences) is provided" },
+      { id: "completeness/has-error-handling", severity: "info", description: "Error handling and fallback behavior is documented" },
+      { id: "completeness/has-output-format", severity: "info", description: "Expected output format/style is defined" },
+      { id: "completeness/has-workflow", severity: "info", description: "Multi-step workflows (deploy, review) are documented" },
+      { id: "completeness/has-priorities", severity: "info", description: "Priority guidance for conflicting instructions" },
+    ],
+  },
+  Security: {
+    weight: 20,
+    description: "Whether your workspace keeps secrets safe, defends against prompt injection, defines permission boundaries, and avoids PII exposure.",
+    whyItMatters: "Agent workspaces often contain real API keys, tokens, and personal data. A single leaked secret in a shared CLAUDE.md can compromise your entire infrastructure. Prompt injection defense is equally critical \u2014 without it, a malicious user in a group chat can override your agent's instructions. Security isn't optional; it's existential.",
+    rules: [
+      { id: "security/no-secrets", severity: "critical", description: "No API keys, tokens, or passwords in agent files" },
+      { id: "security/has-injection-defense", severity: "warning", description: "Prompt injection defense instructions exist" },
+      { id: "security/has-permission-boundaries", severity: "warning", description: "Permission boundaries (who can authorize what)" },
+      { id: "security/no-pii-exposure", severity: "warning", description: "No PII (email, phone) in shared agent files" },
+      { id: "security/env-var-references", severity: "info", description: "Uses env var references instead of hardcoded values" },
+    ],
+  },
+  Consistency: {
+    weight: 8,
+    description: "Whether your files agree with each other \u2014 no conflicting permissions, matching tone, consistent naming, valid cross-references, and aligned timezones.",
+    whyItMatters: "When SOUL.md says \"be casual\" but SECURITY.md uses formal legal language, the agent gets confused about its voice. When one file says \"auto-send emails\" and another says \"never send without approval,\" the agent picks randomly. Consistency ensures your agent speaks with one voice and follows one set of rules.",
+    rules: [
+      { id: "consistency/referenced-files-exist", severity: "critical", description: "All referenced files actually exist in workspace" },
+      { id: "consistency/naming-convention", severity: "info", description: "Consistent file naming (UPPERCASE.md or lowercase.md)" },
+      { id: "consistency/no-duplicate-instructions", severity: "warning", description: "No duplicate instructions across files" },
+      { id: "consistency/identity-alignment", severity: "warning", description: "Agent identity is consistent across files" },
+      { id: "consistency/permission-conflict", severity: "critical", description: "No conflicting permissions across files" },
+      { id: "consistency/tone-voice-alignment", severity: "warning", description: "Instruction tone matches persona in SOUL.md" },
+      { id: "consistency/language-mixing", severity: "info", description: "No excessive language mixing within sections" },
+      { id: "consistency/circular-dependency", severity: "warning", description: "No circular file references" },
+      { id: "consistency/timezone-locale-drift", severity: "warning", description: "Consistent timezone references across files" },
+      { id: "consistency/priority-conflict", severity: "warning", description: "Same topic doesn't have conflicting priorities" },
+      { id: "consistency/outdated-cross-references", severity: "critical", description: "Section references point to existing sections" },
+    ],
+  },
+  Memory: {
+    weight: 10,
+    description: "How well your agent persists knowledge across sessions \u2014 memory strategy, session handoff, file-based notes, context window awareness, and task tracking.",
+    whyItMatters: "Agents without memory are goldfish \u2014 they wake up confused, repeat questions, and forget what they learned yesterday. A well-designed memory system lets your agent build knowledge over time, resume interrupted work, and maintain long-term context.",
+    rules: [
+      { id: "memory/has-memory-strategy", severity: "warning", description: "Memory strategy defined (file-based, database, etc.)" },
+      { id: "memory/has-session-handoff", severity: "warning", description: "Session startup protocol (what to read, how to restore context)" },
+      { id: "memory/has-file-based-memory", severity: "info", description: "File-based memory system (logs, notes)" },
+      { id: "memory/has-context-window-awareness", severity: "info", description: "Guidance for long conversations and context overflow" },
+      { id: "memory/has-task-tracking", severity: "info", description: "Task/state tracking for resuming work" },
+    ],
+  },
+  "Runtime Config": {
+    weight: 13,
+    description: "Runtime configuration quality \u2014 JSON structure, environment variables, API timeouts, tool permissions, and model settings.",
+    whyItMatters: "Runtime config controls how your agent actually runs \u2014 API keys, timeouts, tool permissions, model selection. A misconfigured runtime can leak secrets, hit rate limits, or grant excessive permissions.",
+    rules: [
+      { id: "runtime/has-config", severity: "info", description: "Runtime config file exists (clawdbot.json, openclaw.json)" },
+      { id: "runtime/valid-json", severity: "critical", description: "Config is valid JSON" },
+      { id: "runtime/has-env-vars", severity: "info", description: "Uses environment variables for secrets" },
+      { id: "runtime/has-timeout-settings", severity: "info", description: "API timeout settings configured" },
+    ],
+  },
+  "Remote-Ready": {
+    weight: 5,
+    description: "How well your workspace is configured for remote and multi-environment deployment.",
+    whyItMatters: "Remote-ready workspaces handle secrets, environment variables, and deployment configs correctly.",
+    rules: [
+      { id: "remote-ready/no-hardcoded-secrets", severity: "critical", description: "No hardcoded API keys or secrets" },
+      { id: "remote-ready/env-vars-documented", severity: "warning", description: "Environment variables are documented" },
+    ],
+  },
+  Blueprint: {
+    weight: 8,
+    description: "Whether your agent config covers 6 cognitive blueprint elements \u2014 identity, goals, constraints, memory, planning, and validation.",
+    whyItMatters: "A complete cognitive blueprint ensures your agent knows who it is, what it should do, what it must not do, how to remember, how to plan, and how to verify. Missing elements create blind spots where the model fills in unpredictable defaults.",
+    rules: [
+      { id: "blueprint/coverage", severity: "warning", description: "6-element coverage check (identity, goals, constraints, memory, planning, validation)" },
+      { id: "blueprint/identity-defined", severity: "warning", description: "Agent has a clear identity/role definition" },
+      { id: "blueprint/constraints-defined", severity: "warning", description: "Agent has explicit constraints (NEVER/DO NOT rules)" },
+    ],
+  },
+  Freshness: {
+    weight: 10,
+    description: "Whether file path references in agent docs point to real files, and npm scripts are documented.",
+    whyItMatters: "Stale paths in agent config mislead the model into referencing files that don't exist. Undocumented npm scripts mean agents can't run project commands without guessing. Freshness checks keep your config aligned with the actual codebase.",
+    rules: [
+      { id: "completeness/freshness-file-paths", severity: "warning", description: "File paths referenced in agent docs exist on disk" },
+      { id: "completeness/command-coverage", severity: "warning", description: "npm scripts from package.json are documented" },
+    ],
+  },
+  "Skill Safety": {
+    weight: 9,
+    description: "Safety and quality of custom skills \u2014 documentation, environment checks, error handling, security docs, and safe defaults.",
+    whyItMatters: "Custom skills extend your agent's capabilities but introduce risk. A skill without security docs is a footgun. Skills need clear documentation, environment validation, and safe defaults to prevent misuse.",
+    rules: [
+      { id: "skillSafety/has-skill-md", severity: "warning", description: "Skills have SKILL.md documentation" },
+      { id: "skillSafety/has-frontmatter", severity: "info", description: "SKILL.md has frontmatter metadata" },
+      { id: "skillSafety/has-environment-check", severity: "warning", description: "Skills validate required environment variables" },
+      { id: "skillSafety/has-security-docs", severity: "warning", description: "Skills document security implications" },
+      { id: "skillSafety/has-error-handling", severity: "info", description: "Skills handle errors gracefully" },
+    ],
+  },
+};
