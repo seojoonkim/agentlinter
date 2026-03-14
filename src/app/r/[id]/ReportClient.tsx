@@ -57,7 +57,7 @@ export default function ReportPage({ data }: { data: ReportData }) {
             <Logo size={20} />
             <span className="font-semibold text-[14px]">AgentLinter</span>
             <span className="text-[11px] mono text-[var(--text-dim)] ml-1">Report</span>
-            <span className="text-[10px] mono text-[var(--text-dim)]/60 ml-2 hidden sm:inline">v2.3.0</span>
+            <span className="text-[10px] mono text-[var(--text-dim)]/60 ml-2">v2.3.0</span>
           </a>
           <div className="flex items-center gap-3">
             <a
