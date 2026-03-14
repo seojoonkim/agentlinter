@@ -21,53 +21,45 @@ export default function TabBar({
   diagnosticCount: number;
   score: number;
 }) {
-  const activeIndex = Math.max(TABS.findIndex((tab) => tab.id === activeTab), 0);
   const tier = getTier(score);
 
   return (
-    <div className="sticky top-[56px] z-40 bg-[var(--bg)] border-b-2 border-[var(--border)]">
+    <div className="sticky top-[56px] z-40 bg-[var(--bg)] border-b border-[var(--border)]">
       <div className="max-w-[760px] mx-auto px-4 sm:px-6">
         <div
-          className="relative grid grid-cols-4 gap-1 overflow-x-auto scrollbar-hide"
+          className="flex overflow-x-auto"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 h-full w-1/4 rounded-t-lg bg-white/5 transition-transform duration-300 ease-out"
-            style={{ transform: `translateX(${activeIndex * 100}%)` }}
-          />
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 h-[2px] w-1/4 transition-transform duration-300 ease-out"
-            style={{
-              transform: `translateX(${activeIndex * 100}%)`,
-              background: `linear-gradient(90deg, ${tier.color}00 0%, ${tier.color} 28%, ${tier.color} 72%, ${tier.color}00 100%)`,
-            }}
-          />
           {TABS.map((tab) => {
             const Icon = tab.Icon;
             const isActive = activeTab === tab.id;
             return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`
-                relative z-10 flex items-center justify-center gap-2 px-5 py-3.5 whitespace-nowrap
-                text-[14px] sm:text-[15px]
-                transition-colors shrink-0 rounded-t-lg
-                ${isActive
-                  ? "text-white font-semibold"
-                  : "text-white/35 hover:text-white/60 font-medium"
-                }
-              `}
-            >
-              <Icon className="w-4 h-4 transition-colors" style={isActive ? { color: tier.color } : { opacity: 0.4 }} />
-              {tab.label}
-              {tab.id === "diagnostics" && diagnosticCount > 0 && (
-                <span className="ml-1.5 text-[11px] mono px-1.5 py-0.5 rounded-full bg-[var(--red)]/20 text-[var(--red)]">
-                  {diagnosticCount}
-                </span>
-              )}
-            </button>
-          );
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  flex items-center gap-1.5 px-4 py-3.5 whitespace-nowrap shrink-0
+                  text-[13px] sm:text-[14px] transition-colors
+                  border-b-2
+                  ${isActive
+                    ? "font-semibold text-white"
+                    : "font-medium text-white/35 hover:text-white/60 border-transparent"
+                  }
+                `}
+                style={isActive ? { borderBottomColor: tier.color } : {}}
+              >
+                <Icon
+                  className="w-3.5 h-3.5 shrink-0"
+                  style={isActive ? { color: tier.color } : { opacity: 0.35 }}
+                />
+                {tab.label}
+                {tab.id === "diagnostics" && diagnosticCount > 0 && (
+                  <span className="ml-1 text-[11px] mono px-1.5 py-0.5 rounded-full bg-[var(--red)]/20 text-[var(--red)]">
+                    {diagnosticCount}
+                  </span>
+                )}
+              </button>
+            );
           })}
         </div>
       </div>
