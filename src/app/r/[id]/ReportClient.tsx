@@ -273,6 +273,15 @@ const CATEGORY_META: Record<string, {
       { id: "blueprint/constraints-defined", severity: "warning", description: "Agent has explicit constraints (NEVER/DO NOT rules)" },
     ],
   },
+  Freshness: {
+    weight: 10,
+    description: "Whether file path references in agent docs point to real files, and npm scripts are documented.",
+    whyItMatters: "Stale paths in agent config mislead the model into referencing files that don't exist. Undocumented npm scripts mean agents can't run project commands without guessing. Freshness checks keep your config aligned with the actual codebase.",
+    rules: [
+      { id: "completeness/freshness-file-paths", severity: "warning", description: "File paths referenced in agent docs exist on disk" },
+      { id: "completeness/command-coverage", severity: "warning", description: "npm scripts from package.json are documented" },
+    ],
+  },
   "Skill Safety": {
     weight: 9,
     description: "Safety and quality of custom skills — documentation, environment checks, error handling, security docs, and safe defaults.",
