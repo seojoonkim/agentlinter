@@ -51,6 +51,7 @@ export const freshnessRules: Rule[] = [
       const targetFiles = files.filter(
         (f) => /\.(md)$/i.test(f.name)
           && !f.name.startsWith("memory/")
+          && !f.name.startsWith("compound/")
           && f.name !== "MEMORY.md"
       );
 

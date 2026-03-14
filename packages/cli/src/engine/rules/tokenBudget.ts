@@ -60,7 +60,7 @@ export const tokenBudgetRules: Rule[] = [
 
       for (const file of files) {
         if (!file.name.endsWith(".md") && !file.name.endsWith(".txt")) continue;
-        if (file.name.startsWith("memory/") || file.name.startsWith("skills/")) continue;
+        if (file.name.startsWith("memory/") || file.name.startsWith("skills/") || file.name.startsWith("compound/")) continue;
         // MEMORY.md is the designated long-term memory store — large size is expected by design
         if (file.name === "MEMORY.md") continue;
 
@@ -102,7 +102,7 @@ export const tokenBudgetRules: Rule[] = [
 
       for (const file of files) {
         if (!file.name.endsWith(".md")) continue;
-        if (file.name.startsWith("memory/") || file.name.startsWith("skills/")) continue;
+        if (file.name.startsWith("memory/") || file.name.startsWith("skills/") || file.name.startsWith("compound/")) continue;
         if (file.sections.length < 2) continue;
 
         const weights = computeSectionWeights(file);
@@ -138,7 +138,7 @@ export const tokenBudgetRules: Rule[] = [
 
       for (const file of files) {
         if (!file.name.endsWith(".md") && !file.name.endsWith(".txt")) continue;
-        if (file.name.startsWith("memory/") || file.name.startsWith("skills/")) continue;
+        if (file.name.startsWith("memory/") || file.name.startsWith("skills/") || file.name.startsWith("compound/")) continue;
 
         let inCodeBlock = false;
         const paddingFound: { line: number; phrase: string; suggestion: string }[] = [];

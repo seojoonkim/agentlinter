@@ -100,7 +100,20 @@ export function formatJSON(result: LintResult): string {
         name: CATEGORY_LABELS[c.category],
         score: c.score,
         weight: c.weight,
-        issues: c.diagnostics.length,
+        issueCount: c.diagnostics.length,
+        topIssues: c.diagnostics
+          .sort((a, b) => {
+            const sev: Record<string, number> = { critical: 0, error: 1, warning: 2, info: 3 };
+            return (sev[a.severity] ?? 3) - (sev[b.severity] ?? 3);
+          })
+          .slice(0, 5)
+          .map((d) => ({
+            severity: d.severity,
+            file: d.file,
+            line: d.line,
+            message: d.message,
+            fix: d.fix,
+          })),
       })),
       diagnostics: result.diagnostics.map((d) => ({
         severity: d.severity,
