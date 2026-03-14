@@ -25,6 +25,10 @@ const PKG_PATTERNS = [
   /`([a-z@][a-z0-9\-_@/.]*)`\s+(?:package|dependency|library)/gi,
 ];
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function getDaysAgo(dateStr: string): number {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return -1;
@@ -32,7 +36,154 @@ function getDaysAgo(dateStr: string): number {
   return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+// File path patterns for freshness check (broader than stale-file-reference)
+const FRESHNESS_PATH_RE = /(?:^|\s|`)((?:~\/|\.\/|\.\.\/|\/Users\/|src\/|scripts\/)[^\s`'",;)}\]>]+)/g;
+
 export const freshnessRules: Rule[] = [
+  // completeness/freshness-file-paths
+  {
+    id: "completeness/freshness-file-paths",
+    category: "freshness",
+    severity: "warning",
+    description: "Checks that file paths mentioned in agent docs actually exist on disk",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+      const targetFiles = files.filter(
+        (f) => /\.(md)$/i.test(f.name) && !f.name.startsWith("memory/")
+      );
+
+      for (const file of targetFiles) {
+        const workspaceDir = file.path ? path.dirname(file.path) : process.cwd();
+        // Walk up to find workspace root
+        const rootDir = file.path
+          ? path.resolve(path.dirname(file.path), "..")
+          : process.cwd();
+
+        let codeBlock = false;
+        for (let i = 0; i < file.lines.length; i++) {
+          const line = file.lines[i];
+          if (line.trim().startsWith("```")) {
+            codeBlock = !codeBlock;
+            continue;
+          }
+          if (codeBlock) continue;
+
+          FRESHNESS_PATH_RE.lastIndex = 0;
+          let match;
+          while ((match = FRESHNESS_PATH_RE.exec(line)) !== null) {
+            const refPath = match[1].replace(/[.,;:)}\]>]+$/, ""); // trim trailing punctuation
+            // Skip URLs, wildcards, dynamic placeholders
+            if (refPath.includes("://") || refPath.includes("*")) continue;
+            if (/\{[^}]+\}|\$\{[^}]+\}|<[^>]+>/.test(refPath)) continue;
+
+            let resolved: string;
+            if (refPath.startsWith("~/")) {
+              resolved = path.join(process.env.HOME || "", refPath.slice(2));
+            } else if (refPath.startsWith("/Users/")) {
+              resolved = refPath;
+            } else if (refPath.startsWith("./") || refPath.startsWith("../")) {
+              resolved = path.resolve(workspaceDir, refPath);
+            } else {
+              // src/, scripts/ etc. — resolve relative to root
+              resolved = path.resolve(rootDir, refPath);
+              if (!fs.existsSync(resolved)) {
+                resolved = path.resolve(workspaceDir, refPath);
+              }
+            }
+
+            if (!fs.existsSync(resolved)) {
+              diagnostics.push({
+                severity: "warning",
+                category: "freshness",
+                rule: this.id,
+                file: file.name,
+                line: i + 1,
+                message: `Path '${refPath}' referenced in ${file.name} but not found on disk.`,
+                fix: "Update the path to match the current project structure or remove the stale reference.",
+              });
+            }
+          }
+        }
+      }
+
+      return diagnostics;
+    },
+  },
+
+  // completeness/command-coverage
+  {
+    id: "completeness/command-coverage",
+    category: "freshness",
+    severity: "warning",
+    description: "Checks that npm scripts from package.json are documented in agent files",
+    check(files) {
+      const diagnostics: Diagnostic[] = [];
+
+      // Find package.json in workspace
+      let scripts: Record<string, string> = {};
+      let pkgFound = false;
+      for (const file of files) {
+        if (!file.path) continue;
+        for (const dir of [
+          path.dirname(file.path),
+          path.resolve(path.dirname(file.path), ".."),
+        ]) {
+          const pkgPath = path.resolve(dir, "package.json");
+          if (fs.existsSync(pkgPath)) {
+            try {
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+              if (pkg.scripts && typeof pkg.scripts === "object") {
+                scripts = pkg.scripts;
+                pkgFound = true;
+              }
+            } catch { /* ignore */ }
+            break;
+          }
+        }
+        if (pkgFound) break;
+      }
+
+      const scriptNames = Object.keys(scripts);
+      if (scriptNames.length === 0) return diagnostics;
+
+      // Check which scripts are mentioned in agent docs
+      const allContent = files
+        .filter((f) => f.name.endsWith(".md"))
+        .map((f) => f.content)
+        .join("\n");
+
+      const documented = scriptNames.filter((name) => {
+        // Match "npm run <name>", "yarn <name>", "pnpm <name>", or just the script name in backticks
+        const patterns = [
+          new RegExp(`npm\\s+run\\s+${escapeRegex(name)}\\b`),
+          new RegExp(`yarn\\s+${escapeRegex(name)}\\b`),
+          new RegExp(`pnpm\\s+${escapeRegex(name)}\\b`),
+          new RegExp(`\`${escapeRegex(name)}\``),
+        ];
+        return patterns.some((p) => p.test(allContent));
+      });
+
+      const ratio = documented.length / scriptNames.length;
+      if (ratio < 0.5) {
+        const pct = Math.round(ratio * 100);
+        const mainFile = files.find(
+          (f) => f.name === "CLAUDE.md" || f.name === "AGENTS.md"
+        );
+        diagnostics.push({
+          severity: "warning",
+          category: "freshness",
+          rule: this.id,
+          file: mainFile?.name || "(workspace)",
+          message: `Only ${pct}% of npm scripts documented in CLAUDE.md (${documented.length}/${scriptNames.length} scripts).`,
+          fix: "Document key npm scripts in your agent config so the agent knows which commands to use.",
+        });
+      }
+
+      return diagnostics;
+    },
+  },
+
+
   // stale-file-reference
   {
     id: "consistency/stale-file-reference",
