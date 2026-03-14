@@ -33,7 +33,8 @@ export const instructionCountRules: Rule[] = [
 
       const ALWAYS_LOADED = new Set(["CLAUDE.md", "AGENTS.md", "SOUL.md", "IDENTITY.md", "USER.md"]);
 
-      // Count across core agent config files only (not memory, compound, or skills)
+      // Count across core agent config files only (not memory, compound, skills, or long-form logs)
+      const MEMORY_FILES = new Set(["MEMORY.md", "HEARTBEAT.md"]);
       const coreFiles = files.filter(
         (f) =>
           !f.name.startsWith("memory/") &&
@@ -41,6 +42,7 @@ export const instructionCountRules: Rule[] = [
           !f.name.startsWith("skills/") &&
           !f.name.startsWith(".claude/skills/") &&
           !f.name.startsWith("claude/skills/") &&
+          !MEMORY_FILES.has(f.name) &&
           (f.name.endsWith(".md") || f.name.endsWith(".txt"))
       );
 

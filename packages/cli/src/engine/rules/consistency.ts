@@ -10,9 +10,9 @@ export const consistencyRules: Rule[] = [
     description: "Files referenced in agent configs should exist",
     check(files) {
       const diagnostics: Diagnostic[] = [];
-      // Skip compound/memory files — they are working docs, not agent config
+      // Skip compound/memory files and MEMORY.md — they are working docs/logs, not agent config
       const checkFiles = files.filter(
-        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/")
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name !== "MEMORY.md"
       );
       const fileNames = new Set(files.map((f) => f.name));
       // Also track lowercase versions and base names (without path)

@@ -61,8 +61,8 @@ export const tokenBudgetRules: Rule[] = [
       for (const file of files) {
         if (!file.name.endsWith(".md") && !file.name.endsWith(".txt")) continue;
         if (file.name.startsWith("memory/") || file.name.startsWith("skills/") || file.name.startsWith("compound/")) continue;
-        // MEMORY.md is the designated long-term memory store — large size is expected by design
-        if (file.name === "MEMORY.md") continue;
+        // MEMORY.md/HEARTBEAT.md are long-form logs — large size is expected by design
+        if (file.name === "MEMORY.md" || file.name === "HEARTBEAT.md") continue;
 
         const tokens = estimateTokens(file.content);
         const bytes = Buffer.byteLength(file.content, "utf-8");

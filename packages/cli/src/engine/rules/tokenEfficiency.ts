@@ -116,7 +116,7 @@ export const tokenEfficiencyRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const targetFiles = files.filter(
-        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name !== "MEMORY.md" && f.name !== "HEARTBEAT.md" && f.name.endsWith(".md")
       );
 
       for (const file of targetFiles) {
@@ -150,7 +150,7 @@ export const tokenEfficiencyRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const targetFiles = files.filter(
-        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name !== "MEMORY.md" && f.name !== "HEARTBEAT.md" && f.name.endsWith(".md")
       );
 
       // Collect all sections with their ngrams
@@ -253,7 +253,7 @@ export const tokenEfficiencyRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const targetFiles = files.filter(
-        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
+        (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name !== "MEMORY.md" && f.name !== "HEARTBEAT.md" && f.name.endsWith(".md")
       );
 
       for (const file of targetFiles) {

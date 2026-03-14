@@ -300,4 +300,47 @@ export const completenessRules: Rule[] = [
       return [];
     },
   },
+
+  {
+    id: "completeness/session-learning-hooks",
+    category: "completeness",
+    severity: "info",
+    description: "Agent should have self-improvement or session learning hooks",
+    check(files) {
+      const allContent = files
+        .filter((f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/"))
+        .map((f) => f.content)
+        .join("\n");
+
+      const hasLearningHook =
+        /revise[-_ ]claude[-_ ]?md/i.test(allContent) ||
+        /\/memory\b/i.test(allContent) ||
+        /session[-_ ]?learn/i.test(allContent) ||
+        /self[-_ ]?improv/i.test(allContent) ||
+        /update.*CLAUDE\.md/i.test(allContent) ||
+        /save.*memory/i.test(allContent) ||
+        /remember.*for.*next/i.test(allContent) ||
+        /retrospective/i.test(allContent) ||
+        /lessons?[-_ ]?learned/i.test(allContent) ||
+        /auto[-_ ]?memory/i.test(allContent);
+
+      if (!hasLearningHook) {
+        const mainFile = files.find(
+          (f) => f.name === "CLAUDE.md" || f.name === "AGENTS.md"
+        );
+        return [
+          {
+            severity: "info",
+            category: "completeness",
+            rule: this.id,
+            file: mainFile?.name || "(workspace)",
+            message:
+              "No session learning hooks found. Agents that can update their own config improve over time.",
+            fix: "Add a self-improvement mechanism: '/memory' command, auto-memory hooks, or a 'revise-claude-md' workflow.",
+          },
+        ];
+      }
+      return [];
+    },
+  },
 ];
