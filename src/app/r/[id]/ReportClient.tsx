@@ -84,22 +84,25 @@ export default function ReportPage({ data }: { data: ReportData }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         diagnosticCount={data.diagnostics.length}
+        score={data.totalScore}
       />
 
       {/* Content */}
       <main className="max-w-[760px] mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8 sm:space-y-10">
-        {activeTab === "overview" && (
-          <OverviewTab data={data} onTabChange={setActiveTab} />
-        )}
-        {activeTab === "diagnostics" && (
-          <DiagnosticsTab data={data} />
-        )}
-        {activeTab === "categories" && (
-          <CategoriesTab data={data} />
-        )}
-        {activeTab === "methodology" && (
-          <MethodologyTab data={data} />
-        )}
+        <div key={activeTab} className="animate-fade-in">
+          {activeTab === "overview" && (
+            <OverviewTab data={data} onTabChange={setActiveTab} />
+          )}
+          {activeTab === "diagnostics" && (
+            <DiagnosticsTab data={data} />
+          )}
+          {activeTab === "categories" && (
+            <CategoriesTab data={data} />
+          )}
+          {activeTab === "methodology" && (
+            <MethodologyTab data={data} />
+          )}
+        </div>
 
         {/* Footer */}
         <div className="pt-6 border-t border-[var(--border)] flex items-center justify-between text-[12px] text-[var(--text-dim)]">

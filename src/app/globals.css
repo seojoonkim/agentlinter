@@ -68,6 +68,7 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 800;
     letter-spacing: -0.02em;
+    font-feature-settings: 'tnum' 1;
   }
 
   code, pre, .mono {
@@ -92,11 +93,20 @@
 
   /* Fade-in animation for replacing framer-motion */
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
   }
   .animate-fade-in {
     animation: fadeIn 0.4s ease-out both;
+  }
+
+  @keyframes pulseOnce {
+    0% { box-shadow: 0 0 0 rgba(255, 255, 255, 0); opacity: 0.96; }
+    45% { box-shadow: 0 0 18px rgba(255, 255, 255, 0.24); opacity: 1; }
+    100% { box-shadow: 0 0 0 rgba(255, 255, 255, 0); opacity: 1; }
+  }
+  .animate-pulse-once {
+    animation: pulseOnce 1s ease-out 1;
   }
 
   /* Glow effect for accent elements */
