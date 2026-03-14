@@ -12,7 +12,7 @@ const SECRET_PATTERNS = [
   { name: "GitHub Token (ghs_)", pattern: /ghs_[a-zA-Z0-9]{36}/ },
   { name: "Slack Token", pattern: /xox[bpas]-[a-zA-Z0-9\-]{10,}/ },
   { name: "Discord Token", pattern: /[MN][A-Za-z\d]{23,}\.[\w-]{6}\.[\w-]{27}/ },
-  { name: "Generic Secret", pattern: /(?:secret|password|passwd|pwd|token|api_key|apikey|access_key)\s*[:=]\s*['"][^'"]{8,}['"]/i },
+  { name: "Generic Secret", pattern: /(?<![a-zA-Z])(?:secret|password|passwd|pwd|token|api_key|apikey|access_key)\s*[:=]\s*['"][^'"]{8,}['"]/i },
   { name: "Private Key", pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/ },
   { name: "Supabase Key", pattern: /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[a-zA-Z0-9_-]{50,}/ },
   { name: "OpenAI Key", pattern: /sk-proj-[a-zA-Z0-9]{20,}/ },

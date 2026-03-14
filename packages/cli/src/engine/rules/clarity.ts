@@ -531,6 +531,11 @@ export const clarityRules: Rule[] = [
         // RFC 2119 keywords (requirement levels) — NOT acronyms
         "MUST", "SHALL", "SHOULD", "MAY", "REQUIRED", "RECOMMENDED",
         "OPTIONAL", "NOT", "NEVER", "ALWAYS", "ALL", "ANY", "ONLY",
+        // Common English words / proper nouns / short codes
+        "TOKYO", "TOP", "ON", "AIR", "DIARY", "BOARD", "NIGHT", "WAV", "SHO",
+        "KIM", "YK", "DC", "GA", "TWIN", "PLAYA", "SKINN", "ACID", "NASA",
+        "HIT", "GCC", "PC", "JSONL", "ILS", "ODD", "GDA", "YG", "UK", "CN",
+        "SRE", "VC", "PE", "RULES", "EA", "DDG", "TAB", "TASK",
       ]);
       const coreFiles = files.filter(
         (f) => !f.name.startsWith("compound/") && !f.name.startsWith("memory/") && f.name.endsWith(".md")
@@ -543,6 +548,7 @@ export const clarityRules: Rule[] = [
           if (!acronyms) continue;
           for (const acr of acronyms) {
             if (COMMON_ACRONYMS.has(acr)) continue;
+            if (acr.length <= 2) continue; // 2-char uppercase words (ON, EA, PC) — too common to flag
             if (found.has(acr)) continue;
             found.add(acr);
             // Check if defined nearby

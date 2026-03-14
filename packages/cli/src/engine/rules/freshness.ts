@@ -224,6 +224,11 @@ export const freshnessRules: Rule[] = [
               // Skip dynamic placeholder paths
               const DYNAMIC_PLACEHOLDERS = /YYYY|MM[-\/]DD|HH:mm|\{[^}]+\}|\$\{[^}]+\}|<[^>]+>/;
               if (DYNAMIC_PLACEHOLDERS.test(refPath)) continue;
+              // Skip code-like expressions: no `/` and short prefix before `.` (e.g. r.ok, res.json, layout.tsx)
+              if (!refPath.includes("/")) {
+                const dotIdx = refPath.indexOf(".");
+                if (dotIdx >= 0 && dotIdx <= 3) continue; // short prefix like r.ok, fs.stat
+              }
 
               // Resolve path relative to workspace
               let resolved = refPath;

@@ -115,7 +115,9 @@ function computeCategoryScore(
       score -= warnings.length * 5;
     }
   } else {
-    score -= errors.length * 15; // errors are severe
+    // Consistency: reduce per-error penalty (stale dates etc. pile up fast)
+    const errorPenalty = category === "consistency" ? 8 : 15;
+    score -= errors.length * errorPenalty;
     // Runtime: reduce warning penalty (3 instead of 5) to reward good patterns over warnings
     const warningPenalty = category === "runtime" ? 3 : 5;
     const rawWarningDeduction = warnings.length * warningPenalty;
@@ -130,8 +132,9 @@ function computeCategoryScore(
   // Bonus points for good practices (category-specific)
   score += computeBonus(category, files);
 
-  // Clamp to 0-100
-  return Math.max(0, Math.min(100, Math.round(score)));
+  // Clamp to 0-100 (consistency gets a minimum floor of 25)
+  const floor = category === "consistency" ? 25 : 0;
+  return Math.max(floor, Math.min(100, Math.round(score)));
 }
 
 /**
