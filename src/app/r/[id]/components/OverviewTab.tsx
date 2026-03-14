@@ -47,7 +47,10 @@ export default function OverviewTab({
   const [copied, setCopied] = useState(false);
 
   const totalRules = Object.values(CATEGORY_META).reduce((sum, c) => sum + c.rules.length, 0);
-  const passedRules = totalRules - data.diagnostics.length;
+  const failedRuleIds = new Set(
+    data.diagnostics.filter((d) => d.severity !== "info").map((d) => d.rule)
+  );
+  const passedRules = Math.max(0, totalRules - failedRuleIds.size);
   const errors = data.diagnostics.filter((d) => d.severity === "critical" || d.severity === "error");
   const warnings = data.diagnostics.filter((d) => d.severity === "warning");
 

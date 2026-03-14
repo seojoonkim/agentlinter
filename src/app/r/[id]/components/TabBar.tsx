@@ -51,15 +51,15 @@ export default function TabBar({
               onClick={() => setActiveTab(tab.id)}
               className={`
                 relative z-10 flex items-center justify-center gap-2 px-5 py-3.5 whitespace-nowrap
-                text-[14px] sm:text-[15px] font-medium
+                text-[14px] sm:text-[15px]
                 transition-colors shrink-0 rounded-t-lg
                 ${isActive
-                  ? "text-white bg-white/5"
-                  : "text-[var(--text-dim)] hover:text-[var(--text-secondary)]"
+                  ? "text-white font-semibold"
+                  : "text-white/35 hover:text-white/60 font-medium"
                 }
               `}
             >
-              <Icon className="w-4 h-4 transition-colors" style={isActive ? { color: tier.color } : undefined} />
+              <Icon className="w-4 h-4 transition-colors" style={isActive ? { color: tier.color } : { opacity: 0.4 }} />
               {tab.label}
               {tab.id === "diagnostics" && diagnosticCount > 0 && (
                 <span className="ml-1.5 text-[11px] mono px-1.5 py-0.5 rounded-full bg-[var(--red)]/20 text-[var(--red)]">
