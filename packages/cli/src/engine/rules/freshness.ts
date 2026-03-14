@@ -49,7 +49,9 @@ export const freshnessRules: Rule[] = [
     check(files) {
       const diagnostics: Diagnostic[] = [];
       const targetFiles = files.filter(
-        (f) => /\.(md)$/i.test(f.name) && !f.name.startsWith("memory/")
+        (f) => /\.(md)$/i.test(f.name)
+          && !f.name.startsWith("memory/")
+          && f.name !== "MEMORY.md"
       );
 
       for (const file of targetFiles) {
