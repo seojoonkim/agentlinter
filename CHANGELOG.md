@@ -2,6 +2,57 @@
 
 ---
 
+## [2.3.0] - 2026-03-22 🎨
+
+*Freshness, false-positive hardening, and a fully redesigned report page.*
+
+### Added
+- **Freshness Linter** (NEW rule file `rules/freshness.ts`, 151 LOC) — file-path and command-coverage checks
+  - `freshness/stale-file-reference` — flags markdown references to files that no longer exist on disk
+  - `freshness/command-coverage` — detects commands documented in agent files that are no longer present in referenced scripts/packages
+- **New Category: Freshness** — added to scorer with weight + `CATEGORY_META` entry (fixes v2.3.0 early boot `TypeError: a.weight is undefined`)
+- **`completeness/session-learning-hooks`** (Opus review rule) — checks that agent files define self-improvement mechanisms (lessons capture, retro, heartbeat hooks)
+- **Korean Workspace Fairness** — skills budget separated from main-file budget so Korean-heavy configs aren't unfairly penalised by token estimation
+- **`skillSafety` bonus** — bonus weighting for agents that correctly gate external actions with explicit skill definitions
+
+### Changed
+- **Report Page Redesign** (Opus plan, tab-based architecture) — split monolithic 1,321-line `ReportClient.tsx` into modular components:
+  - `TabBar` (sticky: Overview / Diagnostics / Categories / How It Works)
+  - `OverviewTab` — 128px score hero, 3-column quick stats, click-to-navigate category bars
+  - `DiagnosticsTab` — severity filter toggles, issue cards with educational context
+  - `CategoriesTab` — collapsible deep-dives with per-rule checklist
+  - `MethodologyTab` — grade scale, scoring formula, files scanned
+  - Extracted constants: `CATEGORY_META`, `RULE_EDUCATION`, `SCORING_METHODOLOGY`
+  - Extracted utils (`getTier`) and types (`ReportData`)
+- **Editorial Polish** — glow effects, gradients, micro-animations, upgraded CTA styling
+- **Gaussian bell-curve histogram** replacing linear bars on report page
+- **Exclusions** (Opus review, score impact 90→97):
+  - `consistency/referenced-files-exist` — excludes `MEMORY.md` (historical log, not config)
+  - `freshness/stale-file-reference` — excludes `MEMORY.md`
+  - `instructionCount` — excludes `MEMORY.md`, `HEARTBEAT.md`
+  - `tokenEfficiency` — excludes `MEMORY.md`, `HEARTBEAT.md`
+  - `tokenBudget` — excludes `HEARTBEAT.md`
+  - `compound/` directory — excluded from freshness checks (support docs, not runtime config)
+- **JSON diagnostics output** — clarity/consistency rule output normalized for cleaner machine consumption
+
+### Fixed
+- `3a7b471` — Freshness category missing from `CATEGORY_META` caused `TypeError: a.weight` on report page render
+- `2b5fb1f` — Tab contrast, version badge, "passed rules -31" counter bug
+- `703da26` — Tab background opacity (no bleed through), histogram shape corrected to bell curve
+- `b445f12` — Version badge now visible on mobile (removed `hidden sm:inline`)
+- `ec94642` — Tab indicator uses per-tab `border-b` (removes sliding-offset animation glitch)
+- `527e7c0` — False positives: bot token patterns, consistency score under-counting, freshness matching code blocks, acronym handling
+- `abb5a38` — Freshness false positives from `MEMORY.md` entries
+- `93f9e1e` — Clarity false positives for Korean workspace terms, escape-hatch phrases, acronyms
+- `e92de2e` — `compound/` freshness exclusion + clarity review refinements
+
+### Internal
+- New component directory: `src/app/r/[id]/components/` (8 files, ~1,000 LOC)
+- New constants directory: `src/app/r/[id]/constants/` (3 files)
+- Dual engine path maintained: `packages/cli/src/engine/` + `src/engine/` kept in sync
+
+---
+
 ## [2.2.0] - 2026-03-09
 
 ### Added
