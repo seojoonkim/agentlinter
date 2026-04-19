@@ -22,6 +22,10 @@ npm-debug.log*
 # vercel
 .vercel
 
+# sensitive
+.env.local.real
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
