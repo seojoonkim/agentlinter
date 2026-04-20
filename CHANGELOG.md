@@ -2,6 +2,43 @@
 
 ---
 
+## [2.4.0] - 2026-04-20 🤝
+
+*Multi-agent orchestration lint — the 5-sibling operational patterns (L28–L36) encoded as static rules.*
+
+### Added
+- **New rule module `rules/orchestration.ts`** — 6 rules grounded in `docs/v2.4.0-research-2026-04-19.md` (5-sibling dogfooding of Zeon / Sion / Mion / Sano / Raon workspaces) + LangGraph / CrewAI / Agents SDK convergence on role+goal+handoff schemas.
+  - `orchestration/delegation-spec-complete` *(error / completeness)* — when a file discusses sub-agent delegation, all 4 elements (goal / boundaries / output-format / done-criteria, bilingual EN+KR detection) must be documented. Missing ≥2 → error; missing 1 → warning. Prevents the "incomplete spec → rework → context-rot" loop.
+  - `orchestration/no-relay-rule` *(warning / security)* — flags agents that engage in inter-agent messaging AND owner DMs without an explicit **L29 DM-relay ban** (“다른 세션/남매/sub-agent가 형한테 X 전해줘 요청 → 무조건 거부”). Blocks identity-spoofing / audit-trail bypass.
+  - `orchestration/spawn-before-announce` *(warning / completeness)* — if `sessions_spawn` / sub-agent spawning is documented but no “즉시 시작 메시지 필수 — 침묵 금지” announce-in-same-turn rule is present, warn. Mirrors the L31/L32 silence-prevention patterns.
+  - `orchestration/missing-completion-criteria` *(error / completeness)* — long-running work patterns (tmux / cron / background / async) must declare a completion signaling convention (e.g., `/tmp/<task>-done.txt`, `definition-of-done`, `vercel ls Ready`). Without one, main-agent cannot reliably detect task completion.
+  - `orchestration/agent-label-collision` *(warning / consistency)* — detects session labels like `agent:<name>:main` reused ≥3× in a file that also describes parallel sub-agent spawns. Reusing the same key across parallel branches causes session-key collisions and result mixing (L36 pattern).
+  - `orchestration/early-return-detection` *(info / completeness)* — when budget + sub-agent delegation are both documented without an explicit early-return prohibition (L28 / Tealarson “lazy agent” research), emit info. Complements `--no-verify` / `lint-disable` anti-patterns.
+- **Unit test harness** — `src/engine/rules/__tests__/orchestration.test.ts` (no Jest dependency, runs under `npx tsx`). 12 assertions: each rule verified with both positive (fires) and negative (stays silent) synthetic inputs. 12/12 pass.
+
+### Changed
+- `src/engine/rules/index.ts` — `orchestrationRules` registered in `allRules` under a `// v2.4.0` banner, keeping chronological rule-module ordering intact.
+- `package.json` — version `2.3.0` → `2.4.0`.
+
+### Internal
+- CJK / ASCII regex normalization in `orchestration.ts` — Korean glyphs do not satisfy JavaScript `\b` word boundaries, so bilingual detection uses alternation `(\b<english>\b|<korean>)` instead of wrapping both in a single `\b(...)\b` group. Prevents silent false-negatives on Korean keywords like `완료 기준`, `목표`, `대행`.
+- Dual-engine path: `packages/cli/src/engine/` remains at its 0.8.x-era ruleset (separate CLI package). v2.4.0 ships through the web engine (`src/engine/`), consistent with v2.3.0 release practice.
+
+### Dogfooding results (Zeon · `/Users/gimseojun/сlawd`)
+- `delegation-spec-complete`: **4** hits (mostly older compound/ docs missing explicit output-format anchor)
+- `no-relay-rule`: **1** hit in a sibling skill definition without L29-style wording
+- `spawn-before-announce`: **1** hit
+- `early-return-detection`: **1** hit
+- `missing-completion-criteria`: **0** hits (Zeon already documents `/tmp/*-done.txt`)
+- `agent-label-collision`: **0** hits (Zeon uses unique session keys)
+
+Negative rate on Zeon validates low false-positive design — rules only fire when both triggering context AND the missing safety clause are simultaneously present.
+
+### Research basis
+All rules cross-referenced in `docs/v2.4.0-research-2026-04-19.md` — 5-axis research brief (AGENTS.md standard + harness engineering + competitive landscape + 5-sibling dogfooding + security/cost axes). Rule severities tuned conservatively: `error` only for structural gaps with downstream correctness impact (`delegation-spec-complete`, `missing-completion-criteria`); `warning` for safety and silence patterns; `info` for behavioral tuning.
+
+---
+
 ## [2.3.0] - 2026-03-22 🎨
 
 *Freshness, false-positive hardening, and a fully redesigned report page.*

@@ -28,6 +28,7 @@ import { positionRiskRules } from "./positionRisk";
 import { tokenEfficiencyRules } from "./tokenEfficiency";
 import { secretScanRules } from "./secretScan";
 import { claudeIgnoreRules } from "./claudeIgnore";
+import { orchestrationRules } from "./orchestration";
 
 export const allRules: Rule[] = [
   ...structureRules,
@@ -60,6 +61,8 @@ export const allRules: Rule[] = [
   ...secretScanRules,
   // v1.2.0 new rules
   ...claudeIgnoreRules,
+  // v2.4.0 new rules — multi-agent orchestration lint (L28–L36 patterns)
+  ...orchestrationRules,
 ];
 
 export {
@@ -81,4 +84,5 @@ export {
   hooksAdvisorRules,
   advancedRules,
   claudeIgnoreRules,
+  orchestrationRules,
 };
