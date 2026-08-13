@@ -1,0 +1,6 @@
+name: security
+version: "0.1.0"
+description: "Add security guidance to tool results."
+author: "AgentLinter"
+hooks:
+  - transform_tool_result

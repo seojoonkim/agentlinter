@@ -25,14 +25,24 @@ const AGENT_FILES = [
   "clawdbot.json",
   "openclaw.json",
   "moltbot.json",
+  "config.yaml",
 ];
 
 const AGENT_DIRS = [".claude", "claude", ".cursor", ".windsurf", ".github"];
+const HERMES_DIRS = ["plugins", "profiles"];
+
+function isHermesMarker(fileName: string): boolean {
+  return fileName === "config.yaml" ||
+    fileName === ".hermes/config.yaml" ||
+    /^\.hermes\/profiles\/[^/]+\/config\.yaml$/.test(fileName) ||
+    /^profiles\/[^/]+\/config\.yaml$/.test(fileName) ||
+    /(^|\/)plugins\/.*\/plugin\.ya?ml$/.test(fileName);
+}
 
 /**
  * Detect lint context based on files present
  */
-function detectContext(fileNames: string[]): LintContext {
+export function detectContext(fileNames: string[]): LintContext {
   // CLAUDE.md → claude-code context
   if (fileNames.includes("CLAUDE.md")) {
     return "claude-code";
@@ -48,7 +58,13 @@ function detectContext(fileNames: string[]): LintContext {
     return "copilot";
   }
 
-  // AGENTS.md or runtime config → agent-runtime context
+  // Hermes and OpenClaw both use AGENTS.md, so require a Hermes-specific
+  // marker before assigning the dedicated Hermes runtime context.
+  if (fileNames.some(isHermesMarker)) {
+    return "hermes-runtime";
+  }
+
+  // AGENTS.md or OpenClaw runtime config → OpenClaw context
   if (fileNames.includes("AGENTS.md") ||
       fileNames.includes("openclaw.json") ||
       fileNames.includes("clawdbot.json") ||
@@ -74,6 +90,10 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
       fileNames.push(fileName);
     }
   }
+
+  // Nested profile/plugin paths are Hermes-specific markers and must be
+  // collected before context detection.
+  collectHermesMarkers(workspacePath, fileNames);
 
   // Detect context based on collected files
   const context = detectContext(fileNames);
@@ -106,6 +126,15 @@ export function scanWorkspace(workspacePath: string): FileInfo[] {
           }
         }
       }
+    }
+  }
+
+  // Hermes profile and plugin YAML belongs in FileInfo as text. Existing
+  // rules are text-oriented, so introducing a YAML parser would add no value.
+  for (const dir of HERMES_DIRS) {
+    const dirPath = path.join(workspacePath, dir);
+    if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
+      scanHermesDir(dirPath, files, dir, context, 0, 4);
     }
   }
 
@@ -195,6 +224,52 @@ function scanDirRecursive(
     }
   } catch {
     // Permission denied or other error — skip
+  }
+}
+
+function collectHermesMarkers(workspacePath: string, fileNames: string[]) {
+  for (const dir of HERMES_DIRS) {
+    const dirPath = path.join(workspacePath, dir);
+    collectHermesPaths(dirPath, dir, fileNames, 0, 4);
+  }
+}
+
+function collectHermesPaths(dir: string, prefix: string, fileNames: string[], depth: number, maxDepth: number) {
+  if (depth > maxDepth || !fs.existsSync(dir)) return;
+  try {
+    for (const entry of fs.readdirSync(dir)) {
+      const fullPath = path.join(dir, entry);
+      const relativeName = `${prefix}/${entry}`;
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        collectHermesPaths(fullPath, relativeName, fileNames, depth + 1, maxDepth);
+      } else if (entry === "config.yaml" || /^plugin\.ya?ml$/.test(entry)) {
+        fileNames.push(relativeName);
+      }
+    }
+  } catch {
+    // Optional unreadable runtime directories do not abort the scan.
+  }
+}
+
+function scanHermesDir(dir: string, files: FileInfo[], prefix: string, context: LintContext, depth: number, maxDepth: number) {
+  if (depth > maxDepth) return;
+  try {
+    for (const entry of fs.readdirSync(dir)) {
+      if (entry === "node_modules") continue;
+      const fullPath = path.join(dir, entry);
+      const relativeName = `${prefix}/${entry}`;
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        scanHermesDir(fullPath, files, relativeName, context, depth + 1, maxDepth);
+      } else if ([".md", ".json", ".yaml", ".yml"].some((extension) => entry.endsWith(extension))) {
+        if (!files.some((file) => file.path === fullPath)) {
+          files.push(parseFile(fullPath, relativeName, context));
+        }
+      }
+    }
+  } catch {
+    // Optional unreadable runtime directories do not abort the scan.
   }
 }
 

@@ -15,7 +15,12 @@ import { allRules } from "./rules";
  */
 export function lint(workspacePath: string, files: FileInfo[]): LintResult {
   // Separate core agent files from skill files
-  const coreFiles = files.filter((f) => !f.name.startsWith("skills/") && !f.name.includes("/skills/"));
+  const coreFiles = files.filter((f) =>
+    !f.name.startsWith("skills/") &&
+    !f.name.includes("/skills/") &&
+    !f.name.startsWith("plugins/") &&
+    !f.name.includes("/plugins/")
+  );
   const skillFiles = files.filter((f) => f.name.startsWith("skills/"));
 
   // Detect workspace context
