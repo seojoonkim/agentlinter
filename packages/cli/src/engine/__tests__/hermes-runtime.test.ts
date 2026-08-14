@@ -59,6 +59,19 @@ describe("Hermes Agent v0.20.0 stable workspace compatibility", () => {
     assert.deepEqual(scanWorkspace(workspace), []);
   });
 
+  it("does not treat combinations of generic application keys as Hermes structure", () => {
+    for (const content of [
+      "model: generic-model\nsecurity:\n  enabled: true\n",
+      "providers:\n  database: postgres\ndisplay:\n  theme: dark\n",
+      "agent:\n  retries: 3\ncontext:\n  environment: production\n",
+      "terminal:\n  shell: bash\ncompression:\n  enabled: true\n",
+    ]) {
+      const workspace = temporaryWorkspace();
+      write(workspace, "config.yaml", content);
+      assert.deepEqual(scanWorkspace(workspace), []);
+    }
+  });
+
   it("collects a root config only with Hermes-specific structure", () => {
     const workspace = temporaryWorkspace();
     write(workspace, "config.yaml", "mcp_servers:\n  filesystem:\n    command: npx\n");

@@ -27,7 +27,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "tsx --test src/**/*.test.ts",
+    "test": "tsx --test src/engine/__tests__/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

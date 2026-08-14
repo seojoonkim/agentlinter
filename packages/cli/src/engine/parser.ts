@@ -24,13 +24,9 @@ function isHermesRootConfig(content: string): boolean {
   const topLevelKeys = new Set(
     Array.from(content.matchAll(/^([A-Za-z_][\w-]*)\s*:/gm), (match) => match[1])
   );
-  const distinctiveKeys = ["mcp_servers", "toolsets", "terminal", "compression"];
-  if (distinctiveKeys.some((key) => topLevelKeys.has(key))) return true;
-
-  // Less distinctive keys only identify Hermes in combination, avoiding false
-  // positives for commonplace configs containing only `model` or `security`.
-  const supportingKeys = ["model", "models", "providers", "security", "agent", "display", "context"];
-  return supportingKeys.filter((key) => topLevelKeys.has(key)).length >= 2;
+  // Root config collection is an upload boundary, so fail closed. Generic
+  // application keys, even in combination, are not sufficient evidence.
+  return topLevelKeys.has("mcp_servers");
 }
 
 /** Detect lint context based on already validated file names. */
