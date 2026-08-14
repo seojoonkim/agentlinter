@@ -15,8 +15,16 @@ import { allRules } from "./rules";
  */
 export function lint(workspacePath: string, files: FileInfo[]): LintResult {
   // Separate core agent files from skill files
-  const coreFiles = files.filter((f) => !f.name.startsWith("skills/") && !f.name.includes("/skills/"));
+  const coreFiles = files.filter((f) =>
+    !f.name.startsWith("skills/") &&
+    !f.name.includes("/skills/") &&
+    !f.name.startsWith("plugins/") &&
+    !f.name.includes("/plugins/")
+  );
   const skillFiles = files.filter((f) => f.name.startsWith("skills/"));
+  const pluginFiles = files.filter((f) =>
+    f.name.startsWith("plugins/") && f.name.endsWith("/plugin.yaml")
+  );
 
   // Detect workspace context
   const context = files[0]?.context || "universal";
@@ -30,8 +38,9 @@ export function lint(workspacePath: string, files: FileInfo[]): LintResult {
         continue;
       }
 
-      const targetFiles =
-        rule.category === "skillSafety" || rule.category === "runtime" || rule.category === "remoteReady"
+      const targetFiles = rule.category === "security"
+        ? [...coreFiles, ...pluginFiles] // manifests need secret and other security checks
+        : rule.category === "skillSafety" || rule.category === "runtime" || rule.category === "remoteReady"
           ? files       // these categories check everything
           : coreFiles;  // other categories only check core agent files
       const diagnostics = rule.check(targetFiles);

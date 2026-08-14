@@ -19,9 +19,10 @@ export type Category =
  * Lint context — determines which rules apply
  * - claude-code: Project-scoped (CLAUDE.md, .claude/)
  * - openclaw-runtime: Workspace-scoped (AGENTS.md, USER.md, ~/.openclaw/)
+ * - hermes-runtime: Hermes Agent home/profile (config.yaml, skills, plugins)
  * - universal: Applies to both contexts
  */
-export type LintContext = "claude-code" | "openclaw-runtime" | "universal" | "cursor" | "copilot";
+export type LintContext = "claude-code" | "openclaw-runtime" | "hermes-runtime" | "universal" | "cursor" | "copilot";
 
 export interface Diagnostic {
   severity: Severity;

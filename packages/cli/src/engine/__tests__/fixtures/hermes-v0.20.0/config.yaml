@@ -1,0 +1,6 @@
+mcp_servers:
+  filesystem:
+    command: "npx"
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
+    enabled: true
+    trust: untrusted

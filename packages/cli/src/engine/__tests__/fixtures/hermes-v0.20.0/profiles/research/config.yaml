@@ -1,0 +1,5 @@
+model:
+  provider: openrouter
+  default: nousresearch/hermes-4-405b
+security:
+  allow_lazy_installs: false
