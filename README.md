@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://agentlinter.com">Website</a> ·
   <a href="#quick-start">Quick Start</a> ·
-  <a href="#eight-scoring-dimensions">Scoring</a> ·
+  <a href="#ten-scoring-dimensions">Scoring</a> ·
   <a href="#vs-anthropics-official-tools">Comparison</a> ·
   <a href="#how-it-works">How it Works</a>
 </p>
